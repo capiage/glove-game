@@ -357,7 +357,7 @@
                 const now = Date.now();
                 for (const [id, data] of Object.entries(rooms)) {
                     if (!data.timestamp || now - data.timestamp > 1800000) {
-                        continue; // BUG FIX: Hide stale lobbies WITHOUT deleting them to prevent rogue clocks from wiping the DB
+                        continue; 
                     }
 
                     if (data.status === 'waiting') {
@@ -365,7 +365,6 @@
                         const btn = document.createElement('button');
                         const hostDisplayName = (data.hostName || "FIGHTER").substring(0, 12);
                         
-                        // Check Game Version Compatibility
                         if (data.version !== GAME_VERSION) {
                             btn.className = 'btn text-left py-3 px-4 flex justify-between items-center w-full rounded-xl border border-red-500/30 bg-red-900/20 opacity-50 cursor-not-allowed';
                             btn.innerHTML = `
@@ -453,8 +452,9 @@
     async function startHostWebRTC(roomRef, data) {
         window.peerConnection = new RTCPeerConnection(rtcConfig);
         
-        // BUG FIX: Removed { ordered: false } to enforce Reliable TCP WebRTC. Fixes dropped input packets permanently desyncing logic
-        window.dataChannel = window.peerConnection.createDataChannel('gameData'); 
+        // REVERT FIX: Brought back original UDP-style perfect WebRTC implementation {ordered: false, maxRetransmits: 0}. 
+        // This fully prevents the hanging "Establishing P2P Connection" phase and strict firewall blocking.
+        window.dataChannel = window.peerConnection.createDataChannel('gameData', { ordered: false, maxRetransmits: 0 }); 
         setupDataChannelEvents(window.dataChannel);
 
         window.peerConnection.onicecandidate = (e) => {
