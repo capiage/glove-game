@@ -357,8 +357,7 @@
                 const now = Date.now();
                 for (const [id, data] of Object.entries(rooms)) {
                     if (!data.timestamp || now - data.timestamp > 1800000) {
-                        set(ref(db, 'rooms/' + id), null).catch(e => {});
-                        continue;
+                        continue; // BUG FIX: Hide stale lobbies WITHOUT deleting them to prevent rogue clocks from wiping the DB
                     }
 
                     if (data.status === 'waiting') {
@@ -454,7 +453,8 @@
     async function startHostWebRTC(roomRef, data) {
         window.peerConnection = new RTCPeerConnection(rtcConfig);
         
-        window.dataChannel = window.peerConnection.createDataChannel('gameData', { ordered: false, maxRetransmits: 0 });
+        // BUG FIX: Removed { ordered: false } to enforce Reliable TCP WebRTC. Fixes dropped input packets permanently desyncing logic
+        window.dataChannel = window.peerConnection.createDataChannel('gameData'); 
         setupDataChannelEvents(window.dataChannel);
 
         window.peerConnection.onicecandidate = (e) => {
@@ -868,6 +868,7 @@
     let keysDown = {};
     let prevKeysDown = {};
     
+    // BUG FIX: Completely prevented stuck keys dropping inputs on chat open causing permanent desync
     window.addEventListener('keydown', e => { 
         if (document.activeElement && document.activeElement.id === 'chat-input') {
             if (e.key === 'Enter') window.sendChat();
@@ -875,6 +876,7 @@
         }
         if (e.key === 'Enter' && window.matchActive && window.isOnlineGame) {
             e.preventDefault();
+            keysDown = {}; // Fix for stuck keys breaking sync!
             window.showChatInput();
             return;
         }
@@ -882,7 +884,7 @@
     });
     
     window.addEventListener('keyup', e => { 
-        if (document.activeElement && document.activeElement.id === 'chat-input') return;
+        // Always clear keyup even if focused, prevents inputs hanging when typing
         keysDown[e.key.toLowerCase()] = false; 
     });
     
