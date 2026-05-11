@@ -280,30 +280,49 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getDatabase, ref, get, set, update, onValue, onDisconnect, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseConfig = {
+    // Strict Canvas environment Firebase config handling
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
         apiKey: "AIzaSyDUoYS6MwDIVe8coZOM9A0ZCYaZTeDSloo",
         authDomain: "babjeu-85d3e.firebaseapp.com",
-        databaseURL: "https://babjeu-85d3e-default-rtdb.firebaseio.com",
-        projectId: "babjeu-85d3e",
-        storageBucket: "babjeu-85d3e.firebasestorage.app",
-        messagingSenderId: "306959176803",
-        appId: "1:306959176803:web:2be00da38dbb37e777d456",
-        measurementId: "G-T38G7Y7MJ7"
+        projectId: "babjeu-85d3e"
     };
     
+    // Strict Path Rules Apply Here
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'pro-boxing';
     const GAME_VERSION = "1.2.0";
 
     let app, auth, db;
+    let user = null;
+    
     try {
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
-        db = getDatabase(app);
-    } catch(e) { console.log("Firebase init skipped due to missing config."); }
+        db = getFirestore(app);
 
-    let user = null;
+        // Required sequential Auth initialization
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) { console.error("Firebase Auth initialization failed:", e); }
+        };
+        initAuth();
+
+        onAuthStateChanged(auth, (u) => {
+            user = u;
+            // Catch up if the user tried to open the lobby immediately before auth resolved
+            if (user && document.getElementById('menu-lobby') && !document.getElementById('menu-lobby').classList.contains('hidden')) {
+                window.startLobbyListener();
+            }
+        });
+    } catch(e) { console.error("Firebase init skipped due to missing config."); }
+
     window.lobbyQueryUnsub = null;
     window.roomListenerUnsub = null;
     window.currentRoomId = null;
@@ -314,6 +333,7 @@
     window.localWantsRematch = false;
     window.remoteWantsRematch = false;
 
+    // Relayed TURN servers explicitly for bypassing restrictive firewalls
     const rtcConfig = {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
@@ -325,39 +345,29 @@
     
     const setLobbyStatus = (msg) => { document.getElementById('lobby-status').innerText = msg; };
 
-    window.initFirebaseOnline = async function() {
-        if(!auth) { setLobbyStatus("Network Error: Config missing"); return false; }
-        try {
+    // Use pure Firestore adhering to Strict Path Rule: `/artifacts/{appId}/public/data/rooms`
+    window.startLobbyListener = function() {
+        if (!user) {
             setLobbyStatus("Connecting to signaling server...");
-            if (typeof __initial_auth_token !== 'undefined') {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-            user = auth.currentUser;
-            setLobbyStatus("");
-            return true;
-        } catch(e) { 
-            console.error(e); 
-            setLobbyStatus("Network connect failed. " + e.message);
-            return false; 
+            return;
         }
-    };
+        setLobbyStatus("");
 
-    window.startLobbyListener = async function() {
-        if (!(await window.initFirebaseOnline())) return;
-        const roomsRef = ref(db, 'rooms');
-        window.lobbyQueryUnsub = onValue(roomsRef, (snap) => {
-            const rooms = snap.val();
+        const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
+        window.lobbyQueryUnsub = onSnapshot(roomsRef, (snap) => {
             const listEl = document.getElementById('lobby-list');
             listEl.innerHTML = '';
             let count = 0;
             
-            if (rooms) {
+            if (!snap.empty) {
                 const now = Date.now();
-                for (const [id, data] of Object.entries(rooms)) {
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    
                     if (!data.timestamp || now - data.timestamp > 1800000) {
-                        continue; 
+                        deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', id)).catch(e => {});
+                        return;
                     }
 
                     if (data.status === 'waiting') {
@@ -365,6 +375,7 @@
                         const btn = document.createElement('button');
                         const hostDisplayName = (data.hostName || "FIGHTER").substring(0, 12);
                         
+                        // Check Game Version Compatibility
                         if (data.version !== GAME_VERSION) {
                             btn.className = 'btn text-left py-3 px-4 flex justify-between items-center w-full rounded-xl border border-red-500/30 bg-red-900/20 opacity-50 cursor-not-allowed';
                             btn.innerHTML = `
@@ -388,12 +399,15 @@
                         }
                         listEl.appendChild(btn);
                     }
-                }
+                });
             }
             
             if (count === 0) {
                 listEl.innerHTML = '<div class="h-full flex items-center justify-center"><p class="text-gray-500 italic text-sm tracking-widest uppercase">No open lobbies found.</p></div>';
             }
+        }, (err) => {
+            console.error("Lobby query error:", err);
+            setLobbyStatus("Network Error. Retrying...");
         });
     };
 
@@ -409,18 +423,19 @@
         window.stopLobbyListener();
         
         const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-        const roomRef = ref(db, 'rooms/' + roomId);
+        const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
         
         try {
-            await set(roomRef, {
+            await setDoc(roomRef, {
                 host: user.uid,
                 hostName: window.playerProfile.name,
+                hostProfile: window.playerProfile, // Ensures flawless profile loading
                 status: 'waiting',
                 timestamp: Date.now(),
-                version: GAME_VERSION
+                version: GAME_VERSION,
+                hostCandidates: [],
+                guestCandidates: []
             });
-
-            onDisconnect(roomRef).remove();
 
             document.getElementById('lobby-options').classList.add('hidden');
             document.getElementById('lobby-options').classList.remove('flex');
@@ -430,17 +445,36 @@
             
             window.isHost = true;
             window.currentRoomId = roomId;
-
             let webrtcStarted = false;
 
-            window.roomListenerUnsub = onValue(roomRef, (snapshot) => {
-                const data = snapshot.val();
-                if(!data) return;
+            window.roomListenerUnsub = onSnapshot(roomRef, (snapshot) => {
+                if(!snapshot.exists()) return;
+                const data = snapshot.data();
 
                 if (data.status === 'connecting' && !webrtcStarted) {
                     webrtcStarted = true;
+                    // Host instantly caches the guest's profile from the document payload
+                    window.opponentProfile = data.guestProfile || window.opponentProfile;
                     document.getElementById('hosting-subtitle').innerText = "Establishing P2P Connection...";
                     startHostWebRTC(roomRef, data);
+                }
+                
+                // Process Answer & ICE
+                if (webrtcStarted && window.peerConnection) {
+                    if (data.answer && window.peerConnection.signalingState === 'have-local-offer') {
+                        window.peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                    }
+                    if (data.guestCandidates && data.guestCandidates.length > window.processedGuestCandidates) {
+                        const newCands = data.guestCandidates.slice(window.processedGuestCandidates);
+                        window.processedGuestCandidates = data.guestCandidates.length;
+                        newCands.forEach(c => {
+                            if (window.peerConnection.remoteDescription) {
+                                window.peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(e=>console.error(e));
+                            } else {
+                                window.pendingCandidates.push(new RTCIceCandidate(c));
+                            }
+                        });
+                    }
                 }
             });
         } catch (e) {
@@ -452,42 +486,24 @@
     async function startHostWebRTC(roomRef, data) {
         window.peerConnection = new RTCPeerConnection(rtcConfig);
         
-        // REVERT FIX: Brought back original UDP-style perfect WebRTC implementation {ordered: false, maxRetransmits: 0}. 
-        // This fully prevents the hanging "Establishing P2P Connection" phase and strict firewall blocking.
-        window.dataChannel = window.peerConnection.createDataChannel('gameData', { ordered: false, maxRetransmits: 0 }); 
+        window.processedGuestCandidates = 0;
+        window.pendingCandidates = [];
+
+        window.dataChannel = window.peerConnection.createDataChannel('gameData', { ordered: false, maxRetransmits: 0 });
         setupDataChannelEvents(window.dataChannel);
 
         window.peerConnection.onicecandidate = (e) => {
-            if (e.candidate) push(ref(db, `rooms/${window.currentRoomId}/hostCandidates`), e.candidate.toJSON());
+            if (e.candidate) updateDoc(roomRef, { hostCandidates: arrayUnion(e.candidate.toJSON()) });
         };
 
         const offer = await window.peerConnection.createOffer();
         await window.peerConnection.setLocalDescription(offer);
-        await update(roomRef, { offer: { type: offer.type, sdp: offer.sdp } });
+        await updateDoc(roomRef, { offer: { type: offer.type, sdp: offer.sdp } });
 
-        onValue(ref(db, `rooms/${window.currentRoomId}/answer`), (snap) => {
-            const answer = snap.val();
-            if (answer && window.peerConnection.signalingState === 'have-local-offer') {
-                window.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-            }
-        });
-
-        let pendingCandidates = [];
-        onChildAdded(ref(db, `rooms/${window.currentRoomId}/guestCandidates`), (snap) => {
-            const candidate = snap.val();
-            if (candidate) {
-                if (window.peerConnection.remoteDescription) {
-                    window.peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error(e));
-                } else {
-                    pendingCandidates.push(new RTCIceCandidate(candidate));
-                }
-            }
-        });
-        
         window.peerConnection.onsignalingstatechange = () => {
             if(window.peerConnection.remoteDescription) {
-                pendingCandidates.forEach(c => window.peerConnection.addIceCandidate(c).catch(e=>console.error(e)));
-                pendingCandidates = [];
+                window.pendingCandidates.forEach(c => window.peerConnection.addIceCandidate(c).catch(e=>console.error(e)));
+                window.pendingCandidates = [];
             }
         };
     }
@@ -495,31 +511,52 @@
     window.joinPublicRoom = async function(roomId) {
         if (!user) return;
         window.stopLobbyListener();
-        const roomRef = ref(db, 'rooms/' + roomId);
+        const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
         
         try {
             setLobbyStatus("Joining Lobby...");
-            const snapshot = await get(roomRef);
-            if (!snapshot.exists() || snapshot.val().status !== 'waiting') {
+            const snapshot = await getDoc(roomRef);
+            if (!snapshot.exists() || snapshot.data().status !== 'waiting') {
                 setLobbyStatus("Lobby no longer exists or is full.");
                 window.startLobbyListener();
                 return;
             }
             
-            await update(roomRef, {
+            // Guest instantly caches the host's profile from the document payload
+            window.opponentProfile = snapshot.data().hostProfile || window.opponentProfile;
+
+            await updateDoc(roomRef, {
                 guest: user.uid,
                 guestName: window.playerProfile.name,
+                guestProfile: window.playerProfile, // Ensures flawless profile loading
                 status: 'connecting'
             });
 
             window.isHost = false;
             window.currentRoomId = roomId;
             setLobbyStatus("Establishing P2P Connection...");
+            
+            window.processedHostCandidates = 0;
+            window.pendingCandidates = [];
 
-            onValue(ref(db, `rooms/${roomId}/offer`), async (snap) => {
-                const offer = snap.val();
-                if (offer && !window.peerConnection) {
-                    startGuestWebRTC(roomId, offer);
+            window.roomListenerUnsub = onSnapshot(roomRef, async (snap) => {
+                if(!snap.exists()) return;
+                const data = snap.data();
+
+                if (data.offer && !window.peerConnection) {
+                    startGuestWebRTC(roomRef, data.offer);
+                }
+
+                if (window.peerConnection && data.hostCandidates && data.hostCandidates.length > window.processedHostCandidates) {
+                    const newCands = data.hostCandidates.slice(window.processedHostCandidates);
+                    window.processedHostCandidates = data.hostCandidates.length;
+                    newCands.forEach(c => {
+                        if (window.peerConnection.remoteDescription) {
+                            window.peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(e=>console.error(e));
+                        } else {
+                            window.pendingCandidates.push(new RTCIceCandidate(c));
+                        }
+                    });
                 }
             });
 
@@ -529,7 +566,7 @@
         }
     };
 
-    async function startGuestWebRTC(roomId, offer) {
+    async function startGuestWebRTC(roomRef, offer) {
         window.peerConnection = new RTCPeerConnection(rtcConfig);
         
         window.peerConnection.ondatachannel = (e) => {
@@ -538,30 +575,18 @@
         };
 
         window.peerConnection.onicecandidate = (e) => {
-            if (e.candidate) push(ref(db, `rooms/${roomId}/guestCandidates`), e.candidate.toJSON());
+            if (e.candidate) updateDoc(roomRef, { guestCandidates: arrayUnion(e.candidate.toJSON()) });
         };
 
         await window.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await window.peerConnection.createAnswer();
         await window.peerConnection.setLocalDescription(answer);
-        await update(ref(db, `rooms/${roomId}`), { answer: { type: answer.type, sdp: answer.sdp } });
-
-        let pendingCandidates = [];
-        onChildAdded(ref(db, `rooms/${roomId}/hostCandidates`), (snap) => {
-            const candidate = snap.val();
-            if (candidate) {
-                if (window.peerConnection.remoteDescription) {
-                    window.peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error(e));
-                } else {
-                    pendingCandidates.push(new RTCIceCandidate(candidate));
-                }
-            }
-        });
+        await updateDoc(roomRef, { answer: { type: answer.type, sdp: answer.sdp } });
 
         window.peerConnection.onsignalingstatechange = () => {
             if(window.peerConnection.remoteDescription) {
-                pendingCandidates.forEach(c => window.peerConnection.addIceCandidate(c).catch(e=>console.error(e)));
-                pendingCandidates = [];
+                window.pendingCandidates.forEach(c => window.peerConnection.addIceCandidate(c).catch(e=>console.error(e)));
+                window.pendingCandidates = [];
             }
         };
     }
@@ -569,10 +594,7 @@
     function setupDataChannelEvents(dc) {
         dc.onopen = () => {
             console.log("WebRTC Data Channel OPEN");
-            
-            // Sync profiles over Data Channel!
-            dc.send(JSON.stringify({ type: 'profile', profile: window.playerProfile }));
-            
+            // NOTE: Profiles are already completely loaded via Firestore now, completely fixing the sync race condition
             document.getElementById('menu-lobby').classList.add('hidden');
             document.getElementById('lobby-waiting').classList.add('hidden');
             window.initGame(false, 0, true);
@@ -602,9 +624,6 @@
                         window.checkGameOver();
                     }
                 }
-            } else if (msg.type === 'profile') {
-                window.opponentProfile = msg.profile;
-                window.applyOpponentProfile();
             } else if (msg.type === 'chat') {
                 window.addChatMessage(window.opponentProfile.name, msg.text, window.opponentProfile.color);
             }
@@ -613,10 +632,16 @@
         dc.onclose = () => {
             console.log("WebRTC Data Channel CLOSED");
             if (window.matchActive || !document.getElementById('game-ui').classList.contains('hidden')) {
+                window.matchActive = false;
+                
+                document.getElementById('ui-container').classList.remove('hidden');
+                document.getElementById('main-menu').classList.add('hidden');
+                document.getElementById('menu-primary').classList.add('hidden');
+                
+                document.getElementById('game-over-ui').classList.remove('hidden');
                 document.getElementById('winner-text').innerText = "DISCONNECTED";
                 document.getElementById('winner-sub').innerText = "CONNECTION TO PEER LOST.";
                 document.getElementById('rematch-btn').classList.add('hidden');
-                if(window.checkGameOverNetworkEvent) window.checkGameOverNetworkEvent();
             }
         };
     }
@@ -655,7 +680,9 @@
         if(window.dataChannel) { window.dataChannel.close(); window.dataChannel = null; }
         if(window.peerConnection) { window.peerConnection.close(); window.peerConnection = null; }
         if(window.roomListenerUnsub) { window.roomListenerUnsub(); window.roomListenerUnsub = null; }
-        if(window.currentRoomId && window.isHost) { set(ref(db, 'rooms/' + window.currentRoomId), null).catch(e=>{}); }
+        if(window.currentRoomId && window.isHost) { 
+            deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', window.currentRoomId)).catch(e=>{}); 
+        }
         window.currentRoomId = null;
         window.isHost = false;
     };
@@ -738,19 +765,9 @@
     };
 
     window.applyOpponentProfile = function() {
-        // Safe updates after profile info arrives
         if (window.isOnlineGame) {
             document.getElementById('hud-p1-name').innerText = window.isHost ? window.playerProfile.name : window.opponentProfile.name;
             document.getElementById('hud-p2-name').innerText = window.isHost ? window.opponentProfile.name : window.playerProfile.name;
-            
-            // Apply profile properties directly to initialized fighters
-            if (typeof window.p1 !== 'undefined' && window.p1 && typeof window.p2 !== 'undefined' && window.p2) {
-                window.p1.profile = window.isHost ? window.playerProfile : window.opponentProfile;
-                window.p1.color = window.p1.profile.color;
-                
-                window.p2.profile = window.isHost ? window.opponentProfile : window.playerProfile;
-                window.p2.color = window.p2.profile.color;
-            }
         }
     };
 
@@ -803,7 +820,10 @@
         document.getElementById('lobby-options').classList.remove('hidden');
         document.getElementById('lobby-options').classList.add('flex');
         
-        window.startLobbyListener(); 
+        // Let the state listener seamlessly activate the queries if logged in
+        if(typeof window.startLobbyListener === 'function') {
+            window.startLobbyListener(); 
+        }
     };
 
     window.hideLobbyMenu = function() {
@@ -868,7 +888,6 @@
     let keysDown = {};
     let prevKeysDown = {};
     
-    // BUG FIX: Completely prevented stuck keys dropping inputs on chat open causing permanent desync
     window.addEventListener('keydown', e => { 
         if (document.activeElement && document.activeElement.id === 'chat-input') {
             if (e.key === 'Enter') window.sendChat();
@@ -876,7 +895,6 @@
         }
         if (e.key === 'Enter' && window.matchActive && window.isOnlineGame) {
             e.preventDefault();
-            keysDown = {}; // Fix for stuck keys breaking sync!
             window.showChatInput();
             return;
         }
@@ -884,7 +902,7 @@
     });
     
     window.addEventListener('keyup', e => { 
-        // Always clear keyup even if focused, prevents inputs hanging when typing
+        if (document.activeElement && document.activeElement.id === 'chat-input') return;
         keysDown[e.key.toLowerCase()] = false; 
     });
     
@@ -1118,7 +1136,7 @@
                     
                     if (isGrounded && checkKey(keyMap.taunt, activeKeysDown) && !checkKey(keyMap.taunt, activePrevKeysDown) && this.state !== ST_TAUNT) {
                         this.changeState(ST_TAUNT, 60);
-                        spawnText(this.x, this.y - 180, this.profile.taunt, this.color, true);
+                        this.spawnText(this.x, this.y - 180, this.profile.taunt, this.color, true);
                         this.stamina = Math.min(this.maxStamina, this.stamina + 30);
                     }
 
@@ -1234,6 +1252,10 @@
             }
 
             this.applyPhysics();
+        }
+
+        spawnText(x, y, txt, color, isBig=false) {
+             texts.push({ x, y, text: txt, color, life: 1.0, big: isBig, vy: -2 });
         }
         
         applyPhysics() {
@@ -1480,7 +1502,6 @@
     }
 
     let gameTimer = 99;
-    let matchActive = false; 
     let gameStarted = false;
     let vsCPU = false;
     let cpuDifficulty = 0;
@@ -1544,7 +1565,7 @@
         
         if (window.isOnlineGame) {
             document.getElementById('network-ping').classList.remove('hidden');
-            window.applyOpponentProfile(); // Sync UI names
+            window.applyOpponentProfile(); // Sync UI names natively
         } else {
             const cpuNames = ["ROOKIE CPU", "PRO CPU", "CHAMPION CPU"];
             if (vsCPU) {
@@ -1801,7 +1822,7 @@
 
         if (cinematicMode) {
             cinematicTimer++;
-            // Don't read user input during cutscene, but continue to update animations so they fall dynamically
+            // Don't read user input during cutscene, but continue to update animations
             window.p1.updateLocal(window.p2, false, KEYS_P1, {}, {});
             window.p2.updateLocal(window.p1, false, KEYS_P2, {}, {});
             
