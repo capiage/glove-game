@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glove Game: Ultimate Edition</title>
+    <title>Pro Boxing: Ultimate Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Inter:wght@400;700;900&display=swap');
@@ -21,46 +21,49 @@
         
         .hidden { display: none !important; }
         
+        /* Raw / Minimal Glassmorphism Aesthetic */
         .glass-panel { 
-            background: linear-gradient(145deg, rgba(20, 20, 25, 0.95), rgba(10, 10, 15, 0.95)); 
-            border: 1px solid rgba(255,255,255,0.08); 
-            backdrop-filter: blur(20px); 
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,0.1); 
+            background: rgba(10, 10, 12, 0.4); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255,255,255,0.02); 
         }
         
         h1, h2, .boxing-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
         
-        .btn { 
-            position: relative; overflow: hidden; padding: 16px 32px; font-weight: 900; 
-            border-radius: 12px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            border: none; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; 
-            font-family: 'Oswald', sans-serif;
+        .glitch-text {
+            color: #ffffff;
+            text-shadow: 3px 0px 0px rgba(239, 68, 68, 0.8), -3px 0px 0px rgba(59, 130, 246, 0.8);
+            letter-spacing: 0.05em;
+        }
+
+        /* Minimalist Raw Buttons */
+        .btn-raw {
+            position: relative; overflow: hidden; padding: 16px 24px; font-weight: 700; 
+            cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white; font-size: 16px; letter-spacing: 0.2em; text-transform: uppercase; 
+            font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center;
         }
         
-        .btn::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
-            transform: rotate(45deg) translateY(-100%); transition: all 0.5s ease;
+        .btn-raw:hover { 
+            background: rgba(255, 255, 255, 0.95); color: black; 
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
-        .btn:hover::after { transform: rotate(45deg) translateY(100%); }
+        .btn-raw:active { transform: translateY(1px); }
 
-        .btn-blue { background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%); color: white; box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5), inset 0 2px 0 rgba(255,255,255,0.2); }
-        .btn-blue:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 30px rgba(37, 99, 235, 0.7), inset 0 2px 0 rgba(255,255,255,0.2); }
-        .btn-blue:active { transform: translateY(1px) scale(0.98); }
+        .btn-raw-accent {
+            border-color: rgba(59, 130, 246, 0.4);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        .btn-raw-accent:hover {
+            background: #3b82f6; color: white;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
         
-        .btn-red { background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); color: white; box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5), inset 0 2px 0 rgba(255,255,255,0.2); }
-        .btn-red:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 30px rgba(220, 38, 38, 0.7), inset 0 2px 0 rgba(255,255,255,0.2); }
-        
-        .btn-gray { background: linear-gradient(180deg, #4b5563 0%, #1f2937 100%); color: white; box-shadow: inset 0 2px 0 rgba(255,255,255,0.1); }
-        .btn-gray:hover { transform: translateY(-2px); background: #374151; }
-
-        .btn-green { background: linear-gradient(180deg, #10b981 0%, #047857 100%); color: white; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5), inset 0 2px 0 rgba(255,255,255,0.2); }
-        .btn-green:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.7), inset 0 2px 0 rgba(255,255,255,0.2); }
-        
-        .btn-purple { background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%); color: white; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5), inset 0 2px 0 rgba(255,255,255,0.2); }
-        .btn-purple:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.7), inset 0 2px 0 rgba(255,255,255,0.2); }
-        
-        #ui-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10; background: radial-gradient(circle at center, rgba(15,15,25,0.9) 0%, rgba(0,0,0,0.98) 100%); }
+        #ui-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10; background: radial-gradient(circle at center, rgba(15,15,20,0.8) 0%, rgba(0,0,0,0.98) 100%); }
         #game-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
 
         .health-bar-container { transform: skewX(-15deg); }
@@ -72,21 +75,22 @@
         }
         .timer-glow { animation: pulse-glow 2s infinite; }
         
+        /* Clean early-web style inputs */
         input[type="text"], select {
-            background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1);
+            background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2);
             color: white; font-family: 'Oswald', sans-serif;
             font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase;
+            transition: all 0.2s;
         }
-        input[type="text"]:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
-        
-        select option { background-color: #111827; color: white; }
+        input[type="text"]:focus, select:focus { outline: none; border-bottom-color: white; }
+        select option { background-color: #050508; color: white; }
 
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
 
-        .feint-cooldown { background: repeating-linear-gradient(45deg, #1f2937, #1f2937 10px, #374151 10px, #374151 20px); }
+        .feint-cooldown { background: repeating-linear-gradient(45deg, #111, #111 10px, #333 10px, #333 20px); }
         .chat-bubble { animation: floatUp 5s forwards; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; transform: translateY(-10px); } 100% { opacity: 0; transform: translateY(-15px); } }
     </style>
@@ -94,121 +98,127 @@
 <body>
 
     <div id="ui-container">
-        <div class="glass-panel p-8 md:p-12 rounded-[2rem] shadow-2xl max-w-3xl w-full text-center border-t-8 border-t-blue-500 border-b-8 border-b-red-500 relative overflow-hidden transition-all duration-300" id="main-menu">
-            <div class="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50 z-0 pointer-events-none"></div>
+        
+        <!-- TURN Status moved to absolute corner to prevent layout shifting -->
+        <div id="turn-status-container" class="absolute bottom-6 right-6 z-50 pointer-events-none">
+            <div id="turn-status" class="text-[10px] font-bold tracking-[0.2em] uppercase bg-black/60 px-4 py-2 border border-white/10 backdrop-blur shadow-lg text-gray-400"></div>
+        </div>
+
+        <div class="glass-panel p-10 md:p-14 max-w-2xl w-full text-center relative overflow-hidden transition-all duration-300" id="main-menu">
             
             <div class="relative z-10" id="menu-primary">
-                <h1 class="text-7xl font-black mb-1 text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-purple-400 to-red-500 tracking-tighter drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]">Glove Game</h1>
-                <p class="text-gray-400 mb-8 text-sm font-bold tracking-[0.3em] uppercase" id="version-text">ULTIMATE EDITION</p>
+                <h1 class="text-7xl md:text-8xl font-black mb-2 glitch-text tracking-tighter">PRO BOXING</h1>
+                <p class="text-gray-400 mb-10 text-xs font-bold tracking-[0.4em] uppercase border-b border-white/10 pb-4 w-max mx-auto">P2P Relay Edition</p>
                 
-                <div class="flex flex-col gap-4 max-w-md mx-auto">
-                    <button class="btn btn-purple text-xl py-5 flex items-center justify-center gap-3" onclick="showLobbyMenu()">
-                        <span class="text-2xl">🌐</span> ONLINE MULTIPLAYER
+                <div class="flex flex-col gap-3 max-w-sm mx-auto">
+                    <button class="btn-raw btn-raw-accent mb-2" onclick="showLobbyMenu()">
+                        [ ONLINE MULTIPLAYER ]
                     </button>
-                    <button class="btn btn-blue text-lg py-4 flex items-center justify-center gap-3" onclick="showDifficultyMenu()">
-                        <span class="text-xl">🥊</span> 1 PLAYER (VS CPU)
+                    <button class="btn-raw" onclick="showDifficultyMenu()">
+                        [ 1 PLAYER VS CPU ]
                     </button>
-                    <button class="btn btn-red text-lg py-4 flex items-center justify-center gap-3" onclick="initGame(false, 0, false)">
-                        <span class="text-xl">🤜🤛</span> 2 PLAYER (LOCAL)
+                    <button class="btn-raw" onclick="initGame(false, 0, false)">
+                        [ 2 PLAYER LOCAL ]
                     </button>
-                    <button class="btn btn-gray text-md py-3 mt-4 flex items-center justify-center gap-2" onclick="showProfileMenu()">
-                        <span>⚙️</span> EDIT PROFILE
+                    <button class="btn-raw text-sm py-3 mt-4 border-dashed" onclick="showProfileMenu()">
+                        EDIT PROFILE
                     </button>
                 </div>
             </div>
 
             <!-- Profile Menu Overhauled -->
             <div class="relative z-10 hidden w-full" id="menu-profile">
-                <h2 class="text-4xl font-black mb-6 text-blue-400 tracking-tighter drop-shadow-[0_0_15px_rgba(96,165,250,0.4)]">FIGHTER PROFILE</h2>
+                <h2 class="text-4xl font-black mb-8 text-white tracking-widest uppercase">PROFILE SETUP</h2>
                 
-                <div class="flex flex-col md:flex-row gap-6 w-full">
+                <div class="flex flex-col md:flex-row gap-8 w-full justify-center">
                     <!-- Left: Inputs -->
-                    <div class="bg-black/40 p-6 rounded-xl border border-white/10 flex-1 flex flex-col gap-4 text-left">
+                    <div class="flex-1 flex flex-col gap-6 text-left max-w-sm">
                         <div>
-                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">FIGHTER ALIAS</p>
-                            <input type="text" id="profile-name-input" maxlength="12" placeholder="ENTER NAME" class="w-full rounded-lg py-2 px-3 text-center">
+                            <p class="text-[10px] text-gray-500 font-bold mb-1 tracking-widest uppercase">FIGHTER ALIAS</p>
+                            <input type="text" id="profile-name-input" maxlength="12" placeholder="ENTER NAME" class="w-full py-2 text-center focus:bg-white/5">
                         </div>
                         <div>
-                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">FINISHER TEXT</p>
-                            <input type="text" id="profile-finisher-input" maxlength="40" placeholder="E.G. FATALITY OR KNOCKOUT" class="w-full rounded-lg py-2 px-3 text-center">
+                            <p class="text-[10px] text-gray-500 font-bold mb-1 tracking-widest uppercase">FINISHER TEXT</p>
+                            <input type="text" id="profile-finisher-input" maxlength="40" placeholder="E.G. FATALITY" class="w-full py-2 text-center focus:bg-white/5">
                         </div>
                         <div>
-                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">TAUNT TEXT (PRESS 'T')</p>
-                            <input type="text" id="profile-taunt-input" maxlength="20" placeholder="E.G. BRING IT!" class="w-full rounded-lg py-2 px-3 text-center">
+                            <p class="text-[10px] text-gray-500 font-bold mb-1 tracking-widest uppercase">TAUNT TEXT (PRESS 'T')</p>
+                            <input type="text" id="profile-taunt-input" maxlength="20" placeholder="E.G. BRING IT!" class="w-full py-2 text-center focus:bg-white/5">
                         </div>
                         <div>
-                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">HEADGEAR</p>
-                            <select id="profile-hat-input" class="w-full rounded-lg py-2 px-3 text-center cursor-pointer">
+                            <p class="text-[10px] text-gray-500 font-bold mb-1 tracking-widest uppercase">HEADGEAR</p>
+                            <select id="profile-hat-input" class="w-full py-2 text-center cursor-pointer">
                                 <option value="none">NONE</option>
                                 <option value="kippah">KIPPAH</option>
-                                <option value="widebrim">WIDE BRIM HAT</option>
+                                <option value="widebrim">WIDE BRIM</option>
                             </select>
                         </div>
-                        <div class="flex items-center justify-between bg-black/50 p-3 rounded-lg border border-white/5 mt-2">
-                            <span class="text-sm text-gray-300 font-bold tracking-widest uppercase">TRUNK & GLOVE COLOR</span>
-                            <input type="color" id="profile-color-input" class="w-12 h-12 rounded cursor-pointer bg-transparent border-0">
+                        <div class="flex items-center justify-between border-b border-white/20 pb-2 mt-2">
+                            <span class="text-[10px] text-gray-500 font-bold tracking-widest uppercase">GLOVE COLOR</span>
+                            <input type="color" id="profile-color-input" class="w-8 h-8 cursor-pointer bg-transparent border-0 p-0">
                         </div>
                     </div>
                     
                     <!-- Right: Character Preview -->
-                    <div class="bg-black/40 p-4 rounded-xl border border-white/10 w-full md:w-64 flex flex-col items-center justify-center relative shadow-inner">
-                        <p class="text-xs text-gray-400 font-bold tracking-widest uppercase absolute top-4 left-4">PREVIEW</p>
-                        <canvas id="previewCanvas" width="200" height="280" class="mt-6 border-b-4 border-white/5"></canvas>
+                    <div class="w-full md:w-48 flex flex-col items-center justify-center relative border border-white/10 bg-black/20 p-2">
+                        <p class="text-[10px] text-gray-500 font-bold tracking-widest uppercase absolute top-2 left-2">PREVIEW</p>
+                        <canvas id="previewCanvas" width="180" height="260" class="mt-4 opacity-90"></canvas>
                     </div>
                 </div>
                 
-                <div class="flex gap-4 mt-6">
-                    <button class="btn btn-gray text-md py-3 w-1/3" onclick="hideProfileMenu()">CANCEL</button>
-                    <button class="btn btn-green text-lg py-3 flex-1" onclick="saveProfile()">SAVE CHANGES</button>
+                <div class="flex gap-4 mt-10 max-w-sm mx-auto">
+                    <button class="btn-raw text-sm py-3 w-1/3" onclick="hideProfileMenu()">CANCEL</button>
+                    <button class="btn-raw btn-raw-accent py-3 flex-1" onclick="saveProfile()">SAVE</button>
                 </div>
             </div>
             
             <!-- Lobby Menu -->
             <div class="relative z-10 hidden flex-col h-full min-h-[400px]" id="menu-lobby">
-                <h2 class="text-4xl font-black mb-4 text-purple-400 tracking-tighter drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">PUBLIC LOBBIES</h2>
-                <div id="turn-status" class="text-xs font-bold tracking-widest uppercase mb-1"></div>
-                <div id="lobby-status" class="text-yellow-400 font-bold mb-2 h-6 uppercase tracking-wider text-sm"></div>
+                <h2 class="text-4xl font-black mb-2 text-white tracking-widest uppercase">NETWORK LOBBIES</h2>
+                <div id="lobby-status" class="text-blue-400 font-bold mb-4 h-4 uppercase tracking-[0.2em] text-xs"></div>
                 
-                <div class="flex-col gap-4 flex-grow flex max-w-md mx-auto w-full" id="lobby-options">
-                    <button class="btn btn-purple text-lg py-4 shadow-[0_0_20px_rgba(168,85,247,0.4)]" onclick="window.hostGame()">+ HOST NEW ROOM</button>
+                <div class="flex-col gap-3 flex-grow flex max-w-sm mx-auto w-full" id="lobby-options">
+                    <button class="btn-raw btn-raw-accent py-4 mb-2" onclick="window.hostGame()">[ HOST NEW ROOM ]</button>
                     
-                    <div class="bg-black/40 p-3 rounded-xl border border-white/10 mt-2 flex-grow flex flex-col h-60">
-                        <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase text-left border-b border-white/10 pb-2">Available Matches</p>
-                        <div id="lobby-list" class="flex flex-col gap-2 overflow-y-auto pr-2 flex-grow">
-                            <p class="text-gray-500 italic py-4 text-sm">Searching for rooms...</p>
+                    <div class="bg-black/20 p-4 border border-white/10 flex-grow flex flex-col h-64">
+                        <p class="text-[10px] text-gray-500 font-bold mb-3 tracking-[0.2em] uppercase text-left border-b border-white/10 pb-2">Available Nodes</p>
+                        <div id="lobby-list" class="flex flex-col gap-2 overflow-y-auto pr-1 flex-grow">
+                            <p class="text-gray-600 text-xs tracking-widest py-4">SCANNING...</p>
                         </div>
                     </div>
-                    <button class="btn btn-gray text-lg py-3 mt-2" onclick="hideLobbyMenu()">BACK TO MENU</button>
+                    <button class="btn-raw text-sm py-3 mt-2 border-dashed" onclick="hideLobbyMenu()">RETURN</button>
                 </div>
                 
-                <div id="lobby-waiting" class="hidden flex-col gap-4 items-center justify-center flex-grow h-full py-6">
-                    <div class="w-24 h-24 rounded-full border-4 border-t-purple-500 border-r-transparent border-b-purple-500 border-l-transparent animate-spin mb-4 shadow-[0_0_30px_rgba(168,85,247,0.3)]"></div>
-                    <h1 class="text-3xl font-black text-white tracking-widest drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">HOSTING ROOM</h1>
-                    <p class="text-purple-400 font-bold animate-pulse" id="hosting-subtitle">Waiting for a challenger to join...</p>
-                    <button class="btn btn-gray text-sm py-2 mt-6 px-8" onclick="cancelHosting()">CANCEL</button>
+                <div id="lobby-waiting" class="hidden flex-col gap-6 items-center justify-center flex-grow h-full py-8">
+                    <div class="w-16 h-16 border-2 border-t-white border-r-transparent border-b-white border-l-transparent animate-spin opacity-70"></div>
+                    <div>
+                        <h1 class="text-2xl font-black text-white tracking-[0.3em] uppercase">HOSTING</h1>
+                        <p class="text-gray-400 text-xs tracking-[0.2em] mt-2 animate-pulse" id="hosting-subtitle">Awaiting connection...</p>
+                    </div>
+                    <button class="btn-raw text-xs py-2 px-8 mt-4 border-dashed" onclick="cancelHosting()">ABORT</button>
                 </div>
             </div>
 
             <!-- Difficulty Menu -->
             <div class="relative z-10 hidden" id="menu-difficulty">
-                <h2 class="text-4xl font-black mb-6 text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">SELECT CPU DIFFICULTY</h2>
+                <h2 class="text-4xl font-black mb-10 text-white tracking-widest uppercase">SYSTEM DIFFICULTY</h2>
                 
-                <div class="flex flex-col gap-4 max-w-md mx-auto w-full">
-                    <button class="btn btn-green text-lg py-4" onclick="initGame(true, 0, false)">EASY - For Beginners</button>
-                    <button class="btn btn-blue text-lg py-4" onclick="initGame(true, 1, false)">MEDIUM - Balanced Bout</button>
-                    <button class="btn btn-red text-lg py-4" onclick="initGame(true, 2, false)">HARD - Professional</button>
-                    <button class="btn btn-gray text-lg py-3 mt-4" onclick="hideDifficultyMenu()">BACK</button>
+                <div class="flex flex-col gap-3 max-w-sm mx-auto w-full">
+                    <button class="btn-raw" onclick="initGame(true, 0, false)">[ EASY ]</button>
+                    <button class="btn-raw" onclick="initGame(true, 1, false)">[ MEDIUM ]</button>
+                    <button class="btn-raw font-black text-red-400 border-red-500/30 hover:bg-red-500 hover:text-white" onclick="initGame(true, 2, false)">[ HARD ]</button>
+                    <button class="btn-raw text-sm py-3 mt-6 border-dashed" onclick="hideDifficultyMenu()">RETURN</button>
                 </div>
             </div>
         </div>
 
         <!-- Game Over Screen -->
-        <div id="game-over-ui" class="hidden glass-panel p-12 rounded-[2rem] shadow-2xl text-center z-50 w-full max-w-lg border-y-8 border-yellow-500">
-            <h2 class="text-8xl font-black mb-2 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600 drop-shadow-[0_0_30px_rgba(234,179,8,0.5)]" id="winner-text">K.O.</h2>
-            <p class="text-gray-300 font-bold text-2xl mb-10 tracking-widest uppercase" id="winner-sub">The bout is over.</p>
-            <div class="flex flex-col gap-4">
-                <button class="btn btn-blue text-2xl px-12 py-5 w-full" id="rematch-btn" onclick="handleRematchClick()">REMATCH</button>
-                <button class="btn btn-gray text-lg py-4 w-full" onclick="location.reload()">MAIN MENU</button>
+        <div id="game-over-ui" class="hidden glass-panel p-12 max-w-md w-full text-center z-50">
+            <h2 class="text-7xl font-black mb-2 tracking-widest text-white glitch-text" id="winner-text">K.O.</h2>
+            <p class="text-gray-400 text-sm mb-10 tracking-[0.3em] uppercase" id="winner-sub">MATCH CONCLUDED</p>
+            <div class="flex flex-col gap-3">
+                <button class="btn-raw btn-raw-accent py-4 w-full" id="rematch-btn" onclick="handleRematchClick()">[ REMATCH ]</button>
+                <button class="btn-raw text-sm py-3 w-full border-dashed" onclick="location.reload()">MAIN MENU</button>
             </div>
         </div>
     </div>
@@ -220,43 +230,43 @@
             <!-- P1 HUD -->
             <div class="w-5/12">
                 <div class="flex justify-between items-end mb-2 px-2">
-                    <div id="hud-p1-name" class="text-blue-400 boxing-font text-4xl drop-shadow-[0_0_15px_rgba(59,130,246,0.8)] font-black italic tracking-wider truncate max-w-[80%]">PLAYER 1</div>
-                    <div class="text-gray-400 text-sm font-bold tracking-widest">HP</div>
+                    <div id="hud-p1-name" class="text-blue-400 boxing-font text-3xl drop-shadow-[0_0_10px_rgba(59,130,246,0.5)] font-black italic tracking-wider truncate max-w-[80%]">PLAYER 1</div>
+                    <div class="text-gray-400 text-xs font-bold tracking-[0.2em]">HP</div>
                 </div>
-                <div class="health-bar-container h-10 w-full bg-red-950 border-4 border-gray-900 rounded-lg overflow-hidden relative shadow-[0_0_30px_rgba(59,130,246,0.3)]">
-                    <div id="p1-hp" class="h-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-white w-full transition-all duration-150 origin-left"></div>
+                <div class="health-bar-container h-6 w-full bg-black/80 border border-white/20 overflow-hidden relative backdrop-blur-sm">
+                    <div id="p1-hp" class="h-full bg-white w-full transition-all duration-150 origin-left"></div>
                 </div>
-                <div class="health-bar-container h-4 w-11/12 bg-gray-900 border-x-4 border-b-4 border-gray-900 rounded-b-lg overflow-hidden shadow-inner relative ml-4">
-                    <div id="p1-stam" class="h-full bg-gradient-to-r from-blue-600 to-cyan-400 w-full transition-all duration-75 absolute top-0 left-0"></div>
+                <div class="health-bar-container h-2 w-11/12 bg-black/80 border-x border-b border-white/10 overflow-hidden relative ml-4">
+                    <div id="p1-stam" class="h-full bg-blue-500 w-full transition-all duration-75 absolute top-0 left-0"></div>
                 </div>
                 <!-- Feint Cooldown -->
-                <div class="health-bar-container h-1 w-11/12 bg-gray-900 ml-4 rounded-b mt-[2px] overflow-hidden relative">
+                <div class="health-bar-container h-1 w-11/12 bg-black/80 ml-4 mt-[2px] overflow-hidden relative">
                     <div id="p1-feint" class="h-full bg-purple-400 w-full transition-all duration-75 absolute top-0 left-0 feint-cooldown"></div>
                 </div>
             </div>
             
             <!-- Timer -->
             <div class="w-2/12 text-center flex flex-col items-center">
-                <div class="bg-gray-900/80 border-4 border-gray-700 rounded-2xl px-6 py-2 backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
-                    <div class="text-white font-black text-6xl boxing-font timer-glow" id="timer">99</div>
+                <div class="bg-black/60 border border-white/20 px-6 py-1 backdrop-blur-md">
+                    <div class="text-white font-black text-5xl boxing-font timer-glow" id="timer">99</div>
                 </div>
-                <div id="network-ping" class="text-xs text-green-400 font-bold mt-2 tracking-widest hidden animate-pulse bg-black/50 px-3 py-1 rounded-full border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.3)]">🟢 P2P CONNECTED</div>
+                <div id="network-ping" class="text-[10px] text-green-400 font-bold mt-2 tracking-[0.2em] hidden animate-pulse bg-black/50 px-3 py-1 border border-green-500/30">P2P LINKED</div>
             </div>
 
             <!-- P2 HUD -->
             <div class="w-5/12">
                 <div class="flex justify-between items-end mb-2 px-2">
-                    <div class="text-gray-400 text-sm font-bold tracking-widest">HP</div>
-                    <div id="hud-p2-name" class="text-red-400 boxing-font text-4xl drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] font-black italic tracking-wider truncate max-w-[80%] text-right">PLAYER 2</div>
+                    <div class="text-gray-400 text-xs font-bold tracking-[0.2em]">HP</div>
+                    <div id="hud-p2-name" class="text-red-400 boxing-font text-3xl drop-shadow-[0_0_10px_rgba(239,68,68,0.5)] font-black italic tracking-wider truncate max-w-[80%] text-right">PLAYER 2</div>
                 </div>
-                <div class="health-bar-container p2-skew h-10 w-full bg-red-950 border-4 border-gray-900 rounded-lg overflow-hidden relative flex justify-end shadow-[0_0_30px_rgba(239,68,68,0.3)]">
-                    <div id="p2-hp" class="h-full bg-gradient-to-l from-yellow-400 via-yellow-300 to-white w-full transition-all duration-150 origin-right"></div>
+                <div class="health-bar-container p2-skew h-6 w-full bg-black/80 border border-white/20 overflow-hidden relative flex justify-end backdrop-blur-sm">
+                    <div id="p2-hp" class="h-full bg-white w-full transition-all duration-150 origin-right"></div>
                 </div>
-                <div class="health-bar-container p2-skew h-4 w-11/12 bg-gray-900 border-x-4 border-b-4 border-gray-900 rounded-b-lg overflow-hidden shadow-inner relative flex justify-end mr-4 float-right">
-                    <div id="p2-stam" class="h-full bg-gradient-to-l from-red-600 to-orange-400 w-full transition-all duration-75 absolute top-0 right-0"></div>
+                <div class="health-bar-container p2-skew h-2 w-11/12 bg-black/80 border-x border-b border-white/10 overflow-hidden relative flex justify-end mr-4 float-right">
+                    <div id="p2-stam" class="h-full bg-red-500 w-full transition-all duration-75 absolute top-0 right-0"></div>
                 </div>
                  <!-- Feint Cooldown -->
-                 <div class="health-bar-container p2-skew h-1 w-11/12 bg-gray-900 mr-4 rounded-b mt-[2px] overflow-hidden relative float-right clear-right">
+                 <div class="health-bar-container p2-skew h-1 w-11/12 bg-black/80 mr-4 mt-[2px] overflow-hidden relative float-right clear-right">
                     <div id="p2-feint" class="h-full bg-purple-400 w-full transition-all duration-75 absolute top-0 right-0 feint-cooldown"></div>
                 </div>
             </div>
@@ -266,13 +276,12 @@
         <div class="flex items-end justify-between w-full pointer-events-none mt-auto">
             <!-- Chat Box overlay -->
             <div id="chat-container" class="w-72 hidden flex-col gap-2 z-20">
-                <div id="chat-log" class="flex flex-col gap-1 text-sm font-bold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] overflow-hidden h-32 justify-end"></div>
-                <input type="text" id="chat-input" class="pointer-events-auto bg-black/70 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-all font-sans normal-case" placeholder="Type message... (Press Enter to send)" style="display:none;" maxlength="60">
+                <div id="chat-log" class="flex flex-col gap-1 text-xs font-bold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] overflow-hidden h-32 justify-end"></div>
+                <input type="text" id="chat-input" class="pointer-events-auto bg-black/80 border border-white/20 px-3 py-2 text-white text-xs focus:border-white transition-all font-sans normal-case" placeholder="Type message... (Press Enter to send)" style="display:none;" maxlength="60">
             </div>
 
-            <div id="controls-text" class="text-center text-gray-200 text-sm bg-black/80 rounded-2xl px-8 py-4 backdrop-blur-md border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] mx-auto tracking-wide mb-4"></div>
+            <div id="controls-text" class="text-center text-gray-300 text-[10px] bg-black/60 px-6 py-3 backdrop-blur-sm border border-white/10 mx-auto tracking-[0.2em] mb-4 uppercase"></div>
             
-            <!-- Spacing for layout alignment -->
             <div class="w-72"></div>
         </div>
     </div>
@@ -328,7 +337,7 @@
     window.verifyTurnServers = async function() {
         const turnStatusEl = document.getElementById('turn-status');
         if(!turnStatusEl) return;
-        turnStatusEl.innerHTML = '<span class="text-yellow-400">Checking Relay Servers (TURN)...</span>';
+        turnStatusEl.innerHTML = '<span class="text-yellow-400">CHECKING RELAY SERVERS...</span>';
         
         try {
             const pc = new RTCPeerConnection(rtcConfig);
@@ -338,7 +347,7 @@
             pc.onicecandidate = (e) => {
                 if (e.candidate && e.candidate.type === 'relay') {
                     turnFound = true;
-                    turnStatusEl.innerHTML = '<span class="text-green-400">Relay Servers: ONLINE</span>';
+                    turnStatusEl.innerHTML = '<span class="text-green-400">RELAY SERVERS: ONLINE</span>';
                     pc.close();
                 }
             };
@@ -347,12 +356,12 @@
             
             setTimeout(() => {
                 if (!turnFound && pc.signalingState !== "closed") {
-                    turnStatusEl.innerHTML = '<span class="text-red-400">Relay Servers: OFFLINE (Firewalls may block connections)</span>';
+                    turnStatusEl.innerHTML = '<span class="text-red-400">RELAY SERVERS: OFFLINE</span>';
                     pc.close();
                 }
             }, 5000);
         } catch(e) {
-            turnStatusEl.innerHTML = '<span class="text-red-400">Relay Servers: ERROR</span>';
+            turnStatusEl.innerHTML = '<span class="text-red-500">RELAY SERVERS: ERROR</span>';
         }
     };
 
@@ -397,15 +406,12 @@
                     if (data.status === 'waiting') {
                         count++;
                         const btn = document.createElement('button');
-                        btn.className = 'btn btn-gray text-left py-3 px-4 flex justify-between items-center w-full rounded-xl border border-white/5 shadow-sm hover:border-purple-500/50 hover:bg-white/5 transition-all group';
+                        btn.className = 'btn-raw w-full text-left flex justify-between items-center group mb-2 py-3 px-4';
                         
                         const hostDisplayName = (data.hostName || "FIGHTER").substring(0, 12);
                         btn.innerHTML = `
-                            <div class="flex items-center gap-3">
-                                <span class="text-2xl drop-shadow-[0_0_5px_rgba(255,255,255,0.5)] group-hover:scale-110 transition-transform">🥊</span>
-                                <span class="font-bold text-white tracking-widest uppercase">${hostDisplayName}'S LOBBY</span>
-                            </div>
-                            <span class="text-xs font-black text-green-400 tracking-widest bg-green-900/40 px-3 py-1 rounded-full group-hover:bg-green-500 group-hover:text-black transition-colors">JOIN P2P</span>
+                            <span class="font-bold tracking-[0.2em] group-hover:text-black transition-colors">> ${hostDisplayName}</span>
+                            <span class="text-[10px] bg-white/10 px-2 py-1 group-hover:bg-black group-hover:text-white transition-colors border border-white/20">[ JOIN ]</span>
                         `;
                         btn.onclick = () => window.joinPublicRoom(id);
                         listEl.appendChild(btn);
@@ -414,7 +420,7 @@
             }
             
             if (count === 0) {
-                listEl.innerHTML = '<div class="h-full flex items-center justify-center"><p class="text-gray-500 italic text-sm tracking-widest uppercase">No open lobbies found.</p></div>';
+                listEl.innerHTML = '<div class="h-full flex items-center justify-center"><p class="text-gray-500 italic text-xs tracking-widest uppercase">NO OPEN LOBBIES FOUND.</p></div>';
             }
         });
     };
@@ -447,7 +453,7 @@
             document.getElementById('lobby-options').classList.remove('flex');
             document.getElementById('lobby-waiting').classList.remove('hidden');
             document.getElementById('lobby-waiting').classList.add('flex');
-            document.getElementById('hosting-subtitle').innerText = "Waiting for a challenger to join...";
+            document.getElementById('hosting-subtitle').innerText = "AWAITING CONNECTION...";
             
             window.isHost = true;
             window.currentRoomId = roomId;
@@ -460,7 +466,7 @@
 
                 if (data.status === 'connecting' && !webrtcStarted) {
                     webrtcStarted = true;
-                    document.getElementById('hosting-subtitle').innerText = "Establishing P2P Connection...";
+                    document.getElementById('hosting-subtitle').innerText = "ESTABLISHING P2P LINK...";
                     startHostWebRTC(roomRef, data);
                 }
             });
@@ -471,6 +477,7 @@
     };
 
     async function startHostWebRTC(roomRef, data) {
+        window.opponentName = data.guestName || "GUEST";
         window.peerConnection = new RTCPeerConnection(rtcConfig);
         
         // Creating the UDP-like Data Channel
@@ -523,7 +530,7 @@
             setLobbyStatus("Joining Lobby...");
             const snapshot = await get(roomRef);
             if (!snapshot.exists() || snapshot.val().status !== 'waiting') {
-                setLobbyStatus("Lobby no longer exists or is full.");
+                setLobbyStatus("Lobby no longer exists.");
                 window.startLobbyListener();
                 return;
             }
@@ -536,12 +543,13 @@
 
             window.isHost = false;
             window.currentRoomId = roomId;
-            setLobbyStatus("Establishing P2P Connection...");
+            setLobbyStatus("Establishing P2P Link...");
 
             // Listen for Host Offer
             onValue(ref(db, `rooms/${roomId}/offer`), async (snap) => {
                 const offer = snap.val();
                 if (offer && !window.peerConnection) {
+                    window.opponentName = (await get(roomRef)).val().hostName || "HOST";
                     startGuestWebRTC(roomId, offer);
                 }
             });
@@ -611,7 +619,7 @@
             } else if (msg.type === 'rematch') {
                 window.remoteWantsRematch = true;
                 if(document.getElementById('winner-sub')) {
-                    document.getElementById('winner-sub').innerText = "OPPONENT WANTS REMATCH...";
+                    document.getElementById('winner-sub').innerText = "OPPONENT REQUESTS REMATCH";
                 }
                 checkRematch();
             } else if (msg.type === 'gameover') {
@@ -687,7 +695,7 @@
 
 <script>
     // Profile & Customization Management
-    const defaultProfile = { name: 'BOXER_' + Math.floor(Math.random()*999), finisher: 'K.O.', taunt: 'COME ON!', color: '#3b82f6', hat: 'none' };
+    const defaultProfile = { name: 'BOXER_' + Math.floor(Math.random()*999), finisher: 'K.O.', taunt: 'COME ON!', color: '#ffffff', hat: 'none' };
     const savedProfile = JSON.parse(localStorage.getItem('pb_profile')) || {};
     window.playerProfile = { ...defaultProfile, ...savedProfile }; // Robust merge to prevent missing properties on load
     
@@ -718,13 +726,13 @@
         }
         if (!window.previewFighter) {
             window.previewFighter = new Fighter(true, window.playerProfile);
-            window.previewFighter.groundY = 260; // Local preview ground
-            window.previewFighter.y = 260;
-            window.previewFighter.x = 100; // Center of preview canvas
+            window.previewFighter.groundY = 240; // Local preview ground
+            window.previewFighter.y = 240;
+            window.previewFighter.x = 90; // Center of preview canvas
         }
         
         function renderPreview() {
-            window.previewCtx.clearRect(0, 0, 200, 280);
+            window.previewCtx.clearRect(0, 0, 180, 260);
             
             // Dynamically sync preview to currently selected UI options
             window.previewFighter.profile.color = document.getElementById('profile-color-input').value;
@@ -763,7 +771,7 @@
             document.getElementById('hud-p1-name').innerText = window.isHost ? window.playerProfile.name : window.opponentProfile.name;
             document.getElementById('hud-p2-name').innerText = window.isHost ? window.opponentProfile.name : window.playerProfile.name;
             
-            // Apply profile properties directly to initialized fighters globally mapped in snippet 1 combat
+            // Apply profile properties directly to initialized fighters
             if (typeof window.p1 !== 'undefined' && window.p1 && typeof window.p2 !== 'undefined' && window.p2) {
                 window.p1.profile = window.isHost ? window.playerProfile : window.opponentProfile;
                 window.p1.color = window.p1.profile.color;
@@ -804,7 +812,7 @@
         document.getElementById('chat-container').classList.add('flex');
         const log = document.getElementById('chat-log');
         const msg = document.createElement('div');
-        msg.className = "chat-bubble bg-black/50 px-2 py-1 rounded w-fit max-w-[250px] break-words shadow-sm border border-white/10";
+        msg.className = "chat-bubble bg-black/80 px-2 py-1 border border-white/20 w-fit max-w-[250px] break-words";
         msg.innerHTML = `<span style="color:${color}">${escapeHTML(name)}:</span> <span class="font-normal font-sans">${escapeHTML(text)}</span>`;
         log.appendChild(msg);
         
@@ -937,7 +945,7 @@
         constructor(isPlayer1, profileObj) {
             this.isP1 = isPlayer1;
             this.profile = profileObj;
-            this.color = this.profile ? this.profile.color : (isPlayer1 ? '#3b82f6' : '#ef4444'); 
+            this.color = this.profile ? this.profile.color : (isPlayer1 ? '#ffffff' : '#ef4444'); 
             
             this.groundY = GROUND_Y;
             
@@ -1441,7 +1449,7 @@
             
             // Trunks
             ctx.fillStyle = this.color; ctx.beginPath(); ctx.roundRect(-20, -65, 40, 25, 6); ctx.fill();
-            ctx.fillStyle = '#f8fafc'; ctx.fillRect(-20, -65, 40, 6); 
+            ctx.fillStyle = '#050508'; ctx.fillRect(-20, -65, 40, 6); 
 
             // Arms & Gloves
             ctx.strokeStyle = this.color; ctx.lineWidth = 10;
@@ -1504,18 +1512,26 @@
     let cpuDifficulty = 0;
     let cpuReactionTimer = 0;
     let lastLoopTime = 0;
+    let gameOverTimeout = null;
     let cpuInputs = {};
     let cpuPrevInputs = {};
 
     function getLogicalInputs(keysObj, keyMap) {
         return {
-            left: checkKey(keyMap.left, keysObj), right: checkKey(keyMap.right, keysObj),
-            block: checkKey(keyMap.block, keysObj), dash: checkKey(keyMap.dash, keysObj),
-            jump: checkKey(keyMap.jump, keysObj), jab: checkKey(keyMap.jab, keysObj),
-            cross: checkKey(keyMap.cross, keysObj), hook: checkKey(keyMap.hook, keysObj),
-            uppercut: checkKey(keyMap.uppercut, keysObj), knee: checkKey(keyMap.knee, keysObj),
-            kick: checkKey(keyMap.kick, keysObj), clinch: checkKey(keyMap.clinch, keysObj),
-            clinchMash: checkKey(keyMap.clinchMash, keysObj), taunt: checkKey(keyMap.taunt, keysObj)
+            left: checkKey(keyMap.left, keysObj),
+            right: checkKey(keyMap.right, keysObj),
+            block: checkKey(keyMap.block, keysObj),
+            dash: checkKey(keyMap.dash, keysObj),
+            jump: checkKey(keyMap.jump, keysObj),
+            jab: checkKey(keyMap.jab, keysObj),
+            cross: checkKey(keyMap.cross, keysObj),
+            hook: checkKey(keyMap.hook, keysObj),
+            uppercut: checkKey(keyMap.uppercut, keysObj),
+            knee: checkKey(keyMap.knee, keysObj),
+            kick: checkKey(keyMap.kick, keysObj),
+            clinch: checkKey(keyMap.clinch, keysObj),
+            clinchMash: checkKey(keyMap.clinchMash, keysObj),
+            taunt: checkKey(keyMap.taunt, keysObj)
         };
     }
 
@@ -1554,6 +1570,7 @@
         vsCPU = playAgainstCPU;
         cpuDifficulty = diff;
         window.isOnlineGame = isOnline;
+        clearTimeout(gameOverTimeout);
         
         document.getElementById('ui-container').classList.add('hidden');
         document.getElementById('game-ui').classList.remove('hidden');
@@ -1574,17 +1591,6 @@
             document.getElementById('hud-p2-name').innerText = window.opponentProfile.name;
         }
         
-        if (vsCPU || window.isOnlineGame) {
-            document.getElementById('controls-text').innerHTML = `
-                <span class="text-blue-400 font-bold">YOUR CONTROLS:</span> WASD Move &nbsp;|&nbsp; Space Jump &nbsp;|&nbsp; Shift Dodge &nbsp;|&nbsp; S Block/Feint &nbsp;|&nbsp; J,K,L Punch &nbsp;|&nbsp; H Uppercut &nbsp;|&nbsp; U,I Kick &nbsp;|&nbsp; O Clinch &nbsp;|&nbsp; T Taunt
-            `;
-        } else {
-            document.getElementById('controls-text').innerHTML = `
-                <span class="text-blue-400 font-bold">P1:</span> WASD Move | Shift Dodge | S Block | J,K,L Punch | H Uppercut | U,I Kick | O Clinch | T Taunt &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp; 
-                <span class="text-red-400 font-bold">P2:</span> Arrows Move | Enter Dodge | Down Block | 1,2,3 Punch | 7 Uppercut | 4,5 Kick | 6 Clinch | M Taunt
-            `;
-        }
-
         keysDown = {};
         prevKeysDown = {};
         cpuInputs = {};
@@ -1618,9 +1624,10 @@
     };
 
     window.resetMatchForRematch = function() {
+        clearTimeout(gameOverTimeout);
         document.getElementById('ui-container').classList.add('hidden');
         document.getElementById('game-over-ui').classList.add('hidden');
-        document.getElementById('winner-sub').innerText = "The bout is over.";
+        document.getElementById('winner-sub').innerText = "MATCH CONCLUDED";
         document.getElementById('rematch-btn').classList.remove('hidden');
 
         keysDown = {}; prevKeysDown = {}; cpuInputs = {}; window.remoteLogicalInputs = {};
@@ -1700,7 +1707,7 @@
             cpuInputs[movingToward] = true;
             if (Math.random() < 0.2 && window.p2.stamina > 20) cpuInputs.enter = true; 
             if (Math.random() < 0.1) cpuInputs.arrowup = true; 
-            if (Math.random() < prof.tauntFreq && window.p1.state !== ST_KNOCKDOWN) cpuInputs['m'] = true; // Taunt!
+            if (Math.random() < prof.tauntFreq && window.p1.state !== ST_KNOCKDOWN) cpuInputs['m'] = true; 
             cpuReactionTimer = 15; 
         } else {
             if (Math.random() < prof.atkFreq && window.p2.stamina >= 20) {
@@ -1775,36 +1782,38 @@
     window.checkGameOver = function() {
         window.matchActive = false; clinchActive = false; cinematicMode = false;
         
-        document.getElementById('ui-container').classList.remove('hidden');
-        document.getElementById('main-menu').classList.add('hidden');
-        document.getElementById('menu-primary').classList.add('hidden');
-        document.getElementById('game-over-ui').classList.remove('hidden');
-        document.getElementById('rematch-btn').classList.remove('hidden'); 
-        
-        let winnerTxt = "K.O."; let subTxt = "The bout is over.";
-        
-        if (window.p1.hp > 0 && window.p2.hp > 0) winnerTxt = "TIME OUT";
-        
-        if (window.isOnlineGame) {
-            let myFighter = window.isHost ? window.p1 : window.p2;
-            let oppFighter = window.isHost ? window.p2 : window.p1;
+        if (window.isOnlineGame && window.dataChannel && window.dataChannel.readyState === 'open') {
+            window.dataChannel.send(JSON.stringify({ type: 'gameover', p1hp: window.p1.hp, p2hp: window.p2.hp }));
+        }
+
+        gameOverTimeout = setTimeout(() => {
+            document.getElementById('ui-container').classList.remove('hidden');
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('menu-primary').classList.add('hidden');
+            document.getElementById('game-over-ui').classList.remove('hidden');
+            document.getElementById('rematch-btn').classList.remove('hidden'); 
             
-            if(myFighter.hp > oppFighter.hp) { subTxt = "YOU DEFEATED YOUR OPPONENT!"; }
-            else if(oppFighter.hp > myFighter.hp) { subTxt = "YOUR OPPONENT WON."; }
-            else { subTxt = "IT'S A DRAW."; }
-        } else {
-            if(window.p1.hp > window.p2.hp) { subTxt = vsCPU ? "YOU DEFEATED THE CPU!" : "PLAYER 1 IS VICTORIOUS!"; }
-            else if(window.p2.hp > window.p1.hp) { subTxt = vsCPU ? "THE CPU CRUSHED YOU." : "PLAYER 2 IS VICTORIOUS!"; }
-            else { subTxt = "IT'S A DRAW."; }
-        }
-        
-        document.getElementById('winner-text').innerText = winnerTxt; 
-        
-        if (window.remoteWantsRematch) {
-            document.getElementById('winner-sub').innerText = "OPPONENT WANTS REMATCH...";
-        } else {
-            document.getElementById('winner-sub').innerText = subTxt;
-        }
+            let winnerTxt = "DRAW"; let subTxt = "MATCH CONCLUDED";
+            
+            if (window.isOnlineGame) {
+                let myFighter = window.isHost ? window.p1 : window.p2;
+                let oppFighter = window.isHost ? window.p2 : window.p1;
+                
+                if(myFighter.hp > oppFighter.hp) { winnerTxt = "VICTORY"; subTxt = "YOU DEFEATED YOUR OPPONENT!"; }
+                if(oppFighter.hp > myFighter.hp) { winnerTxt = "DEFEAT"; subTxt = "YOUR OPPONENT WON."; }
+            } else {
+                if(window.p1.hp > window.p2.hp) { winnerTxt = "P1 WINS"; subTxt = vsCPU ? "YOU DEFEATED THE CPU!" : "PLAYER 1 IS VICTORIOUS!"; }
+                if(window.p2.hp > window.p1.hp) { winnerTxt = "P2 WINS"; subTxt = vsCPU ? "THE CPU CRUSHED YOU." : "PLAYER 2 IS VICTORIOUS!"; }
+            }
+            
+            document.getElementById('winner-text').innerText = winnerTxt; 
+            
+            if (window.remoteWantsRematch) {
+                document.getElementById('winner-sub').innerText = "OPPONENT REQUESTS REMATCH";
+            } else {
+                document.getElementById('winner-sub').innerText = subTxt;
+            }
+        }, 2000);
     }
 
     function gameLoop(timestamp) {
@@ -1964,7 +1973,7 @@
             
             let totalScore = Math.max(1, clinchScoreP1 + clinchScoreP2); let p1Ratio = clinchScoreP1 / totalScore;
             ctx.fillStyle = "#1e293b"; ctx.fillRect(W/2 - 350, H/2, 700, 50);
-            ctx.fillStyle = "#3b82f6"; ctx.fillRect(W/2 - 350, H/2, 700 * p1Ratio, 50);
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(W/2 - 350, H/2, 700 * p1Ratio, 50);
             ctx.fillStyle = "#ef4444"; ctx.fillRect(W/2 - 350 + (700 * p1Ratio), H/2, 700 * (1 - p1Ratio), 50);
             ctx.strokeStyle = "white"; ctx.lineWidth = 6; ctx.strokeRect(W/2 - 350, H/2, 700, 50);
             
