@@ -71,45 +71,47 @@
             50% { filter: drop-shadow(0 0 30px rgba(255,255,255,1)); }
         }
         .timer-glow { animation: pulse-glow 2s infinite; }
-        
-        input[type="text"], select {
-            background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1);
-            color: white; font-family: 'Oswald', sans-serif;
-            font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase;
+
+        @keyframes chat-fade-in {
+            from { opacity: 0; transform: translateY(10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        input[type="text"]:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        .chat-msg { animation: chat-fade-in 0.25s ease-out forwards; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
         
-        select option { background-color: #111827; color: white; }
+        input[type="text"] {
+            background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1);
+            color: white; text-align: center; font-family: 'Oswald', sans-serif;
+            font-size: 2rem; letter-spacing: 0.1em; text-transform: uppercase;
+        }
+        input[type="text"]:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        
+        #chat-input { font-family: 'Inter', sans-serif; font-size: 14px; text-transform: none; letter-spacing: normal; text-align: left; }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
-
-        .feint-cooldown { background: repeating-linear-gradient(45deg, #1f2937, #1f2937 10px, #374151 10px, #374151 20px); }
-        .chat-bubble { animation: floatUp 5s forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 80% { opacity: 1; transform: translateY(-10px); } 100% { opacity: 0; transform: translateY(-15px); } }
     </style>
 </head>
 <body>
 
     <div id="ui-container">
-        <div class="glass-panel p-8 md:p-12 rounded-[2rem] shadow-2xl max-w-3xl w-full text-center border-t-8 border-t-blue-500 border-b-8 border-b-red-500 relative overflow-hidden transition-all duration-300" id="main-menu">
+        <div class="glass-panel p-12 rounded-[2rem] shadow-2xl max-w-xl w-full text-center border-t-8 border-t-blue-500 border-b-8 border-b-red-500 relative overflow-hidden" id="main-menu">
             <div class="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50 z-0 pointer-events-none"></div>
             
             <div class="relative z-10" id="menu-primary">
                 <h1 class="text-7xl font-black mb-1 text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-purple-400 to-red-500 tracking-tighter drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]">PRO BOXING</h1>
-                <p class="text-gray-400 mb-8 text-sm font-bold tracking-[0.3em] uppercase" id="version-text">ULTIMATE EDITION v1.2</p>
+                <p class="text-gray-400 mb-8 text-sm font-bold tracking-[0.3em] uppercase">P2P Relay Edition</p>
                 
-                <div class="flex flex-col gap-4 max-w-md mx-auto">
+                <div class="flex flex-col gap-4">
                     <button class="btn btn-purple text-xl py-5 flex items-center justify-center gap-3" onclick="showLobbyMenu()">
-                        <span class="text-2xl">🌐</span> ONLINE MULTIPLAYER
+                        <span class="text-2xl">🌐</span> ONLINE MULTIPLAYER (P2P)
                     </button>
                     <button class="btn btn-blue text-lg py-4 flex items-center justify-center gap-3" onclick="showDifficultyMenu()">
                         <span class="text-xl">🥊</span> 1 PLAYER (VS CPU)
                     </button>
                     <button class="btn btn-red text-lg py-4 flex items-center justify-center gap-3" onclick="initGame(false, 0, false)">
-                        <span class="text-xl">🤜🤛</span> 2 PLAYER (LOCAL)
+                        <span class="text-xl">🤜🤛</span> 2 PLAYER (LOCAL CO-OP)
                     </button>
                     <button class="btn btn-gray text-md py-3 mt-4 flex items-center justify-center gap-2" onclick="showProfileMenu()">
                         <span>⚙️</span> EDIT PROFILE
@@ -117,50 +119,17 @@
                 </div>
             </div>
 
-            <!-- Profile Menu Overhauled -->
-            <div class="relative z-10 hidden w-full" id="menu-profile">
+            <!-- Profile Menu -->
+            <div class="relative z-10 hidden" id="menu-profile">
                 <h2 class="text-4xl font-black mb-6 text-blue-400 tracking-tighter drop-shadow-[0_0_15px_rgba(96,165,250,0.4)]">FIGHTER PROFILE</h2>
                 
-                <div class="flex flex-col md:flex-row gap-6 w-full">
-                    <!-- Left: Inputs -->
-                    <div class="bg-black/40 p-6 rounded-xl border border-white/10 flex-1 flex flex-col gap-4 text-left">
-                        <div>
-                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">FIGHTER ALIAS</p>
-                            <input type="text" id="profile-name-input" maxlength="12" placeholder="ENTER NAME" class="w-full rounded-lg py-2 px-3 text-center">
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">FINISHER TEXT</p>
-                            <input type="text" id="profile-finisher-input" maxlength="40" placeholder="E.G. FATALITY OR KNOCKOUT" class="w-full rounded-lg py-2 px-3 text-center">
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">TAUNT TEXT (PRESS 'T')</p>
-                            <input type="text" id="profile-taunt-input" maxlength="20" placeholder="E.G. BRING IT!" class="w-full rounded-lg py-2 px-3 text-center">
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">HEADGEAR</p>
-                            <select id="profile-hat-input" class="w-full rounded-lg py-2 px-3 text-center cursor-pointer">
-                                <option value="none">NONE</option>
-                                <option value="kippah">KIPPAH</option>
-                                <option value="widebrim">WIDE BRIM HAT</option>
-                            </select>
-                        </div>
-                        <div class="flex items-center justify-between bg-black/50 p-3 rounded-lg border border-white/5 mt-2">
-                            <span class="text-sm text-gray-300 font-bold tracking-widest uppercase">TRUNK & GLOVE COLOR</span>
-                            <input type="color" id="profile-color-input" class="w-12 h-12 rounded cursor-pointer bg-transparent border-0">
-                        </div>
-                    </div>
-                    
-                    <!-- Right: Character Preview -->
-                    <div class="bg-black/40 p-4 rounded-xl border border-white/10 w-full md:w-64 flex flex-col items-center justify-center relative shadow-inner">
-                        <p class="text-xs text-gray-400 font-bold tracking-widest uppercase absolute top-4 left-4">PREVIEW</p>
-                        <canvas id="previewCanvas" width="200" height="280" class="mt-6 border-b-4 border-white/5"></canvas>
-                    </div>
+                <div class="bg-black/40 p-6 rounded-xl border border-white/10 mb-6">
+                    <p class="text-xs text-gray-400 font-bold mb-3 tracking-widest uppercase text-left">FIGHTER ALIAS</p>
+                    <input type="text" id="profile-name-input" maxlength="12" placeholder="ENTER NAME" class="w-full rounded-lg py-3">
                 </div>
                 
-                <div class="flex gap-4 mt-6">
-                    <button class="btn btn-gray text-md py-3 w-1/3" onclick="hideProfileMenu()">CANCEL</button>
-                    <button class="btn btn-green text-lg py-3 flex-1" onclick="saveProfile()">SAVE CHANGES</button>
-                </div>
+                <button class="btn btn-green text-lg py-4 w-full mb-3" onclick="saveProfile()">SAVE CHANGES</button>
+                <button class="btn btn-gray text-md py-3 w-full" onclick="hideProfileMenu()">CANCEL</button>
             </div>
             
             <!-- Lobby Menu -->
@@ -168,11 +137,11 @@
                 <h2 class="text-4xl font-black mb-4 text-purple-400 tracking-tighter drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">PUBLIC LOBBIES</h2>
                 <div id="lobby-status" class="text-yellow-400 font-bold mb-2 h-6 uppercase tracking-wider text-sm"></div>
                 
-                <div class="flex-col gap-4 flex-grow flex max-w-md mx-auto w-full" id="lobby-options">
+                <div class="flex-col gap-4 flex-grow flex" id="lobby-options">
                     <button class="btn btn-purple text-lg py-4 shadow-[0_0_20px_rgba(168,85,247,0.4)]" onclick="window.hostGame()">+ HOST NEW ROOM</button>
                     
                     <div class="bg-black/40 p-3 rounded-xl border border-white/10 mt-2 flex-grow flex flex-col h-60">
-                        <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase text-left border-b border-white/10 pb-2">Available Matches</p>
+                        <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase text-left border-b border-white/10 pb-2">Available Matches (P2P)</p>
                         <div id="lobby-list" class="flex flex-col gap-2 overflow-y-auto pr-2 flex-grow">
                             <p class="text-gray-500 italic py-4 text-sm">Searching for rooms...</p>
                         </div>
@@ -192,7 +161,7 @@
             <div class="relative z-10 hidden" id="menu-difficulty">
                 <h2 class="text-4xl font-black mb-6 text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">SELECT CPU DIFFICULTY</h2>
                 
-                <div class="flex flex-col gap-4 max-w-md mx-auto w-full">
+                <div class="flex flex-col gap-4">
                     <button class="btn btn-green text-lg py-4" onclick="initGame(true, 0, false)">EASY - For Beginners</button>
                     <button class="btn btn-blue text-lg py-4" onclick="initGame(true, 1, false)">MEDIUM - Balanced Bout</button>
                     <button class="btn btn-red text-lg py-4" onclick="initGame(true, 2, false)">HARD - Professional</button>
@@ -212,10 +181,8 @@
         </div>
     </div>
 
-    <div id="game-ui" class="hidden flex flex-col justify-between p-6 h-full w-full pointer-events-none">
-        
-        <!-- Top HUD -->
-        <div class="flex justify-between items-start w-full max-w-7xl mx-auto mt-2 pointer-events-none">
+    <div id="game-ui" class="hidden flex flex-col justify-between p-6 h-full absolute inset-0 pointer-events-none">
+        <div class="flex justify-between items-start w-full max-w-7xl mx-auto mt-2">
             <!-- P1 HUD -->
             <div class="w-5/12">
                 <div class="flex justify-between items-end mb-2 px-2">
@@ -228,9 +195,12 @@
                 <div class="health-bar-container h-4 w-11/12 bg-gray-900 border-x-4 border-b-4 border-gray-900 rounded-b-lg overflow-hidden shadow-inner relative ml-4">
                     <div id="p1-stam" class="h-full bg-gradient-to-r from-blue-600 to-cyan-400 w-full transition-all duration-75 absolute top-0 left-0"></div>
                 </div>
-                <!-- Feint Cooldown -->
-                <div class="health-bar-container h-1 w-11/12 bg-gray-900 ml-4 rounded-b mt-[2px] overflow-hidden relative">
-                    <div id="p1-feint" class="h-full bg-purple-400 w-full transition-all duration-75 absolute top-0 left-0 feint-cooldown"></div>
+                <!-- Feint Cooldown P1 -->
+                <div class="flex items-center gap-2 mt-2 ml-6">
+                    <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">FEINT CD</span>
+                    <div class="h-1.5 w-20 bg-gray-900 rounded-full overflow-hidden shadow-inner border border-gray-700/50">
+                        <div id="p1-feint-bar" class="h-full bg-cyan-300 w-full transition-all duration-100 origin-left shadow-[0_0_8px_#67e8f9]"></div>
+                    </div>
                 </div>
             </div>
             
@@ -254,25 +224,25 @@
                 <div class="health-bar-container p2-skew h-4 w-11/12 bg-gray-900 border-x-4 border-b-4 border-gray-900 rounded-b-lg overflow-hidden shadow-inner relative flex justify-end mr-4 float-right">
                     <div id="p2-stam" class="h-full bg-gradient-to-l from-red-600 to-orange-400 w-full transition-all duration-75 absolute top-0 right-0"></div>
                 </div>
-                 <!-- Feint Cooldown -->
-                 <div class="health-bar-container p2-skew h-1 w-11/12 bg-gray-900 mr-4 rounded-b mt-[2px] overflow-hidden relative float-right clear-right">
-                    <div id="p2-feint" class="h-full bg-purple-400 w-full transition-all duration-75 absolute top-0 right-0 feint-cooldown"></div>
+                <!-- Feint Cooldown P2 -->
+                <div class="flex items-center justify-end gap-2 mt-2 mr-6 clear-right">
+                    <div class="h-1.5 w-20 bg-gray-900 rounded-full overflow-hidden shadow-inner border border-gray-700/50 flex justify-end">
+                        <div id="p2-feint-bar" class="h-full bg-cyan-300 w-full transition-all duration-100 origin-right shadow-[0_0_8px_#67e8f9]"></div>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">FEINT CD</span>
                 </div>
             </div>
         </div>
-        
-        <!-- Controls & Chat UI -->
-        <div class="flex items-end justify-between w-full pointer-events-none mt-auto">
-            <!-- Chat Box overlay -->
-            <div id="chat-container" class="w-72 hidden flex-col gap-2 z-20">
-                <div id="chat-log" class="flex flex-col gap-1 text-sm font-bold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] overflow-hidden h-32 justify-end"></div>
-                <input type="text" id="chat-input" class="pointer-events-auto bg-black/70 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-500 focus:shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-all font-sans normal-case" placeholder="Type message... (Press Enter to send)" style="display:none;" maxlength="60">
-            </div>
 
-            <div id="controls-text" class="text-center text-gray-200 text-sm bg-black/80 rounded-2xl px-8 py-4 backdrop-blur-md border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] mx-auto tracking-wide mb-4"></div>
-            
-            <!-- Spacing for layout alignment -->
-            <div class="w-72"></div>
+        <div id="controls-text" class="text-center text-gray-200 text-sm mb-4 bg-black/80 rounded-2xl mx-auto px-8 py-4 backdrop-blur-md border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] absolute bottom-6 left-1/2 transform -translate-x-1/2 w-max tracking-wide pointer-events-none"></div>
+
+        <!-- In-game Chat Box -->
+        <div id="chat-container" class="absolute bottom-20 left-6 w-80 h-56 flex flex-col pointer-events-auto">
+            <div id="chat-messages" class="flex-grow overflow-y-auto mb-2 flex flex-col justify-end text-[13px] drop-shadow-md pb-1 pl-1" style="scrollbar-width: none;">
+                <!-- Messages appended here dynamically -->
+                <div class="text-gray-400 italic font-bold mb-1 chat-msg">Press 'T' to open chat...</div>
+            </div>
+            <input type="text" id="chat-input" class="w-full bg-black/50 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:bg-black/80 focus:shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all font-sans" placeholder="Type a message..." maxlength="60">
         </div>
     </div>
 
@@ -280,49 +250,28 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getDatabase, ref, get, set, update, onValue, onDisconnect, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-    // Strict Canvas environment Firebase config handling
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+    const firebaseConfig = {
         apiKey: "AIzaSyDUoYS6MwDIVe8coZOM9A0ZCYaZTeDSloo",
         authDomain: "babjeu-85d3e.firebaseapp.com",
-        projectId: "babjeu-85d3e"
+        databaseURL: "https://babjeu-85d3e-default-rtdb.firebaseio.com",
+        projectId: "babjeu-85d3e",
+        storageBucket: "babjeu-85d3e.firebasestorage.app",
+        messagingSenderId: "306959176803",
+        appId: "1:306959176803:web:2be00da38dbb37e777d456",
+        measurementId: "G-T38G7Y7MJ7"
     };
     
-    // Strict Path Rules Apply Here
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'pro-boxing';
-    const GAME_VERSION = "1.2.0";
-
     let app, auth, db;
-    let user = null;
-    
     try {
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
-        db = getFirestore(app);
+        db = getDatabase(app);
+    } catch(e) { console.log("Firebase init skipped due to missing config."); }
 
-        // Required sequential Auth initialization
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (e) { console.error("Firebase Auth initialization failed:", e); }
-        };
-        initAuth();
-
-        onAuthStateChanged(auth, (u) => {
-            user = u;
-            // Catch up if the user tried to open the lobby immediately before auth resolved
-            if (user && document.getElementById('menu-lobby') && !document.getElementById('menu-lobby').classList.contains('hidden')) {
-                window.startLobbyListener();
-            }
-        });
-    } catch(e) { console.error("Firebase init skipped due to missing config."); }
-
+    let user = null;
     window.lobbyQueryUnsub = null;
     window.roomListenerUnsub = null;
     window.currentRoomId = null;
@@ -333,7 +282,7 @@
     window.localWantsRematch = false;
     window.remoteWantsRematch = false;
 
-    // Relayed TURN servers explicitly for bypassing restrictive firewalls
+    // TURN/STUN Configuration to bypass restrictive networks
     const rtcConfig = {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
@@ -345,69 +294,64 @@
     
     const setLobbyStatus = (msg) => { document.getElementById('lobby-status').innerText = msg; };
 
-    // Use pure Firestore adhering to Strict Path Rule: `/artifacts/{appId}/public/data/rooms`
-    window.startLobbyListener = function() {
-        if (!user) {
+    window.initFirebaseOnline = async function() {
+        if(!auth) { setLobbyStatus("Network Error: Config missing"); return false; }
+        try {
             setLobbyStatus("Connecting to signaling server...");
-            return;
+            if (typeof __initial_auth_token !== 'undefined') {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+            user = auth.currentUser;
+            setLobbyStatus("");
+            return true;
+        } catch(e) { 
+            console.error(e); 
+            setLobbyStatus("Network connect failed. " + e.message);
+            return false; 
         }
-        setLobbyStatus("");
+    };
 
-        const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
-        window.lobbyQueryUnsub = onSnapshot(roomsRef, (snap) => {
+    window.startLobbyListener = async function() {
+        if (!(await window.initFirebaseOnline())) return;
+        const roomsRef = ref(db, 'rooms');
+        window.lobbyQueryUnsub = onValue(roomsRef, (snap) => {
+            const rooms = snap.val();
             const listEl = document.getElementById('lobby-list');
             listEl.innerHTML = '';
             let count = 0;
             
-            if (!snap.empty) {
+            if (rooms) {
                 const now = Date.now();
-                snap.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const id = docSnap.id;
-                    
+                for (const [id, data] of Object.entries(rooms)) {
                     if (!data.timestamp || now - data.timestamp > 1800000) {
-                        deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', id)).catch(e => {});
-                        return;
+                        set(ref(db, 'rooms/' + id), null).catch(e => {});
+                        continue;
                     }
 
                     if (data.status === 'waiting') {
                         count++;
                         const btn = document.createElement('button');
-                        const hostDisplayName = (data.hostName || "FIGHTER").substring(0, 12);
+                        btn.className = 'btn btn-gray text-left py-3 px-4 flex justify-between items-center w-full rounded-xl border border-white/5 shadow-sm hover:border-purple-500/50 hover:bg-white/5 transition-all group';
                         
-                        // Check Game Version Compatibility
-                        if (data.version !== GAME_VERSION) {
-                            btn.className = 'btn text-left py-3 px-4 flex justify-between items-center w-full rounded-xl border border-red-500/30 bg-red-900/20 opacity-50 cursor-not-allowed';
-                            btn.innerHTML = `
-                                <div class="flex items-center gap-3">
-                                    <span class="text-2xl grayscale">🥊</span>
-                                    <span class="font-bold text-gray-400 tracking-widest uppercase line-through">${hostDisplayName}'S LOBBY</span>
-                                </div>
-                                <span class="text-xs font-black text-red-400 tracking-widest">v${data.version || '1.0'} (MISMATCH)</span>
-                            `;
-                            btn.onclick = () => alert(`Version mismatch! This lobby requires game version ${data.version || '1.0'}, but you are running ${GAME_VERSION}. Please refresh or host your own.`);
-                        } else {
-                            btn.className = 'btn btn-gray text-left py-3 px-4 flex justify-between items-center w-full rounded-xl border border-white/5 shadow-sm hover:border-purple-500/50 hover:bg-white/5 transition-all group';
-                            btn.innerHTML = `
-                                <div class="flex items-center gap-3">
-                                    <span class="text-2xl drop-shadow-[0_0_5px_rgba(255,255,255,0.5)] group-hover:scale-110 transition-transform">🥊</span>
-                                    <span class="font-bold text-white tracking-widest uppercase">${hostDisplayName}'S LOBBY</span>
-                                </div>
-                                <span class="text-xs font-black text-green-400 tracking-widest bg-green-900/40 px-3 py-1 rounded-full group-hover:bg-green-500 group-hover:text-black transition-colors">JOIN P2P</span>
-                            `;
-                            btn.onclick = () => window.joinPublicRoom(id);
-                        }
+                        const hostDisplayName = (data.hostName || "FIGHTER").substring(0, 12);
+                        btn.innerHTML = `
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl drop-shadow-[0_0_5px_rgba(255,255,255,0.5)] group-hover:scale-110 transition-transform">🥊</span>
+                                <span class="font-bold text-white tracking-widest uppercase">${hostDisplayName}'S LOBBY</span>
+                            </div>
+                            <span class="text-xs font-black text-green-400 tracking-widest bg-green-900/40 px-3 py-1 rounded-full group-hover:bg-green-500 group-hover:text-black transition-colors">JOIN P2P</span>
+                        `;
+                        btn.onclick = () => window.joinPublicRoom(id);
                         listEl.appendChild(btn);
                     }
-                });
+                }
             }
             
             if (count === 0) {
                 listEl.innerHTML = '<div class="h-full flex items-center justify-center"><p class="text-gray-500 italic text-sm tracking-widest uppercase">No open lobbies found.</p></div>';
             }
-        }, (err) => {
-            console.error("Lobby query error:", err);
-            setLobbyStatus("Network Error. Retrying...");
         });
     };
 
@@ -423,19 +367,17 @@
         window.stopLobbyListener();
         
         const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-        const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+        const roomRef = ref(db, 'rooms/' + roomId);
         
         try {
-            await setDoc(roomRef, {
+            await set(roomRef, {
                 host: user.uid,
-                hostName: window.playerProfile.name,
-                hostProfile: window.playerProfile, // Ensures flawless profile loading
+                hostName: window.playerName,
                 status: 'waiting',
-                timestamp: Date.now(),
-                version: GAME_VERSION,
-                hostCandidates: [],
-                guestCandidates: []
+                timestamp: Date.now()
             });
+
+            onDisconnect(roomRef).remove();
 
             document.getElementById('lobby-options').classList.add('hidden');
             document.getElementById('lobby-options').classList.remove('flex');
@@ -445,36 +387,17 @@
             
             window.isHost = true;
             window.currentRoomId = roomId;
+
             let webrtcStarted = false;
 
-            window.roomListenerUnsub = onSnapshot(roomRef, (snapshot) => {
-                if(!snapshot.exists()) return;
-                const data = snapshot.data();
+            window.roomListenerUnsub = onValue(roomRef, (snapshot) => {
+                const data = snapshot.val();
+                if(!data) return;
 
                 if (data.status === 'connecting' && !webrtcStarted) {
                     webrtcStarted = true;
-                    // Host instantly caches the guest's profile from the document payload
-                    window.opponentProfile = data.guestProfile || window.opponentProfile;
                     document.getElementById('hosting-subtitle').innerText = "Establishing P2P Connection...";
                     startHostWebRTC(roomRef, data);
-                }
-                
-                // Process Answer & ICE
-                if (webrtcStarted && window.peerConnection) {
-                    if (data.answer && window.peerConnection.signalingState === 'have-local-offer') {
-                        window.peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-                    }
-                    if (data.guestCandidates && data.guestCandidates.length > window.processedGuestCandidates) {
-                        const newCands = data.guestCandidates.slice(window.processedGuestCandidates);
-                        window.processedGuestCandidates = data.guestCandidates.length;
-                        newCands.forEach(c => {
-                            if (window.peerConnection.remoteDescription) {
-                                window.peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(e=>console.error(e));
-                            } else {
-                                window.pendingCandidates.push(new RTCIceCandidate(c));
-                            }
-                        });
-                    }
                 }
             });
         } catch (e) {
@@ -484,26 +407,46 @@
     };
 
     async function startHostWebRTC(roomRef, data) {
+        window.opponentName = data.guestName || "GUEST";
         window.peerConnection = new RTCPeerConnection(rtcConfig);
         
-        window.processedGuestCandidates = 0;
-        window.pendingCandidates = [];
-
+        // Creating the UDP-like Data Channel
         window.dataChannel = window.peerConnection.createDataChannel('gameData', { ordered: false, maxRetransmits: 0 });
         setupDataChannelEvents(window.dataChannel);
 
         window.peerConnection.onicecandidate = (e) => {
-            if (e.candidate) updateDoc(roomRef, { hostCandidates: arrayUnion(e.candidate.toJSON()) });
+            if (e.candidate) push(ref(db, `rooms/${window.currentRoomId}/hostCandidates`), e.candidate.toJSON());
         };
 
         const offer = await window.peerConnection.createOffer();
         await window.peerConnection.setLocalDescription(offer);
-        await updateDoc(roomRef, { offer: { type: offer.type, sdp: offer.sdp } });
+        await update(roomRef, { offer: { type: offer.type, sdp: offer.sdp } });
 
+        // Listen for the guest's Answer
+        onValue(ref(db, `rooms/${window.currentRoomId}/answer`), (snap) => {
+            const answer = snap.val();
+            if (answer && window.peerConnection.signalingState === 'have-local-offer') {
+                window.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+            }
+        });
+
+        // Listen for Guest ICE Candidates
+        let pendingCandidates = [];
+        onChildAdded(ref(db, `rooms/${window.currentRoomId}/guestCandidates`), (snap) => {
+            const candidate = snap.val();
+            if (candidate) {
+                if (window.peerConnection.remoteDescription) {
+                    window.peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error(e));
+                } else {
+                    pendingCandidates.push(new RTCIceCandidate(candidate));
+                }
+            }
+        });
+        
         window.peerConnection.onsignalingstatechange = () => {
             if(window.peerConnection.remoteDescription) {
-                window.pendingCandidates.forEach(c => window.peerConnection.addIceCandidate(c).catch(e=>console.error(e)));
-                window.pendingCandidates = [];
+                pendingCandidates.forEach(c => window.peerConnection.addIceCandidate(c).catch(e=>console.error(e)));
+                pendingCandidates = [];
             }
         };
     }
@@ -511,52 +454,33 @@
     window.joinPublicRoom = async function(roomId) {
         if (!user) return;
         window.stopLobbyListener();
-        const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', roomId);
+        const roomRef = ref(db, 'rooms/' + roomId);
         
         try {
             setLobbyStatus("Joining Lobby...");
-            const snapshot = await getDoc(roomRef);
-            if (!snapshot.exists() || snapshot.data().status !== 'waiting') {
+            const snapshot = await get(roomRef);
+            if (!snapshot.exists() || snapshot.val().status !== 'waiting') {
                 setLobbyStatus("Lobby no longer exists or is full.");
                 window.startLobbyListener();
                 return;
             }
             
-            // Guest instantly caches the host's profile from the document payload
-            window.opponentProfile = snapshot.data().hostProfile || window.opponentProfile;
-
-            await updateDoc(roomRef, {
+            await update(roomRef, {
                 guest: user.uid,
-                guestName: window.playerProfile.name,
-                guestProfile: window.playerProfile, // Ensures flawless profile loading
+                guestName: window.playerName,
                 status: 'connecting'
             });
 
             window.isHost = false;
             window.currentRoomId = roomId;
             setLobbyStatus("Establishing P2P Connection...");
-            
-            window.processedHostCandidates = 0;
-            window.pendingCandidates = [];
 
-            window.roomListenerUnsub = onSnapshot(roomRef, async (snap) => {
-                if(!snap.exists()) return;
-                const data = snap.data();
-
-                if (data.offer && !window.peerConnection) {
-                    startGuestWebRTC(roomRef, data.offer);
-                }
-
-                if (window.peerConnection && data.hostCandidates && data.hostCandidates.length > window.processedHostCandidates) {
-                    const newCands = data.hostCandidates.slice(window.processedHostCandidates);
-                    window.processedHostCandidates = data.hostCandidates.length;
-                    newCands.forEach(c => {
-                        if (window.peerConnection.remoteDescription) {
-                            window.peerConnection.addIceCandidate(new RTCIceCandidate(c)).catch(e=>console.error(e));
-                        } else {
-                            window.pendingCandidates.push(new RTCIceCandidate(c));
-                        }
-                    });
+            // Listen for Host Offer
+            onValue(ref(db, `rooms/${roomId}/offer`), async (snap) => {
+                const offer = snap.val();
+                if (offer && !window.peerConnection) {
+                    window.opponentName = (await get(roomRef)).val().hostName || "HOST";
+                    startGuestWebRTC(roomId, offer);
                 }
             });
 
@@ -566,7 +490,7 @@
         }
     };
 
-    async function startGuestWebRTC(roomRef, offer) {
+    async function startGuestWebRTC(roomId, offer) {
         window.peerConnection = new RTCPeerConnection(rtcConfig);
         
         window.peerConnection.ondatachannel = (e) => {
@@ -575,18 +499,31 @@
         };
 
         window.peerConnection.onicecandidate = (e) => {
-            if (e.candidate) updateDoc(roomRef, { guestCandidates: arrayUnion(e.candidate.toJSON()) });
+            if (e.candidate) push(ref(db, `rooms/${roomId}/guestCandidates`), e.candidate.toJSON());
         };
 
         await window.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await window.peerConnection.createAnswer();
         await window.peerConnection.setLocalDescription(answer);
-        await updateDoc(roomRef, { answer: { type: answer.type, sdp: answer.sdp } });
+        await update(ref(db, `rooms/${roomId}`), { answer: { type: answer.type, sdp: answer.sdp } });
+
+        // Listen for Host ICE Candidates
+        let pendingCandidates = [];
+        onChildAdded(ref(db, `rooms/${roomId}/hostCandidates`), (snap) => {
+            const candidate = snap.val();
+            if (candidate) {
+                if (window.peerConnection.remoteDescription) {
+                    window.peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error(e));
+                } else {
+                    pendingCandidates.push(new RTCIceCandidate(candidate));
+                }
+            }
+        });
 
         window.peerConnection.onsignalingstatechange = () => {
             if(window.peerConnection.remoteDescription) {
-                window.pendingCandidates.forEach(c => window.peerConnection.addIceCandidate(c).catch(e=>console.error(e)));
-                window.pendingCandidates = [];
+                pendingCandidates.forEach(c => window.peerConnection.addIceCandidate(c).catch(e=>console.error(e)));
+                pendingCandidates = [];
             }
         };
     }
@@ -594,7 +531,6 @@
     function setupDataChannelEvents(dc) {
         dc.onopen = () => {
             console.log("WebRTC Data Channel OPEN");
-            // NOTE: Profiles are already completely loaded via Firestore now, completely fixing the sync race condition
             document.getElementById('menu-lobby').classList.add('hidden');
             document.getElementById('lobby-waiting').classList.add('hidden');
             window.initGame(false, 0, true);
@@ -613,35 +549,21 @@
                 }
                 checkRematch();
             } else if (msg.type === 'gameover') {
-                if (window.p1 && window.p2) {
-                    window.p1.hp = msg.p1hp; 
-                    window.p2.hp = msg.p2hp;
-                }
-                if(window.matchActive) {
-                    if (msg.p1hp <= 0 || msg.p2hp <= 0) {
-                        window.triggerCinematic(msg.p1hp <= 0 ? window.p2 : window.p1);
-                    } else {
-                        window.checkGameOver();
-                    }
-                }
+                p1.hp = msg.p1hp; 
+                p2.hp = msg.p2hp;
+                if(matchActive) checkGameOver();
             } else if (msg.type === 'chat') {
-                window.addChatMessage(window.opponentProfile.name, msg.text, window.opponentProfile.color);
+                window.appendChatMessage(msg.sender, msg.text, false);
             }
         };
 
         dc.onclose = () => {
             console.log("WebRTC Data Channel CLOSED");
             if (window.matchActive || !document.getElementById('game-ui').classList.contains('hidden')) {
-                window.matchActive = false;
-                
-                document.getElementById('ui-container').classList.remove('hidden');
-                document.getElementById('main-menu').classList.add('hidden');
-                document.getElementById('menu-primary').classList.add('hidden');
-                
-                document.getElementById('game-over-ui').classList.remove('hidden');
                 document.getElementById('winner-text').innerText = "DISCONNECTED";
                 document.getElementById('winner-sub').innerText = "CONNECTION TO PEER LOST.";
                 document.getElementById('rematch-btn').classList.add('hidden');
+                if(window.checkGameOverNetworkEvent) window.checkGameOverNetworkEvent();
             }
         };
     }
@@ -676,137 +598,43 @@
         checkRematch();
     };
 
+    window.onlineSendChat = function(text, sender) {
+        if (window.dataChannel && window.dataChannel.readyState === 'open') {
+            window.dataChannel.send(JSON.stringify({ type: 'chat', text: text, sender: sender }));
+        }
+    };
+
     window.cleanupNetworkConnections = function() {
         if(window.dataChannel) { window.dataChannel.close(); window.dataChannel = null; }
         if(window.peerConnection) { window.peerConnection.close(); window.peerConnection = null; }
         if(window.roomListenerUnsub) { window.roomListenerUnsub(); window.roomListenerUnsub = null; }
-        if(window.currentRoomId && window.isHost) { 
-            deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'rooms', window.currentRoomId)).catch(e=>{}); 
-        }
+        if(window.currentRoomId && window.isHost) { set(ref(db, 'rooms/' + window.currentRoomId), null).catch(e=>{}); }
         window.currentRoomId = null;
         window.isHost = false;
     };
 </script>
 
 <script>
-    // Profile & Customization Management
-    window.playerProfile = JSON.parse(localStorage.getItem('pb_profile')) || {
-        name: 'BOXER_' + Math.floor(Math.random()*999),
-        finisher: 'K.O.',
-        taunt: 'COME ON!',
-        color: '#3b82f6',
-        hat: 'none'
-    };
-    
-    window.opponentProfile = {
-        name: 'OPPONENT', finisher: 'K.O.', taunt: 'BRING IT!', color: '#ef4444', hat: 'none'
-    };
-
-    window.previewFighter = null;
-    window.previewAnimFrame = null;
-    window.previewCtx = null;
-
-    function loadProfileUI() {
-        document.getElementById('profile-name-input').value = window.playerProfile.name;
-        document.getElementById('profile-finisher-input').value = window.playerProfile.finisher;
-        document.getElementById('profile-taunt-input').value = window.playerProfile.taunt;
-        document.getElementById('profile-color-input').value = window.playerProfile.color;
-        document.getElementById('profile-hat-input').value = window.playerProfile.hat || 'none';
-    }
-    loadProfileUI();
+    // Profile Management
+    window.playerName = localStorage.getItem('pb_playerName') || 'BOXER_' + Math.floor(Math.random()*999);
+    document.getElementById('profile-name-input').value = window.playerName;
 
     window.showProfileMenu = function() {
         document.getElementById('menu-primary').classList.add('hidden');
         document.getElementById('menu-profile').classList.remove('hidden');
-        
-        // Setup Character Preview Canvas
-        if (!window.previewCtx) {
-            window.previewCtx = document.getElementById('previewCanvas').getContext('2d');
-        }
-        if (!window.previewFighter) {
-            window.previewFighter = new Fighter(true, window.playerProfile);
-            window.previewFighter.groundY = 260; // Local preview ground
-            window.previewFighter.y = 260;
-            window.previewFighter.x = 100; // Center of preview canvas
-        }
-        
-        function renderPreview() {
-            window.previewCtx.clearRect(0, 0, 200, 280);
-            
-            // Dynamically sync preview to currently selected UI options
-            window.previewFighter.profile.color = document.getElementById('profile-color-input').value;
-            window.previewFighter.color = window.previewFighter.profile.color;
-            window.previewFighter.profile.hat = document.getElementById('profile-hat-input').value;
-            
-            window.previewFighter.changeState(ST_IDLE, 0); // Keep idle
-            window.previewFighter.updateAnimation();
-            window.previewFighter.draw(window.previewCtx);
-            
-            window.previewAnimFrame = requestAnimationFrame(renderPreview);
-        }
-        renderPreview();
     };
 
     window.hideProfileMenu = function() {
         document.getElementById('menu-primary').classList.remove('hidden');
         document.getElementById('menu-profile').classList.add('hidden');
-        if (window.previewAnimFrame) cancelAnimationFrame(window.previewAnimFrame);
     };
 
     window.saveProfile = function() {
-        window.playerProfile.name = document.getElementById('profile-name-input').value.trim() || 'FIGHTER';
-        window.playerProfile.finisher = document.getElementById('profile-finisher-input').value.trim() || 'K.O.';
-        window.playerProfile.taunt = document.getElementById('profile-taunt-input').value.trim() || 'BRING IT!';
-        window.playerProfile.color = document.getElementById('profile-color-input').value;
-        window.playerProfile.hat = document.getElementById('profile-hat-input').value;
-        
-        localStorage.setItem('pb_profile', JSON.stringify(window.playerProfile));
+        let inputName = document.getElementById('profile-name-input').value.trim();
+        if(inputName.length === 0) inputName = 'FIGHTER';
+        window.playerName = inputName.toUpperCase();
+        localStorage.setItem('pb_playerName', window.playerName);
         hideProfileMenu();
-    };
-
-    window.applyOpponentProfile = function() {
-        if (window.isOnlineGame) {
-            document.getElementById('hud-p1-name').innerText = window.isHost ? window.playerProfile.name : window.opponentProfile.name;
-            document.getElementById('hud-p2-name').innerText = window.isHost ? window.opponentProfile.name : window.playerProfile.name;
-        }
-    };
-
-    // Chat Management
-    function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
-
-    window.showChatInput = function() {
-        document.getElementById('chat-container').classList.remove('hidden');
-        document.getElementById('chat-container').classList.add('flex');
-        const inp = document.getElementById('chat-input');
-        inp.style.display = 'block';
-        inp.focus();
-    };
-
-    window.sendChat = function() {
-        const inp = document.getElementById('chat-input');
-        const txt = inp.value.trim();
-        inp.value = '';
-        inp.style.display = 'none';
-        inp.blur();
-        document.getElementById('gameCanvas').focus();
-        
-        if (txt && window.dataChannel && window.dataChannel.readyState === 'open') {
-            window.dataChannel.send(JSON.stringify({ type: 'chat', text: txt }));
-            window.addChatMessage(window.playerProfile.name, txt, window.playerProfile.color);
-        }
-    };
-
-    window.addChatMessage = function(name, text, color) {
-        document.getElementById('chat-container').classList.remove('hidden');
-        document.getElementById('chat-container').classList.add('flex');
-        const log = document.getElementById('chat-log');
-        const msg = document.createElement('div');
-        msg.className = "chat-bubble bg-black/50 px-2 py-1 rounded w-fit max-w-[250px] break-words shadow-sm border border-white/10";
-        msg.innerHTML = `<span style="color:${color}">${escapeHTML(name)}:</span> <span class="font-normal font-sans">${escapeHTML(text)}</span>`;
-        log.appendChild(msg);
-        
-        if (log.children.length > 6) log.removeChild(log.firstChild);
-        setTimeout(() => { if (msg.parentNode) msg.parentNode.removeChild(msg); }, 5000);
     };
 
     window.showLobbyMenu = function() {
@@ -820,10 +648,7 @@
         document.getElementById('lobby-options').classList.remove('hidden');
         document.getElementById('lobby-options').classList.add('flex');
         
-        // Let the state listener seamlessly activate the queries if logged in
-        if(typeof window.startLobbyListener === 'function') {
-            window.startLobbyListener(); 
-        }
+        window.startLobbyListener(); 
     };
 
     window.hideLobbyMenu = function() {
@@ -868,7 +693,7 @@
     const ST_P_JAB = 4, ST_P_CROSS = 5, ST_P_HOOK = 6;
     const ST_HITSTUN = 7, ST_KNOCKDOWN = 8, ST_DODGE = 9, ST_PARRY = 10;
     const ST_KNEE = 11, ST_KICK = 12, ST_CLINCH_ATTEMPT = 13, ST_CLINCHED = 14;
-    const ST_AERIAL_PUNCH = 15, ST_AERIAL_KICK = 16, ST_P_UPPERCUT = 17, ST_TAUNT = 18;
+    const ST_AERIAL_PUNCH = 15, ST_AERIAL_KICK = 16, ST_P_UPPERCUT = 17;
 
     const ATTACK_DATA = {
         [ST_P_JAB]:   { dmg: 4,  stamDmg: 10, stamCost: 15, reach: 95, windup: 14, active: 5, recov: 12, stun: 20, name: "JAB" },
@@ -882,39 +707,73 @@
         [ST_AERIAL_KICK]:    { dmg: 16, stamDmg: 25, stamCost: 25, reach: 90, windup: 16, active: 8, recov: 20, stun: 30, name: "AIR KICK", guardBreak: true, knockdown: true }
     };
 
-    const KEYS_P1 = { left: ['a'], right: ['d'], block: ['s'], dash: ['shift'], jab: ['j'], cross: ['k'], hook: ['l'], uppercut: ['h'], jump: ['w', ' '], knee: ['u'], kick: ['i'], clinch: ['o'], clinchMash: [' '], taunt: ['t'] };
-    const KEYS_P2 = { left: ['arrowleft'], right: ['arrowright'], block: ['arrowdown'], dash: ['enter', '0'], jab: ['1', '['], cross: ['2', ']'], hook: ['3', '\\'], uppercut: ['7', '\''], jump: ['arrowup'], knee: ['4', '-'], kick: ['5', '='], clinch: ['6', 'backspace'], clinchMash: ['0', 'enter'], taunt: ['m'] };
+    const KEYS_P1 = { left: ['a'], right: ['d'], block: ['s'], dash: ['shift'], jab: ['j'], cross: ['k'], hook: ['l'], uppercut: ['h'], jump: ['w', ' '], knee: ['u'], kick: ['i'], clinch: ['o'], clinchMash: [' '] };
+    const KEYS_P2 = { left: ['arrowleft'], right: ['arrowright'], block: ['arrowdown'], dash: ['enter', '0'], jab: ['1', '['], cross: ['2', ']'], hook: ['3', '\\'], uppercut: ['7', '\''], jump: ['arrowup'], knee: ['4', '-'], kick: ['5', '='], clinch: ['6', 'backspace'], clinchMash: ['0', 'enter'] };
 
     let keysDown = {};
     let prevKeysDown = {};
+    const chatInputEl = document.getElementById('chat-input');
     
     window.addEventListener('keydown', e => { 
-        if (document.activeElement && document.activeElement.id === 'chat-input') {
-            if (e.key === 'Enter') window.sendChat();
-            return;
+        if (document.activeElement === chatInputEl) {
+            if (e.key === 'Enter') window.sendChatMessage();
+            return; // Don't trigger game actions while chatting
         }
-        if (e.key === 'Enter' && window.matchActive && window.isOnlineGame) {
+        if (e.key.toLowerCase() === 't' && !e.repeat) {
             e.preventDefault();
-            window.showChatInput();
+            chatInputEl.focus();
             return;
         }
         keysDown[e.key.toLowerCase()] = true; 
     });
-    
     window.addEventListener('keyup', e => { 
-        if (document.activeElement && document.activeElement.id === 'chat-input') return;
+        if (document.activeElement === chatInputEl) return;
         keysDown[e.key.toLowerCase()] = false; 
     });
     
     function checkKey(keysArray, keyStateObj) { return keysArray ? keysArray.some(k => keyStateObj[k]) : false; }
 
-    window.matchActive = false; 
+    // Clear inputs when interacting with chat to prevent stuck movement
+    chatInputEl.addEventListener('focus', () => { keysDown = {}; });
+    chatInputEl.addEventListener('blur', () => { keysDown = {}; });
+
+    window.sendChatMessage = function() {
+        const text = chatInputEl.value.trim();
+        if (text.length > 0) {
+            window.appendChatMessage(window.playerName, text, true);
+            if (window.isOnlineGame && window.onlineSendChat) {
+                window.onlineSendChat(text, window.playerName);
+            }
+        }
+        chatInputEl.value = '';
+        chatInputEl.blur();
+        keysDown = {}; // Reset immediately to be safe
+        document.getElementById('gameCanvas').focus();
+    };
+
+    window.appendChatMessage = function(sender, text, isSelf) {
+        const container = document.getElementById('chat-messages');
+        const msgEl = document.createElement('div');
+        msgEl.className = 'chat-msg mb-1';
+        const colorClass = isSelf ? 'text-blue-400' : 'text-red-400';
+        msgEl.innerHTML = `<span class="font-bold ${colorClass}">${sender}:</span> <span class="text-white">${text}</span>`;
+        
+        container.appendChild(msgEl);
+        while (container.children.length > 8) {
+            container.removeChild(container.firstChild);
+        }
+        container.scrollTop = container.scrollHeight;
+        
+        // Auto fade out
+        setTimeout(() => {
+            msgEl.style.transition = 'opacity 1.5s ease-out';
+            msgEl.style.opacity = '0';
+            setTimeout(() => { if (msgEl.parentNode) msgEl.parentNode.removeChild(msgEl); }, 1500);
+        }, 6000);
+    };
+
     window.isOnlineGame = false;
     window.remoteLogicalInputs = {};
-
-    let cinematicMode = false;
-    let cinematicTimer = 0;
-    let cinematicWinner = null;
 
     let lastSentInputString = "";
     let syncTimer = 0;
@@ -934,20 +793,20 @@
     function spawnText(x, y, txt, color, isBig=false) { texts.push({ x, y, text: txt, color, life: 1.0, big: isBig, vy: -2 }); }
 
     class Fighter {
-        constructor(isPlayer1, profileObj) {
+        constructor(isPlayer1) {
             this.isP1 = isPlayer1;
-            this.profile = profileObj;
-            this.color = this.profile.color; 
-            
-            this.groundY = GROUND_Y;
+            this.color = isPlayer1 ? '#3b82f6' : '#ef4444'; 
             
             this.maxHp = 100; this.hp = 100;
             this.maxStamina = 300; this.stamina = 300;
+            
+            // New Cooldown System for Feinting
             this.feintCooldown = 0;
+            this.maxFeintCooldown = 150; // 2.5 seconds (at 60fps)
             
             this.width = 50; this.height = 150;
             this.x = isPlayer1 ? W*0.3 : W*0.7;
-            this.y = this.groundY;
+            this.y = GROUND_Y;
             this.vx = 0; this.vy = 0;
             this.facing = isPlayer1 ? 1 : -1;
             
@@ -1015,7 +874,7 @@
 
             let finalDmg = dmg;
             screenShake = 6;
-            let isAntiAirHit = isAntiAir && (this.y < this.groundY);
+            let isAntiAirHit = isAntiAir && (this.y < GROUND_Y);
 
             if (this.state === ST_BLOCK && !isUnblockable && !isAntiAirHit) {
                 finalDmg = Math.max(1, Math.floor(dmg * 0.3)); 
@@ -1086,8 +945,9 @@
         }
 
         updateLocal(opponent, isActive, keyMap, activeKeysDown, activePrevKeysDown) {
+            // Processing Feint Cooldowns constantly
             if (this.feintCooldown > 0) this.feintCooldown--;
-            
+
             if (this.state === ST_KNOCKDOWN) { 
                 this.applyPhysics(); 
                 if (this.stateTimer < 999 && this.stateTimer > 0) {
@@ -1101,9 +961,9 @@
             }
             if (clinchActive) { this.applyPhysics(); return; }
 
-            let isGrounded = this.y >= this.groundY;
+            let isGrounded = this.y >= GROUND_Y;
 
-            if (isGrounded && (this.state === ST_IDLE || this.state === ST_MOVE || this.state === ST_TAUNT)) {
+            if (isGrounded && (this.state === ST_IDLE || this.state === ST_MOVE)) {
                 this.stamina = Math.min(this.maxStamina, this.stamina + 1.8); 
             }
 
@@ -1133,12 +993,6 @@
                         this.vy = -18; this.stamina -= 20; isGrounded = false;
                         spawnParticles(this.x, this.y, '#555', 15);
                     }
-                    
-                    if (isGrounded && checkKey(keyMap.taunt, activeKeysDown) && !checkKey(keyMap.taunt, activePrevKeysDown) && this.state !== ST_TAUNT) {
-                        this.changeState(ST_TAUNT, 60);
-                        this.spawnText(this.x, this.y - 180, this.profile.taunt, this.color, true);
-                        this.stamina = Math.min(this.maxStamina, this.stamina + 30);
-                    }
 
                     const moveSpeed = this.stamina < 20 ? 2.5 : 6.0;
                     if (checkKey(keyMap.left, activeKeysDown)) { this.vx = -moveSpeed; moving = true; moveDir = -1; }
@@ -1153,7 +1007,7 @@
                             this.stamina -= 1; this.changeState(ST_DASH, 2); this.vx = moveDir * 14;
                             if(Math.random() < 0.4) spawnParticles(this.x, this.y, '#fff', 3);
                         }
-                        else if (this.state !== ST_DASH && this.state !== ST_DODGE && this.state !== ST_TAUNT) {
+                        else if (this.state !== ST_DASH && this.state !== ST_DODGE) {
                             if (moving) this.changeState(ST_MOVE, 1);
                             else if (Math.abs(this.vx) < 0.1) this.changeState(ST_IDLE, 0);
                         }
@@ -1161,7 +1015,7 @@
                         if (this.state === ST_MOVE || this.state === ST_DASH || this.state === ST_DODGE) this.changeState(ST_IDLE, 0);
                     }
 
-                    if (this.stamina >= 10 && this.state !== ST_DODGE && this.state !== ST_TAUNT) {
+                    if (this.stamina >= 10 && this.state !== ST_DODGE) {
                         let attack = null;
                         if (isGrounded) {
                             if (checkKey(keyMap.jab, activeKeysDown)) attack = ST_P_JAB;
@@ -1195,7 +1049,7 @@
                 this.stateTimer--;
                 
                 if (this.stateTimer === 0) {
-                    if (this.state === ST_DASH || this.state === ST_DODGE || this.state === ST_HITSTUN || this.state === ST_TAUNT || ATTACK_DATA[this.state]) {
+                    if (this.state === ST_DASH || this.state === ST_DODGE || this.state === ST_HITSTUN || ATTACK_DATA[this.state]) {
                         this.changeState(ST_IDLE, 0);
                     } else if (this.state === ST_PARRY) {
                         if (checkKey(keyMap.block, activeKeysDown)) this.changeState(ST_BLOCK, 1);
@@ -1209,14 +1063,13 @@
                     const totalDur = data.windup + data.active + data.recov;
                     const elapsed = totalDur - this.stateTimer;
 
-                    if (elapsed < data.windup && checkKey(keyMap.block, activeKeysDown) && !checkKey(keyMap.block, activePrevKeysDown)) {
-                        if (this.feintCooldown === 0) {
-                            this.changeState(ST_IDLE, 0);
-                            this.stamina += data.stamCost * 0.5; 
-                            this.feintCooldown = 180; // 3 Seconds Cooldown
-                            spawnText(this.x, this.y - 120, "FEINT", "#cbd5e1");
-                            spawnParticles(this.x, this.y - 80, '#cbd5e1', 15, 1.2);
-                        }
+                    // Handling Feint with Cooldown Checks
+                    if (elapsed < data.windup && checkKey(keyMap.block, activeKeysDown) && !checkKey(keyMap.block, activePrevKeysDown) && this.feintCooldown === 0) {
+                        this.changeState(ST_IDLE, 0);
+                        this.stamina += data.stamCost * 0.5; 
+                        this.feintCooldown = this.maxFeintCooldown; // Put Feint on CD
+                        spawnText(this.x, this.y - 120, "FEINT", "#cbd5e1");
+                        spawnParticles(this.x, this.y - 80, '#cbd5e1', 15, 1.2);
                         return; 
                     }
 
@@ -1253,32 +1106,28 @@
 
             this.applyPhysics();
         }
-
-        spawnText(x, y, txt, color, isBig=false) {
-             texts.push({ x, y, text: txt, color, life: 1.0, big: isBig, vy: -2 });
-        }
         
         applyPhysics() {
-            if(isNaN(this.x) || isNaN(this.y) || isNaN(this.vx) || isNaN(this.vy)) { this.x = W/2; this.y = this.groundY; this.vx = 0; this.vy = 0; }
+            if(isNaN(this.x) || isNaN(this.y) || isNaN(this.vx) || isNaN(this.vy)) { this.x = W/2; this.y = GROUND_Y; this.vx = 0; this.vy = 0; }
             this.x += this.vx; this.y += this.vy;
             
             if (this.state === ST_KNOCKDOWN) {
                 this.rotation += this.kdRotVel; 
             }
 
-            if (this.y < this.groundY) { 
+            if (this.y < GROUND_Y) { 
                 this.vy += GRAVITY; 
             } else {
                 if (this.state === ST_KNOCKDOWN && this.vy > 4) {
                     screenShake = Math.max(screenShake, Math.min(25, this.vy * 1.5));
                     this.vy = -this.vy * 0.4;
                     this.vx *= 0.6;
-                    this.y = this.groundY;
+                    this.y = GROUND_Y;
                     this.kdRotVel = -this.kdRotVel * 0.5; 
-                    spawnParticles(this.x, this.groundY, '#aaa', 10, 0.5);
+                    spawnParticles(this.x, GROUND_Y, '#aaa', 10, 0.5);
                 } else {
-                    if (this.y > this.groundY && this.vy > 0 && ATTACK_DATA[this.state] && this.state >= ST_AERIAL_PUNCH) this.changeState(ST_IDLE, 0); 
-                    this.y = this.groundY; this.vy = 0;
+                    if (this.y > GROUND_Y && this.vy > 0 && ATTACK_DATA[this.state] && this.state >= ST_AERIAL_PUNCH) this.changeState(ST_IDLE, 0); 
+                    this.y = GROUND_Y; this.vy = 0;
                     
                     if (this.state === ST_KNOCKDOWN) {
                         this.vx *= 0.8;
@@ -1296,7 +1145,7 @@
 
         updateAnimation() {
             this.resetTargets();
-            let isGrounded = this.y >= this.groundY;
+            let isGrounded = this.y >= GROUND_Y;
             
             let targetSway = (this.state === ST_DODGE) ? -this.facing * 0.35 : 0;
             this.swayAmount += (targetSway - this.swayAmount) * 0.4;
@@ -1311,10 +1160,6 @@
             } else if (this.state === ST_BLOCK) {
                 this.gloveL.targetX = this.facing * 10; this.gloveL.targetY = -120;
                 this.gloveR.targetX = this.facing * 5; this.gloveR.targetY = -100;
-            } else if (this.state === ST_TAUNT) {
-                this.gloveL.targetY = -170; this.gloveR.targetY = -160;
-                this.gloveL.targetX = this.facing * 40; this.gloveR.targetX = -this.facing * 20;
-                targetRotation = Math.sin(Date.now() / 80) * 0.15;
             } else if (ATTACK_DATA[this.state]) {
                 const data = ATTACK_DATA[this.state];
                 const totalDur = data.windup + data.active + data.recov;
@@ -1354,7 +1199,7 @@
                 targetRotation = -this.facing * 0.15;
                 this.gloveL.targetY = -55; this.gloveR.targetY = -55;
             } else if (this.state === ST_KNOCKDOWN) {
-                if (this.y < this.groundY) {
+                if (this.y < GROUND_Y) {
                     this.gloveL.targetX = -this.facing * 30; this.gloveL.targetY = -120 + Math.sin(Date.now()/50)*30;
                     this.gloveR.targetX = this.facing * 30; this.gloveR.targetY = -140 + Math.cos(Date.now()/50)*30;
                     this.footL.targetX = -this.facing * 40; this.footL.targetY = -20 + Math.sin(Date.now()/40)*20;
@@ -1413,10 +1258,10 @@
         draw(ctx) {
             ctx.save();
             ctx.save();
-            ctx.translate(this.x, this.groundY);
+            ctx.translate(this.x, GROUND_Y);
             ctx.fillStyle = 'rgba(0,0,0,0.8)';
             ctx.beginPath();
-            let shadowWidth = (this.state === ST_KNOCKDOWN) ? 70 : Math.max(15, 40 - (this.groundY - this.y)*0.2);
+            let shadowWidth = (this.state === ST_KNOCKDOWN) ? 70 : Math.max(15, 40 - (GROUND_Y - this.y)*0.2);
             ctx.ellipse(0, 0, shadowWidth, 10, 0, 0, Math.PI * 2); ctx.fill();
             ctx.restore();
 
@@ -1443,42 +1288,19 @@
             ctx.fillStyle = bodyGrad;
             ctx.beginPath(); ctx.roundRect(-18, -this.height + 25 + this.duckAmount, 36, this.height - 75 - this.duckAmount, 12); ctx.fill();
             
-            // Trunks
-            ctx.fillStyle = this.color; ctx.beginPath(); ctx.roundRect(-20, -65, 40, 25, 6); ctx.fill();
+            ctx.fillStyle = this.isP1 ? '#1e3a8a' : '#7f1d1d'; ctx.beginPath(); ctx.roundRect(-20, -65, 40, 25, 6); ctx.fill();
             ctx.fillStyle = '#f8fafc'; ctx.fillRect(-20, -65, 40, 6); 
 
-            // Arms & Gloves
-            ctx.strokeStyle = this.color; ctx.lineWidth = 10;
+            ctx.strokeStyle = this.isP1 ? '#93c5fd' : '#fca5a5'; ctx.lineWidth = 10;
             ctx.beginPath(); ctx.moveTo(-6, -this.height + 40 + this.duckAmount); ctx.lineTo(this.gloveR.x, this.gloveR.y); ctx.stroke();
             
-            // Head
             ctx.fillStyle = '#fecaca'; ctx.beginPath(); ctx.arc(this.headOffset.x, this.headOffset.y, 22, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.arc(this.headOffset.x - this.facing*7, this.headOffset.y + 2, 18, 0, Math.PI*2); ctx.fill();
             
-            // Headgear / Hats
-            if (this.profile && this.profile.hat) {
-                if (this.profile.hat === 'kippah') {
-                    ctx.fillStyle = '#111827';
-                    ctx.beginPath();
-                    ctx.ellipse(this.headOffset.x - this.facing * 6, this.headOffset.y - 18, 14, 5, -Math.PI/6 * this.facing, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if (this.profile.hat === 'widebrim') {
-                    // Brim
-                    ctx.fillStyle = '#111827';
-                    ctx.beginPath();
-                    ctx.ellipse(this.headOffset.x, this.headOffset.y - 12, 36, 4, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    // Crown
-                    ctx.beginPath();
-                    ctx.roundRect(this.headOffset.x - 16, this.headOffset.y - 24, 32, 12, [2, 2, 0, 0]);
-                    ctx.fill();
-                }
-            }
-            
             ctx.beginPath(); ctx.moveTo(6, -this.height + 40 + this.duckAmount); ctx.lineTo(this.gloveL.x, this.gloveL.y); ctx.stroke();
 
-            ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.gloveR.x, this.gloveR.y, 16, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.gloveL.x, this.gloveL.y, 18, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = this.isP1 ? '#2563eb' : '#dc2828'; ctx.beginPath(); ctx.arc(this.gloveR.x, this.gloveR.y, 16, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = this.isP1 ? '#3b82f6' : '#ef4444'; ctx.beginPath(); ctx.arc(this.gloveL.x, this.gloveL.y, 18, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.arc(this.gloveL.x + this.facing*6, this.gloveL.y - 6, 6, 0, Math.PI*2); ctx.fill();
 
             if (ATTACK_DATA[this.state] && ATTACK_DATA[this.state].guardBreak) {
@@ -1501,24 +1323,33 @@
         }
     }
 
+    let p1, p2;
     let gameTimer = 99;
+    let matchActive = false; 
     let gameStarted = false;
     let vsCPU = false;
     let cpuDifficulty = 0;
     let cpuReactionTimer = 0;
     let lastLoopTime = 0;
+    let gameOverTimeout = null;
     let cpuInputs = {};
     let cpuPrevInputs = {};
 
     function getLogicalInputs(keysObj, keyMap) {
         return {
-            left: checkKey(keyMap.left, keysObj), right: checkKey(keyMap.right, keysObj),
-            block: checkKey(keyMap.block, keysObj), dash: checkKey(keyMap.dash, keysObj),
-            jump: checkKey(keyMap.jump, keysObj), jab: checkKey(keyMap.jab, keysObj),
-            cross: checkKey(keyMap.cross, keysObj), hook: checkKey(keyMap.hook, keysObj),
-            uppercut: checkKey(keyMap.uppercut, keysObj), knee: checkKey(keyMap.knee, keysObj),
-            kick: checkKey(keyMap.kick, keysObj), clinch: checkKey(keyMap.clinch, keysObj),
-            clinchMash: checkKey(keyMap.clinchMash, keysObj), taunt: checkKey(keyMap.taunt, keysObj)
+            left: checkKey(keyMap.left, keysObj),
+            right: checkKey(keyMap.right, keysObj),
+            block: checkKey(keyMap.block, keysObj),
+            dash: checkKey(keyMap.dash, keysObj),
+            jump: checkKey(keyMap.jump, keysObj),
+            jab: checkKey(keyMap.jab, keysObj),
+            cross: checkKey(keyMap.cross, keysObj),
+            hook: checkKey(keyMap.hook, keysObj),
+            uppercut: checkKey(keyMap.uppercut, keysObj),
+            knee: checkKey(keyMap.knee, keysObj),
+            kick: checkKey(keyMap.kick, keysObj),
+            clinch: checkKey(keyMap.clinch, keysObj),
+            clinchMash: checkKey(keyMap.clinchMash, keysObj)
         };
     }
 
@@ -1538,16 +1369,15 @@
         if(logicalObj.kick) physical[map.kick[0]] = true;
         if(logicalObj.clinch) physical[map.clinch[0]] = true;
         if(logicalObj.clinchMash) physical[map.clinchMash[0]] = true;
-        if(logicalObj.taunt) physical[map.taunt[0]] = true;
         return physical;
     }
 
     window.applyHostSync = function(syncData) {
-        if (!window.matchActive && !cinematicMode) return;
+        if (!matchActive) return;
         if (Math.abs(gameTimer - syncData.t) > 2) gameTimer = syncData.t; 
         
-        window.p1.hp = syncData.p1hp; window.p1.stamina = syncData.p1s;
-        window.p2.hp = syncData.p2hp; window.p2.stamina = syncData.p2s;
+        p1.hp = syncData.p1hp; p1.stamina = syncData.p1s;
+        p2.hp = syncData.p2hp; p2.stamina = syncData.p2s;
         
         window.hostSyncP1X = syncData.p1x;
         window.hostSyncP2X = syncData.p2x;
@@ -1557,6 +1387,7 @@
         vsCPU = playAgainstCPU;
         cpuDifficulty = diff;
         window.isOnlineGame = isOnline;
+        clearTimeout(gameOverTimeout);
         
         document.getElementById('ui-container').classList.add('hidden');
         document.getElementById('game-ui').classList.remove('hidden');
@@ -1565,26 +1396,28 @@
         
         if (window.isOnlineGame) {
             document.getElementById('network-ping').classList.remove('hidden');
-            window.applyOpponentProfile(); // Sync UI names natively
         } else {
-            const cpuNames = ["ROOKIE CPU", "PRO CPU", "CHAMPION CPU"];
-            if (vsCPU) {
-                window.opponentProfile = { name: cpuNames[cpuDifficulty], finisher: 'DOMINATED', taunt: 'BEEP BOOP.', color: '#ef4444', hat: 'none' };
-            } else {
-                window.opponentProfile = { name: 'PLAYER 2', finisher: 'K.O.', taunt: 'TOO EASY.', color: '#ef4444', hat: 'none' };
-            }
-            document.getElementById('hud-p1-name').innerText = window.playerProfile.name;
-            document.getElementById('hud-p2-name').innerText = window.opponentProfile.name;
+            document.getElementById('network-ping').classList.add('hidden');
+        }
+
+        const cpuNames = ["ROOKIE CPU", "PRO CPU", "CHAMPION CPU"];
+        
+        if (window.isOnlineGame) {
+            document.getElementById('hud-p1-name').innerText = window.isHost ? window.playerName : window.opponentName;
+            document.getElementById('hud-p2-name').innerText = window.isHost ? window.opponentName : window.playerName;
+        } else {
+            document.getElementById('hud-p1-name').innerText = window.playerName;
+            document.getElementById('hud-p2-name').innerText = vsCPU ? cpuNames[cpuDifficulty] : "PLAYER 2";
         }
         
         if (vsCPU || window.isOnlineGame) {
             document.getElementById('controls-text').innerHTML = `
-                <span class="text-blue-400 font-bold">YOUR CONTROLS:</span> WASD Move &nbsp;|&nbsp; Space Jump &nbsp;|&nbsp; Shift Dodge &nbsp;|&nbsp; S Block/Feint &nbsp;|&nbsp; J,K,L Punch &nbsp;|&nbsp; H Uppercut &nbsp;|&nbsp; U,I Kick &nbsp;|&nbsp; O Clinch &nbsp;|&nbsp; T Taunt
+                <span class="text-blue-400 font-bold">YOUR CONTROLS:</span> WASD Move &nbsp;|&nbsp; Space/W Jump &nbsp;|&nbsp; Shift Dodge &nbsp;|&nbsp; S Block/Feint &nbsp;|&nbsp; J,K,L Punch &nbsp;|&nbsp; H Uppercut &nbsp;|&nbsp; U,I Kick &nbsp;|&nbsp; O Clinch &nbsp;|&nbsp; T Chat
             `;
         } else {
             document.getElementById('controls-text').innerHTML = `
-                <span class="text-blue-400 font-bold">P1:</span> WASD Move | Shift Dodge | S Block | J,K,L Punch | H Uppercut | U,I Kick | O Clinch | T Taunt &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp; 
-                <span class="text-red-400 font-bold">P2:</span> Arrows Move | Enter Dodge | Down Block | 1,2,3 Punch | 7 Uppercut | 4,5 Kick | 6 Clinch | M Taunt
+                <span class="text-blue-400 font-bold">P1:</span> WASD Move | Shift Dodge | S Block | J,K,L Punch | H Uppercut | U,I Kick | O Clinch &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp; 
+                <span class="text-red-400 font-bold">P2:</span> Arrows Move | Enter Dodge | Down Block | 1,2,3 Punch | 7 Uppercut | 4,5 Kick | 6 Clinch
             `;
         }
 
@@ -1596,11 +1429,7 @@
         window.localWantsRematch = false;
         window.remoteWantsRematch = false;
         
-        cinematicMode = false;
-        cinematicTimer = 0;
-        cinematicWinner = null;
-        
-        const p2KeysList = ['arrowleft', 'arrowright', 'arrowdown', 'arrowup', 'enter', '0', '1', '2', '3', '4', '5', '6', '7', 'backspace', '[', ']', '\\', '\'', '-', '=', 'm'];
+        const p2KeysList = ['arrowleft', 'arrowright', 'arrowdown', 'arrowup', 'enter', '0', '1', '2', '3', '4', '5', '6', '7', 'backspace', '[', ']', '\\', '\'', '-', '='];
         p2KeysList.forEach(k => cpuInputs[k] = false);
         cpuPrevInputs = { ...cpuInputs };
         
@@ -1608,9 +1437,9 @@
         clinchActive = false; clinchScoreP1 = 0; clinchScoreP2 = 0; cpuReactionTimer = 0;
         syncTimer = 0;
 
-        window.p1 = new Fighter(true, window.isHost || !window.isOnlineGame ? window.playerProfile : window.opponentProfile); 
-        window.p2 = new Fighter(false, window.isHost || !window.isOnlineGame ? window.opponentProfile : window.playerProfile);
-        gameTimer = 99; window.matchActive = true; 
+        p1 = new Fighter(true); 
+        p2 = new Fighter(false);
+        gameTimer = 99; matchActive = true; 
         
         document.getElementById('game-over-ui').classList.add('hidden');
         hideDifficultyMenu(); 
@@ -1621,6 +1450,7 @@
     };
 
     window.resetMatchForRematch = function() {
+        clearTimeout(gameOverTimeout);
         document.getElementById('ui-container').classList.add('hidden');
         document.getElementById('game-over-ui').classList.add('hidden');
         document.getElementById('winner-sub').innerText = "The bout is over.";
@@ -1628,13 +1458,11 @@
 
         keysDown = {}; prevKeysDown = {}; cpuInputs = {}; window.remoteLogicalInputs = {};
         screenShake = 0; particles = []; texts = [];
-        clinchActive = false; window.matchActive = true; gameTimer = 99;
+        clinchActive = false; matchActive = true; gameTimer = 99;
         window.localWantsRematch = false; window.remoteWantsRematch = false;
         
-        cinematicMode = false; cinematicTimer = 0; cinematicWinner = null;
-        
-        window.p1 = new Fighter(true, window.isHost || !window.isOnlineGame ? window.playerProfile : window.opponentProfile); 
-        window.p2 = new Fighter(false, window.isHost || !window.isOnlineGame ? window.opponentProfile : window.playerProfile);
+        p1 = new Fighter(true); 
+        p2 = new Fighter(false);
         lastLoopTime = performance.now();
         document.getElementById('gameCanvas').focus();
     };
@@ -1648,21 +1476,22 @@
     };
 
     function processCPU() {
-        if (!window.matchActive || window.p2.state === ST_KNOCKDOWN) return;
+        if (!matchActive || p2.state === ST_KNOCKDOWN) return;
         
         cpuPrevInputs = { ...cpuInputs };
 
         const diffProfiles = [
-            { reactBase: 15, reactRand: 20, block: 0.60, dodge: 0.30, atkFreq: 0.60, mashSpd: 10, tauntFreq: 0.05 },
-            { reactBase: 5,  reactRand: 10, block: 0.85, dodge: 0.50, atkFreq: 0.80, mashSpd: 4, tauntFreq: 0.02 },
-            { reactBase: 1,  reactRand: 5,  block: 0.98, dodge: 0.80, atkFreq: 0.95, mashSpd: 2, tauntFreq: 0.01 }
+            { reactBase: 15, reactRand: 20, block: 0.60, dodge: 0.30, atkFreq: 0.60, mashSpd: 10 },
+            { reactBase: 5,  reactRand: 10, block: 0.85, dodge: 0.50, atkFreq: 0.80, mashSpd: 4 },
+            { reactBase: 1,  reactRand: 5,  block: 0.98, dodge: 0.80, atkFreq: 0.95, mashSpd: 2 }
         ];
         let prof = diffProfiles[cpuDifficulty];
 
-        if (cpuDifficulty === 2 && ATTACK_DATA[window.p2.state]) {
-            let data = ATTACK_DATA[window.p2.state];
-            let elapsed = (data.windup + data.active + data.recov) - window.p2.stateTimer;
-            if (elapsed === 6 && (window.p2.state === ST_P_HOOK || window.p2.state === ST_KICK) && Math.random() < 0.4 && window.p2.feintCooldown === 0) {
+        if (cpuDifficulty === 2 && ATTACK_DATA[p2.state]) {
+            let data = ATTACK_DATA[p2.state];
+            let elapsed = (data.windup + data.active + data.recov) - p2.stateTimer;
+            // CPU feint logic with cooldown integration
+            if (elapsed === 6 && (p2.state === ST_P_HOOK || p2.state === ST_KICK) && Math.random() < 0.4 && p2.feintCooldown === 0) {
                 cpuInputs.arrowdown = true; 
             }
         }
@@ -1682,18 +1511,18 @@
         cpuReactionTimer = prof.reactBase + Math.random() * prof.reactRand; 
         Object.keys(cpuInputs).forEach(k => cpuInputs[k] = false);
         
-        let dist = Math.abs(window.p1.x - window.p2.x);
-        let isP1Attacking = window.p1.hitboxActive || (ATTACK_DATA[window.p1.state] && window.p1.stateTimer > ATTACK_DATA[window.p1.state].recov);
+        let dist = Math.abs(p1.x - p2.x);
+        let isP1Attacking = p1.hitboxActive || (ATTACK_DATA[p1.state] && p1.stateTimer > ATTACK_DATA[p1.state].recov);
         
-        let movingAway = window.p2.x > window.p1.x ? 'arrowright' : 'arrowleft';
-        let movingToward = window.p2.x > window.p1.x ? 'arrowleft' : 'arrowright';
+        let movingAway = p2.x > p1.x ? 'arrowright' : 'arrowleft';
+        let movingToward = p2.x > p1.x ? 'arrowleft' : 'arrowright';
 
-        if (isP1Attacking && window.p2.stamina > 20) {
+        if (isP1Attacking && p2.stamina > 20) {
             if (Math.random() < prof.block) { cpuInputs.arrowdown = true; cpuReactionTimer = 25; return; }
             else if (Math.random() < prof.dodge) { cpuInputs.enter = true; return; }
         }
         
-        if (window.p2.stamina < 50 && !isP1Attacking) {
+        if (p2.stamina < 50 && !isP1Attacking) {
             cpuInputs[movingAway] = true;
             if(Math.random() < 0.1) cpuInputs.enter = true;
             cpuReactionTimer = 15; return;
@@ -1701,14 +1530,13 @@
 
         if (dist > 180) {
             cpuInputs[movingToward] = true;
-            if (Math.random() < 0.2 && window.p2.stamina > 20) cpuInputs.enter = true; 
+            if (Math.random() < 0.2 && p2.stamina > 20) cpuInputs.enter = true; 
             if (Math.random() < 0.1) cpuInputs.arrowup = true; 
-            if (Math.random() < prof.tauntFreq && window.p1.state !== ST_KNOCKDOWN) cpuInputs['m'] = true; // Taunt!
             cpuReactionTimer = 15; 
         } else {
-            if (Math.random() < prof.atkFreq && window.p2.stamina >= 20) {
+            if (Math.random() < prof.atkFreq && p2.stamina >= 20) {
                 let rand = Math.random();
-                if (window.p1.y < GROUND_Y - 30 && dist < 120 && Math.random() < 0.7) cpuInputs['7'] = true; 
+                if (p1.y < GROUND_Y - 30 && dist < 120 && Math.random() < 0.7) cpuInputs['7'] = true; 
                 else {
                     if (rand < 0.20) cpuInputs['1'] = true; else if (rand < 0.40) cpuInputs['2'] = true; 
                     else if (rand < 0.55) cpuInputs['3'] = true; else if (rand < 0.70) cpuInputs['7'] = true; 
@@ -1724,82 +1552,80 @@
     }
 
     function triggerClinch() {
-        window.p1.changeState(ST_CLINCHED, 999); window.p2.changeState(ST_CLINCHED, 999);
-        window.p1.x = W/2 - 20; window.p2.x = W/2 + 20;
+        p1.changeState(ST_CLINCHED, 999); p2.changeState(ST_CLINCHED, 999);
+        p1.x = W/2 - 20; p2.x = W/2 + 20;
         clinchActive = true; clinchTimer = CLINCH_MAX_TIME;
         clinchScoreP1 = 0; clinchScoreP2 = 0; screenShake = 15;
     }
 
     function updateUI() {
-        document.getElementById('p1-hp').style.width = `${Math.max(0, window.p1.hp)}%`;
-        document.getElementById('p1-stam').style.width = `${Math.max(0, (window.p1.stamina / window.p1.maxStamina) * 100)}%`;
+        document.getElementById('p1-hp').style.width = `${Math.max(0, p1.hp)}%`;
+        document.getElementById('p1-stam').style.width = `${Math.max(0, (p1.stamina / p1.maxStamina) * 100)}%`;
         
-        let p1FeintPerc = window.p1.feintCooldown === 0 ? 100 : 100 - (window.p1.feintCooldown / 180) * 100;
-        document.getElementById('p1-feint').style.width = `${p1FeintPerc}%`;
-        document.getElementById('p1-feint').style.backgroundColor = window.p1.feintCooldown === 0 ? "#c084fc" : "#7e22ce";
+        // Processing Feint Cooldown HUD visual
+        let p1FeintPct = p1.feintCooldown === 0 ? 100 : ((p1.maxFeintCooldown - p1.feintCooldown) / p1.maxFeintCooldown) * 100;
+        document.getElementById('p1-feint-bar').style.width = `${p1FeintPct}%`;
+        document.getElementById('p1-feint-bar').className = p1.feintCooldown === 0 
+            ? "h-full bg-cyan-300 w-full transition-all duration-100 origin-left shadow-[0_0_8px_#67e8f9]" 
+            : "h-full bg-gray-600 w-full origin-left transition-none";
 
-        document.getElementById('p2-hp').style.width = `${Math.max(0, window.p2.hp)}%`;
-        document.getElementById('p2-stam').style.width = `${Math.max(0, (window.p2.stamina / window.p2.maxStamina) * 100)}%`;
+        document.getElementById('p2-hp').style.width = `${Math.max(0, p2.hp)}%`;
+        document.getElementById('p2-stam').style.width = `${Math.max(0, (p2.stamina / p2.maxStamina) * 100)}%`;
         
-        let p2FeintPerc = window.p2.feintCooldown === 0 ? 100 : 100 - (window.p2.feintCooldown / 180) * 100;
-        document.getElementById('p2-feint').style.width = `${p2FeintPerc}%`;
-        document.getElementById('p2-feint').style.backgroundColor = window.p2.feintCooldown === 0 ? "#c084fc" : "#7e22ce";
+        let p2FeintPct = p2.feintCooldown === 0 ? 100 : ((p2.maxFeintCooldown - p2.feintCooldown) / p2.maxFeintCooldown) * 100;
+        document.getElementById('p2-feint-bar').style.width = `${p2FeintPct}%`;
+        document.getElementById('p2-feint-bar').className = p2.feintCooldown === 0 
+            ? "h-full bg-cyan-300 w-full transition-all duration-100 origin-right shadow-[0_0_8px_#67e8f9]" 
+            : "h-full bg-gray-600 w-full origin-right transition-none";
 
         document.getElementById('timer').innerText = Math.max(0, Math.ceil(gameTimer));
     }
 
-    window.triggerCinematic = function(winner) {
-        if (cinematicMode) return; 
-        window.matchActive = false;
-        clinchActive = false;
-        cinematicMode = true;
-        cinematicTimer = 0;
-        cinematicWinner = winner;
-
-        if (window.isOnlineGame && window.dataChannel && window.dataChannel.readyState === 'open') {
-            window.dataChannel.send(JSON.stringify({ type: 'gameover', p1hp: window.p1.hp, p2hp: window.p2.hp }));
-        }
-
-        if (winner) {
-            winner.changeState(ST_TAUNT, 999);
-            winner.stamina = winner.maxStamina; 
-        }
-        screenShake = 30; // Massive hitstop feeling
-    };
-
-    window.checkGameOver = function() {
-        window.matchActive = false; clinchActive = false; cinematicMode = false;
-        
+    window.checkGameOverNetworkEvent = function() {
+        matchActive = false; clinchActive = false;
         document.getElementById('ui-container').classList.remove('hidden');
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('menu-primary').classList.add('hidden');
         document.getElementById('game-over-ui').classList.remove('hidden');
-        document.getElementById('rematch-btn').classList.remove('hidden'); 
-        
-        let winnerTxt = "K.O."; let subTxt = "The bout is over.";
-        
-        if (window.p1.hp > 0 && window.p2.hp > 0) winnerTxt = "TIME OUT";
-        
-        if (window.isOnlineGame) {
-            let myFighter = window.isHost ? window.p1 : window.p2;
-            let oppFighter = window.isHost ? window.p2 : window.p1;
+    }
+
+    function checkGameOver() {
+        if(!matchActive) return;
+        matchActive = false; clinchActive = false;
+
+        // Ensure the peer knows the match is over, avoiding desyncs where one player stops sending HP updates
+        if (window.isOnlineGame && window.dataChannel && window.dataChannel.readyState === 'open') {
+            window.dataChannel.send(JSON.stringify({ type: 'gameover', p1hp: p1.hp, p2hp: p2.hp }));
+        }
+
+        gameOverTimeout = setTimeout(() => {
+            document.getElementById('ui-container').classList.remove('hidden');
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('menu-primary').classList.add('hidden');
+            document.getElementById('game-over-ui').classList.remove('hidden');
+            document.getElementById('rematch-btn').classList.remove('hidden'); // Guarantee visibility
             
-            if(myFighter.hp > oppFighter.hp) { subTxt = "YOU DEFEATED YOUR OPPONENT!"; }
-            else if(oppFighter.hp > myFighter.hp) { subTxt = "YOUR OPPONENT WON."; }
-            else { subTxt = "IT'S A DRAW."; }
-        } else {
-            if(window.p1.hp > window.p2.hp) { subTxt = vsCPU ? "YOU DEFEATED THE CPU!" : "PLAYER 1 IS VICTORIOUS!"; }
-            else if(window.p2.hp > window.p1.hp) { subTxt = vsCPU ? "THE CPU CRUSHED YOU." : "PLAYER 2 IS VICTORIOUS!"; }
-            else { subTxt = "IT'S A DRAW."; }
-        }
-        
-        document.getElementById('winner-text').innerText = winnerTxt; 
-        
-        if (window.remoteWantsRematch) {
-            document.getElementById('winner-sub').innerText = "OPPONENT WANTS REMATCH...";
-        } else {
-            document.getElementById('winner-sub').innerText = subTxt;
-        }
+            let winnerTxt = "DRAW"; let subTxt = "The bout is over.";
+            
+            if (window.isOnlineGame) {
+                let myFighter = window.isHost ? p1 : p2;
+                let oppFighter = window.isHost ? p2 : p1;
+                if(myFighter.hp > oppFighter.hp) { winnerTxt = "VICTORY"; subTxt = "YOU DEFEATED YOUR OPPONENT!"; }
+                if(oppFighter.hp > myFighter.hp) { winnerTxt = "DEFEAT"; subTxt = "YOUR OPPONENT WON."; }
+            } else {
+                if(p1.hp > p2.hp) { winnerTxt = "P1 WINS"; subTxt = vsCPU ? "YOU DEFEATED THE CPU!" : "PLAYER 1 IS VICTORIOUS!"; }
+                if(p2.hp > p1.hp) { winnerTxt = "P2 WINS"; subTxt = vsCPU ? "THE CPU CRUSHED YOU." : "PLAYER 2 IS VICTORIOUS!"; }
+            }
+            
+            document.getElementById('winner-text').innerText = winnerTxt; 
+            
+            // Don't overwrite the rematch text if the peer already requested one during the timeout
+            if (window.remoteWantsRematch) {
+                document.getElementById('winner-sub').innerText = "OPPONENT WANTS REMATCH...";
+            } else {
+                document.getElementById('winner-sub').innerText = subTxt;
+            }
+        }, 2000);
     }
 
     function gameLoop(timestamp) {
@@ -1811,26 +1637,12 @@
         if (dt < 16) return; 
         lastLoopTime = timestamp - (dt % 16); 
         
-        if (window.matchActive && !clinchActive) {
+        if (matchActive && !clinchActive) {
             gameTimer -= 1/60; 
-            if (window.p1.hp <= 0 || window.p2.hp <= 0) {
-                window.triggerCinematic(window.p1.hp <= 0 ? window.p2 : window.p1);
-            } else if (gameTimer <= 0) {
-                window.checkGameOver();
-            }
+            if(gameTimer <= 0 || p1.hp <= 0 || p2.hp <= 0) checkGameOver();
         }
 
-        if (cinematicMode) {
-            cinematicTimer++;
-            // Don't read user input during cutscene, but continue to update animations
-            window.p1.updateLocal(window.p2, false, KEYS_P1, {}, {});
-            window.p2.updateLocal(window.p1, false, KEYS_P2, {}, {});
-            
-            if (cinematicTimer > 180) { // 3 seconds cutscene
-                cinematicMode = false;
-                window.checkGameOver();
-            }
-        } else if (window.isOnlineGame) {
+        if (window.isOnlineGame) {
             let myLogical = getLogicalInputs(keysDown, KEYS_P1);
             let strMyLogical = JSON.stringify(myLogical);
             
@@ -1842,24 +1654,24 @@
             let networkP1Keys = window.isHost ? keysDown : applyLogicalToPhysical(window.remoteLogicalInputs, true);
             let networkP2Keys = window.isHost ? applyLogicalToPhysical(window.remoteLogicalInputs, false) : applyLogicalToPhysical(myLogical, false);
 
-            if (window.isHost && window.matchActive) {
+            if (window.isHost && matchActive) {
                 syncTimer++;
                 if (syncTimer >= 5) {
                     syncTimer = 0;
-                    window.onlineSendSync({ p1x: window.p1.x, p1hp: window.p1.hp, p1s: window.p1.stamina, p2x: window.p2.x, p2hp: window.p2.hp, p2s: window.p2.stamina, t: gameTimer });
+                    window.onlineSendSync({ p1x: p1.x, p1hp: p1.hp, p1s: p1.stamina, p2x: p2.x, p2hp: p2.hp, p2s: p2.stamina, t: gameTimer });
                 }
-            } else if (!window.isHost && window.matchActive) {
-                if (window.hostSyncP1X !== undefined) window.p1.x += (window.hostSyncP1X - window.p1.x) * 0.15;
-                if (window.hostSyncP2X !== undefined && Math.abs(window.p2.x - window.hostSyncP2X) > 15) {
-                    window.p2.x += (window.hostSyncP2X - window.p2.x) * 0.05;
+            } else if (!window.isHost && matchActive) {
+                if (window.hostSyncP1X !== undefined) p1.x += (window.hostSyncP1X - p1.x) * 0.15;
+                if (window.hostSyncP2X !== undefined && Math.abs(p2.x - window.hostSyncP2X) > 15) {
+                    p2.x += (window.hostSyncP2X - p2.x) * 0.05;
                 }
             }
 
             processClinch(networkP1Keys, prevKeysDown, networkP2Keys, cpuPrevInputs);
             if (!clinchActive) { applySpacing(); }
             
-            window.p1.updateLocal(window.p2, window.matchActive, KEYS_P1, networkP1Keys, prevKeysDown);
-            window.p2.updateLocal(window.p1, window.matchActive, KEYS_P2, networkP2Keys, cpuPrevInputs);
+            p1.updateLocal(p2, matchActive, KEYS_P1, networkP1Keys, prevKeysDown);
+            p2.updateLocal(p1, matchActive, KEYS_P2, networkP2Keys, cpuPrevInputs);
             
             prevKeysDown = { ...networkP1Keys }; 
             cpuPrevInputs = { ...networkP2Keys };
@@ -1872,13 +1684,13 @@
             processClinch(keysDown, prevKeysDown, p2ActiveKeys, p2PrevKeys);
             if (!clinchActive) { applySpacing(); }
 
-            window.p1.updateLocal(window.p2, window.matchActive, KEYS_P1, keysDown, prevKeysDown);
-            window.p2.updateLocal(window.p1, window.matchActive, KEYS_P2, p2ActiveKeys, p2PrevKeys);
+            p1.updateLocal(p2, matchActive, KEYS_P1, keysDown, prevKeysDown);
+            p2.updateLocal(p1, matchActive, KEYS_P2, p2ActiveKeys, p2PrevKeys);
             
             prevKeysDown = { ...keysDown }; 
         }
         
-        window.p1.updateAnimation(); window.p2.updateAnimation();
+        p1.updateAnimation(); p2.updateAnimation();
         drawGame();
     }
 
@@ -1890,18 +1702,18 @@
             
             if (clinchTimer <= 0) {
                 clinchActive = false;
-                if (clinchScoreP1 > clinchScoreP2) { window.p2.changeState(ST_KNOCKDOWN, 80); window.p2.vy = -12; window.p2.vx = 20; window.p2.kdRotVel = 0.2; window.p2.hp -= 25; window.p1.changeState(ST_IDLE, 0); } 
-                else if (clinchScoreP2 > clinchScoreP1) { window.p1.changeState(ST_KNOCKDOWN, 80); window.p1.vy = -12; window.p1.vx = -20; window.p1.kdRotVel = -0.2; window.p1.hp -= 25; window.p2.changeState(ST_IDLE, 0); } 
-                else { window.p1.changeState(ST_HITSTUN, 30); window.p1.vx = -10; window.p2.changeState(ST_HITSTUN, 30); window.p2.vx = 10; }
-                if (window.p1.hp <= 0) window.p1.handleDeath(); if (window.p2.hp <= 0) window.p2.handleDeath();
+                if (clinchScoreP1 > clinchScoreP2) { p2.changeState(ST_KNOCKDOWN, 80); p2.vy = -12; p2.vx = 20; p2.kdRotVel = 0.2; p2.hp -= 25; p1.changeState(ST_IDLE, 0); } 
+                else if (clinchScoreP2 > clinchScoreP1) { p1.changeState(ST_KNOCKDOWN, 80); p1.vy = -12; p1.vx = -20; p1.kdRotVel = -0.2; p1.hp -= 25; p2.changeState(ST_IDLE, 0); } 
+                else { p1.changeState(ST_HITSTUN, 30); p1.vx = -10; p2.changeState(ST_HITSTUN, 30); p2.vx = 10; }
+                if (p1.hp <= 0) p1.handleDeath(); if (p2.hp <= 0) p2.handleDeath();
                 screenShake = 25; spawnParticles(W/2, GROUND_Y-80, '#fff', 70, 3.5);
             }
         }
     }
 
     function applySpacing() {
-        if (Math.abs(window.p1.x - window.p2.x) < 45 && window.p1.state !== ST_KNOCKDOWN && window.p2.state !== ST_KNOCKDOWN) {
-            const push = (window.p1.x < window.p2.x) ? -3.5 : 3.5; window.p1.x += push; window.p2.x -= push;
+        if (Math.abs(p1.x - p2.x) < 45 && p1.state !== ST_KNOCKDOWN && p2.state !== ST_KNOCKDOWN) {
+            const push = (p1.x < p2.x) ? -3.5 : 3.5; p1.x += push; p2.x -= push;
         }
     }
 
@@ -1932,7 +1744,7 @@
         ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 2;
         for(let i=0; i<W; i+=100) { ctx.beginPath(); ctx.moveTo(i, GROUND_Y); ctx.lineTo(i + (i-W/2)*0.5, H); ctx.stroke(); }
 
-        if(window.p1.state === ST_KNOCKDOWN) { window.p1.draw(ctx); window.p2.draw(ctx); } else if(window.p2.state === ST_KNOCKDOWN) { window.p2.draw(ctx); window.p1.draw(ctx); } else { window.p2.draw(ctx); window.p1.draw(ctx); }
+        if(p1.state === ST_KNOCKDOWN) { p1.draw(ctx); p2.draw(ctx); } else if(p2.state === ST_KNOCKDOWN) { p2.draw(ctx); p1.draw(ctx); } else { p2.draw(ctx); p1.draw(ctx); }
 
         for (let i = particles.length - 1; i >= 0; i--) {
             let p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.8; p.life -= 0.035;
@@ -1965,60 +1777,6 @@
             
             ctx.font = "900 40px Oswald"; ctx.fillStyle = "white"; 
             ctx.fillText("P1", W/2 - 390, H/2 + 40); ctx.fillText("P2", W/2 + 390, H/2 + 40);
-        }
-
-        // --- CINEMATIC FINISHER OVERLAY ---
-        if (cinematicMode && cinematicWinner) {
-            let t = cinematicTimer;
-            
-            if (t < 5) {
-                // Initial Massive Flash
-                ctx.fillStyle = "white";
-                ctx.fillRect(0, 0, W, H);
-            } else {
-                // Dark background overlay
-                ctx.fillStyle = `rgba(0,0,0,${Math.min(0.7, (t-5) / 30)})`;
-                ctx.fillRect(0, 0, W, H);
-                
-                // Cinematic Black Bars sliding in
-                let barH = Math.min(100, (t-5) * 8);
-                ctx.fillStyle = "black";
-                ctx.fillRect(0, 0, W, barH);
-                ctx.fillRect(0, H - barH, W, barH);
-                
-                // Custom Finisher Text Stamping In
-                let text = cinematicWinner.profile.finisher;
-                ctx.save();
-                ctx.translate(W/2, H/2);
-                
-                let scale = 1;
-                if (t < 25) {
-                    scale = 1 + (25 - t) * 0.2; 
-                    if (t === 24) screenShake = 25; // Huge screen shake when it lands
-                } else if (t > 150) {
-                    ctx.globalAlpha = Math.max(0, 1 - (t - 150) / 30); // Fade out
-                }
-                
-                ctx.scale(scale, scale);
-                ctx.rotate(-0.05); // Slight dynamic angle
-                
-                // Adjust font size dynamically based on length
-                let fontSize = text.length > 20 ? 60 : (text.length > 10 ? 80 : 110);
-                ctx.font = `900 ${fontSize}px Oswald`; 
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                
-                ctx.shadowColor = cinematicWinner.color;
-                ctx.shadowBlur = 40;
-                ctx.fillStyle = "white";
-                ctx.strokeStyle = cinematicWinner.color;
-                ctx.lineWidth = text.length > 15 ? 4 : 8;
-                
-                ctx.strokeText(text, 0, 0);
-                ctx.fillText(text, 0, 0);
-                
-                ctx.restore();
-            }
         }
 
         ctx.restore(); updateUI();
