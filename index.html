@@ -72,12 +72,14 @@
         }
         .timer-glow { animation: pulse-glow 2s infinite; }
         
-        input[type="text"] {
+        input[type="text"], select {
             background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1);
             color: white; font-family: 'Oswald', sans-serif;
             font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase;
         }
-        input[type="text"]:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        input[type="text"]:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        
+        select option { background-color: #111827; color: white; }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
@@ -92,14 +94,14 @@
 <body>
 
     <div id="ui-container">
-        <div class="glass-panel p-12 rounded-[2rem] shadow-2xl max-w-xl w-full text-center border-t-8 border-t-blue-500 border-b-8 border-b-red-500 relative overflow-hidden" id="main-menu">
+        <div class="glass-panel p-8 md:p-12 rounded-[2rem] shadow-2xl max-w-3xl w-full text-center border-t-8 border-t-blue-500 border-b-8 border-b-red-500 relative overflow-hidden transition-all duration-300" id="main-menu">
             <div class="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50 z-0 pointer-events-none"></div>
             
             <div class="relative z-10" id="menu-primary">
                 <h1 class="text-7xl font-black mb-1 text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-purple-400 to-red-500 tracking-tighter drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]">PRO BOXING</h1>
                 <p class="text-gray-400 mb-8 text-sm font-bold tracking-[0.3em] uppercase" id="version-text">ULTIMATE EDITION v1.2</p>
                 
-                <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-4 max-w-md mx-auto">
                     <button class="btn btn-purple text-xl py-5 flex items-center justify-center gap-3" onclick="showLobbyMenu()">
                         <span class="text-2xl">🌐</span> ONLINE MULTIPLAYER
                     </button>
@@ -115,31 +117,50 @@
                 </div>
             </div>
 
-            <!-- Profile Menu -->
-            <div class="relative z-10 hidden" id="menu-profile">
+            <!-- Profile Menu Overhauled -->
+            <div class="relative z-10 hidden w-full" id="menu-profile">
                 <h2 class="text-4xl font-black mb-6 text-blue-400 tracking-tighter drop-shadow-[0_0_15px_rgba(96,165,250,0.4)]">FIGHTER PROFILE</h2>
                 
-                <div class="bg-black/40 p-6 rounded-xl border border-white/10 mb-6 flex flex-col gap-4 text-left">
-                    <div>
-                        <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">FIGHTER ALIAS</p>
-                        <input type="text" id="profile-name-input" maxlength="12" placeholder="ENTER NAME" class="w-full rounded-lg py-2 px-3 text-center">
+                <div class="flex flex-col md:flex-row gap-6 w-full">
+                    <!-- Left: Inputs -->
+                    <div class="bg-black/40 p-6 rounded-xl border border-white/10 flex-1 flex flex-col gap-4 text-left">
+                        <div>
+                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">FIGHTER ALIAS</p>
+                            <input type="text" id="profile-name-input" maxlength="12" placeholder="ENTER NAME" class="w-full rounded-lg py-2 px-3 text-center">
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">FINISHER TEXT</p>
+                            <input type="text" id="profile-finisher-input" maxlength="40" placeholder="E.G. FATALITY OR KNOCKOUT" class="w-full rounded-lg py-2 px-3 text-center">
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">TAUNT TEXT (PRESS 'T')</p>
+                            <input type="text" id="profile-taunt-input" maxlength="20" placeholder="E.G. BRING IT!" class="w-full rounded-lg py-2 px-3 text-center">
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">HEADGEAR</p>
+                            <select id="profile-hat-input" class="w-full rounded-lg py-2 px-3 text-center cursor-pointer">
+                                <option value="none">NONE</option>
+                                <option value="kippah">KIPPAH</option>
+                                <option value="widebrim">WIDE BRIM HAT</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between bg-black/50 p-3 rounded-lg border border-white/5 mt-2">
+                            <span class="text-sm text-gray-300 font-bold tracking-widest uppercase">TRUNK & GLOVE COLOR</span>
+                            <input type="color" id="profile-color-input" class="w-12 h-12 rounded cursor-pointer bg-transparent border-0">
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">FINISHER TEXT (PLAYS IN CUTSCENE)</p>
-                        <input type="text" id="profile-finisher-input" maxlength="40" placeholder="E.G. FATALITY OR KNOCKOUT" class="w-full rounded-lg py-2 px-3 text-center">
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-400 font-bold mb-2 tracking-widest uppercase">TAUNT TEXT (PRESS 'T')</p>
-                        <input type="text" id="profile-taunt-input" maxlength="20" placeholder="E.G. BRING IT!" class="w-full rounded-lg py-2 px-3 text-center">
-                    </div>
-                    <div class="flex items-center justify-between bg-black/50 p-3 rounded-lg border border-white/5 mt-2">
-                        <span class="text-sm text-gray-300 font-bold tracking-widest uppercase">TRUNK & GLOVE COLOR</span>
-                        <input type="color" id="profile-color-input" class="w-12 h-12 rounded cursor-pointer bg-transparent border-0">
+                    
+                    <!-- Right: Character Preview -->
+                    <div class="bg-black/40 p-4 rounded-xl border border-white/10 w-full md:w-64 flex flex-col items-center justify-center relative shadow-inner">
+                        <p class="text-xs text-gray-400 font-bold tracking-widest uppercase absolute top-4 left-4">PREVIEW</p>
+                        <canvas id="previewCanvas" width="200" height="280" class="mt-6 border-b-4 border-white/5"></canvas>
                     </div>
                 </div>
                 
-                <button class="btn btn-green text-lg py-4 w-full mb-3" onclick="saveProfile()">SAVE CHANGES</button>
-                <button class="btn btn-gray text-md py-3 w-full" onclick="hideProfileMenu()">CANCEL</button>
+                <div class="flex gap-4 mt-6">
+                    <button class="btn btn-gray text-md py-3 w-1/3" onclick="hideProfileMenu()">CANCEL</button>
+                    <button class="btn btn-green text-lg py-3 flex-1" onclick="saveProfile()">SAVE CHANGES</button>
+                </div>
             </div>
             
             <!-- Lobby Menu -->
@@ -147,7 +168,7 @@
                 <h2 class="text-4xl font-black mb-4 text-purple-400 tracking-tighter drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">PUBLIC LOBBIES</h2>
                 <div id="lobby-status" class="text-yellow-400 font-bold mb-2 h-6 uppercase tracking-wider text-sm"></div>
                 
-                <div class="flex-col gap-4 flex-grow flex" id="lobby-options">
+                <div class="flex-col gap-4 flex-grow flex max-w-md mx-auto w-full" id="lobby-options">
                     <button class="btn btn-purple text-lg py-4 shadow-[0_0_20px_rgba(168,85,247,0.4)]" onclick="window.hostGame()">+ HOST NEW ROOM</button>
                     
                     <div class="bg-black/40 p-3 rounded-xl border border-white/10 mt-2 flex-grow flex flex-col h-60">
@@ -171,7 +192,7 @@
             <div class="relative z-10 hidden" id="menu-difficulty">
                 <h2 class="text-4xl font-black mb-6 text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">SELECT CPU DIFFICULTY</h2>
                 
-                <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-4 max-w-md mx-auto w-full">
                     <button class="btn btn-green text-lg py-4" onclick="initGame(true, 0, false)">EASY - For Beginners</button>
                     <button class="btn btn-blue text-lg py-4" onclick="initGame(true, 1, false)">MEDIUM - Balanced Bout</button>
                     <button class="btn btn-red text-lg py-4" onclick="initGame(true, 2, false)">HARD - Professional</button>
@@ -570,11 +591,13 @@
                 }
                 checkRematch();
             } else if (msg.type === 'gameover') {
-                p1.hp = msg.p1hp; 
-                p2.hp = msg.p2hp;
+                if (window.p1 && window.p2) {
+                    window.p1.hp = msg.p1hp; 
+                    window.p2.hp = msg.p2hp;
+                }
                 if(window.matchActive) {
-                    if (p1.hp <= 0 || p2.hp <= 0) {
-                        window.triggerCinematic(p1.hp <= 0 ? p2 : p1);
+                    if (msg.p1hp <= 0 || msg.p2hp <= 0) {
+                        window.triggerCinematic(msg.p1hp <= 0 ? window.p2 : window.p1);
                     } else {
                         window.checkGameOver();
                     }
@@ -644,29 +667,63 @@
         name: 'BOXER_' + Math.floor(Math.random()*999),
         finisher: 'K.O.',
         taunt: 'COME ON!',
-        color: '#3b82f6'
+        color: '#3b82f6',
+        hat: 'none'
     };
     
     window.opponentProfile = {
-        name: 'OPPONENT', finisher: 'K.O.', taunt: 'BRING IT!', color: '#ef4444'
+        name: 'OPPONENT', finisher: 'K.O.', taunt: 'BRING IT!', color: '#ef4444', hat: 'none'
     };
+
+    window.previewFighter = null;
+    window.previewAnimFrame = null;
+    window.previewCtx = null;
 
     function loadProfileUI() {
         document.getElementById('profile-name-input').value = window.playerProfile.name;
         document.getElementById('profile-finisher-input').value = window.playerProfile.finisher;
         document.getElementById('profile-taunt-input').value = window.playerProfile.taunt;
         document.getElementById('profile-color-input').value = window.playerProfile.color;
+        document.getElementById('profile-hat-input').value = window.playerProfile.hat || 'none';
     }
     loadProfileUI();
 
     window.showProfileMenu = function() {
         document.getElementById('menu-primary').classList.add('hidden');
         document.getElementById('menu-profile').classList.remove('hidden');
+        
+        // Setup Character Preview Canvas
+        if (!window.previewCtx) {
+            window.previewCtx = document.getElementById('previewCanvas').getContext('2d');
+        }
+        if (!window.previewFighter) {
+            window.previewFighter = new Fighter(true, window.playerProfile);
+            window.previewFighter.groundY = 260; // Local preview ground
+            window.previewFighter.y = 260;
+            window.previewFighter.x = 100; // Center of preview canvas
+        }
+        
+        function renderPreview() {
+            window.previewCtx.clearRect(0, 0, 200, 280);
+            
+            // Dynamically sync preview to currently selected UI options
+            window.previewFighter.profile.color = document.getElementById('profile-color-input').value;
+            window.previewFighter.color = window.previewFighter.profile.color;
+            window.previewFighter.profile.hat = document.getElementById('profile-hat-input').value;
+            
+            window.previewFighter.changeState(ST_IDLE, 0); // Keep idle
+            window.previewFighter.updateAnimation();
+            window.previewFighter.draw(window.previewCtx);
+            
+            window.previewAnimFrame = requestAnimationFrame(renderPreview);
+        }
+        renderPreview();
     };
 
     window.hideProfileMenu = function() {
         document.getElementById('menu-primary').classList.remove('hidden');
         document.getElementById('menu-profile').classList.add('hidden');
+        if (window.previewAnimFrame) cancelAnimationFrame(window.previewAnimFrame);
     };
 
     window.saveProfile = function() {
@@ -674,6 +731,7 @@
         window.playerProfile.finisher = document.getElementById('profile-finisher-input').value.trim() || 'K.O.';
         window.playerProfile.taunt = document.getElementById('profile-taunt-input').value.trim() || 'BRING IT!';
         window.playerProfile.color = document.getElementById('profile-color-input').value;
+        window.playerProfile.hat = document.getElementById('profile-hat-input').value;
         
         localStorage.setItem('pb_profile', JSON.stringify(window.playerProfile));
         hideProfileMenu();
@@ -685,10 +743,11 @@
             document.getElementById('hud-p1-name').innerText = window.isHost ? window.playerProfile.name : window.opponentProfile.name;
             document.getElementById('hud-p2-name').innerText = window.isHost ? window.opponentProfile.name : window.playerProfile.name;
             
-            // Apply colors directly if fighters exist
-            if (window.p1 && window.p2) {
+            // Apply profile properties directly to initialized fighters
+            if (typeof window.p1 !== 'undefined' && window.p1 && typeof window.p2 !== 'undefined' && window.p2) {
                 window.p1.profile = window.isHost ? window.playerProfile : window.opponentProfile;
                 window.p1.color = window.p1.profile.color;
+                
                 window.p2.profile = window.isHost ? window.opponentProfile : window.playerProfile;
                 window.p2.color = window.p2.profile.color;
             }
@@ -809,7 +868,6 @@
     let keysDown = {};
     let prevKeysDown = {};
     
-    // Crucial fixed input reading logic 
     window.addEventListener('keydown', e => { 
         if (document.activeElement && document.activeElement.id === 'chat-input') {
             if (e.key === 'Enter') window.sendChat();
@@ -861,13 +919,15 @@
             this.profile = profileObj;
             this.color = this.profile.color; 
             
+            this.groundY = GROUND_Y;
+            
             this.maxHp = 100; this.hp = 100;
             this.maxStamina = 300; this.stamina = 300;
             this.feintCooldown = 0;
             
             this.width = 50; this.height = 150;
             this.x = isPlayer1 ? W*0.3 : W*0.7;
-            this.y = GROUND_Y;
+            this.y = this.groundY;
             this.vx = 0; this.vy = 0;
             this.facing = isPlayer1 ? 1 : -1;
             
@@ -935,7 +995,7 @@
 
             let finalDmg = dmg;
             screenShake = 6;
-            let isAntiAirHit = isAntiAir && (this.y < GROUND_Y);
+            let isAntiAirHit = isAntiAir && (this.y < this.groundY);
 
             if (this.state === ST_BLOCK && !isUnblockable && !isAntiAirHit) {
                 finalDmg = Math.max(1, Math.floor(dmg * 0.3)); 
@@ -1021,7 +1081,7 @@
             }
             if (clinchActive) { this.applyPhysics(); return; }
 
-            let isGrounded = this.y >= GROUND_Y;
+            let isGrounded = this.y >= this.groundY;
 
             if (isGrounded && (this.state === ST_IDLE || this.state === ST_MOVE || this.state === ST_TAUNT)) {
                 this.stamina = Math.min(this.maxStamina, this.stamina + 1.8); 
@@ -1175,26 +1235,26 @@
         }
         
         applyPhysics() {
-            if(isNaN(this.x) || isNaN(this.y) || isNaN(this.vx) || isNaN(this.vy)) { this.x = W/2; this.y = GROUND_Y; this.vx = 0; this.vy = 0; }
+            if(isNaN(this.x) || isNaN(this.y) || isNaN(this.vx) || isNaN(this.vy)) { this.x = W/2; this.y = this.groundY; this.vx = 0; this.vy = 0; }
             this.x += this.vx; this.y += this.vy;
             
             if (this.state === ST_KNOCKDOWN) {
                 this.rotation += this.kdRotVel; 
             }
 
-            if (this.y < GROUND_Y) { 
+            if (this.y < this.groundY) { 
                 this.vy += GRAVITY; 
             } else {
                 if (this.state === ST_KNOCKDOWN && this.vy > 4) {
                     screenShake = Math.max(screenShake, Math.min(25, this.vy * 1.5));
                     this.vy = -this.vy * 0.4;
                     this.vx *= 0.6;
-                    this.y = GROUND_Y;
+                    this.y = this.groundY;
                     this.kdRotVel = -this.kdRotVel * 0.5; 
-                    spawnParticles(this.x, GROUND_Y, '#aaa', 10, 0.5);
+                    spawnParticles(this.x, this.groundY, '#aaa', 10, 0.5);
                 } else {
-                    if (this.y > GROUND_Y && this.vy > 0 && ATTACK_DATA[this.state] && this.state >= ST_AERIAL_PUNCH) this.changeState(ST_IDLE, 0); 
-                    this.y = GROUND_Y; this.vy = 0;
+                    if (this.y > this.groundY && this.vy > 0 && ATTACK_DATA[this.state] && this.state >= ST_AERIAL_PUNCH) this.changeState(ST_IDLE, 0); 
+                    this.y = this.groundY; this.vy = 0;
                     
                     if (this.state === ST_KNOCKDOWN) {
                         this.vx *= 0.8;
@@ -1212,7 +1272,7 @@
 
         updateAnimation() {
             this.resetTargets();
-            let isGrounded = this.y >= GROUND_Y;
+            let isGrounded = this.y >= this.groundY;
             
             let targetSway = (this.state === ST_DODGE) ? -this.facing * 0.35 : 0;
             this.swayAmount += (targetSway - this.swayAmount) * 0.4;
@@ -1270,7 +1330,7 @@
                 targetRotation = -this.facing * 0.15;
                 this.gloveL.targetY = -55; this.gloveR.targetY = -55;
             } else if (this.state === ST_KNOCKDOWN) {
-                if (this.y < GROUND_Y) {
+                if (this.y < this.groundY) {
                     this.gloveL.targetX = -this.facing * 30; this.gloveL.targetY = -120 + Math.sin(Date.now()/50)*30;
                     this.gloveR.targetX = this.facing * 30; this.gloveR.targetY = -140 + Math.cos(Date.now()/50)*30;
                     this.footL.targetX = -this.facing * 40; this.footL.targetY = -20 + Math.sin(Date.now()/40)*20;
@@ -1329,10 +1389,10 @@
         draw(ctx) {
             ctx.save();
             ctx.save();
-            ctx.translate(this.x, GROUND_Y);
+            ctx.translate(this.x, this.groundY);
             ctx.fillStyle = 'rgba(0,0,0,0.8)';
             ctx.beginPath();
-            let shadowWidth = (this.state === ST_KNOCKDOWN) ? 70 : Math.max(15, 40 - (GROUND_Y - this.y)*0.2);
+            let shadowWidth = (this.state === ST_KNOCKDOWN) ? 70 : Math.max(15, 40 - (this.groundY - this.y)*0.2);
             ctx.ellipse(0, 0, shadowWidth, 10, 0, 0, Math.PI * 2); ctx.fill();
             ctx.restore();
 
@@ -1371,6 +1431,26 @@
             ctx.fillStyle = '#fecaca'; ctx.beginPath(); ctx.arc(this.headOffset.x, this.headOffset.y, 22, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.arc(this.headOffset.x - this.facing*7, this.headOffset.y + 2, 18, 0, Math.PI*2); ctx.fill();
             
+            // Headgear / Hats
+            if (this.profile && this.profile.hat) {
+                if (this.profile.hat === 'kippah') {
+                    ctx.fillStyle = '#111827';
+                    ctx.beginPath();
+                    ctx.ellipse(this.headOffset.x - this.facing * 6, this.headOffset.y - 18, 14, 5, -Math.PI/6 * this.facing, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (this.profile.hat === 'widebrim') {
+                    // Brim
+                    ctx.fillStyle = '#111827';
+                    ctx.beginPath();
+                    ctx.ellipse(this.headOffset.x, this.headOffset.y - 12, 36, 4, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Crown
+                    ctx.beginPath();
+                    ctx.roundRect(this.headOffset.x - 16, this.headOffset.y - 24, 32, 12, [2, 2, 0, 0]);
+                    ctx.fill();
+                }
+            }
+            
             ctx.beginPath(); ctx.moveTo(6, -this.height + 40 + this.duckAmount); ctx.lineTo(this.gloveL.x, this.gloveL.y); ctx.stroke();
 
             ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.gloveR.x, this.gloveR.y, 16, 0, Math.PI*2); ctx.fill();
@@ -1397,7 +1477,6 @@
         }
     }
 
-    let p1, p2;
     let gameTimer = 99;
     let matchActive = false; 
     let gameStarted = false;
@@ -1444,8 +1523,8 @@
         if (!window.matchActive && !cinematicMode) return;
         if (Math.abs(gameTimer - syncData.t) > 2) gameTimer = syncData.t; 
         
-        p1.hp = syncData.p1hp; p1.stamina = syncData.p1s;
-        p2.hp = syncData.p2hp; p2.stamina = syncData.p2s;
+        window.p1.hp = syncData.p1hp; window.p1.stamina = syncData.p1s;
+        window.p2.hp = syncData.p2hp; window.p2.stamina = syncData.p2s;
         
         window.hostSyncP1X = syncData.p1x;
         window.hostSyncP2X = syncData.p2x;
@@ -1467,9 +1546,9 @@
         } else {
             const cpuNames = ["ROOKIE CPU", "PRO CPU", "CHAMPION CPU"];
             if (vsCPU) {
-                window.opponentProfile = { name: cpuNames[cpuDifficulty], finisher: 'DOMINATED', taunt: 'BEEP BOOP.', color: '#ef4444' };
+                window.opponentProfile = { name: cpuNames[cpuDifficulty], finisher: 'DOMINATED', taunt: 'BEEP BOOP.', color: '#ef4444', hat: 'none' };
             } else {
-                window.opponentProfile = { name: 'PLAYER 2', finisher: 'K.O.', taunt: 'TOO EASY.', color: '#ef4444' };
+                window.opponentProfile = { name: 'PLAYER 2', finisher: 'K.O.', taunt: 'TOO EASY.', color: '#ef4444', hat: 'none' };
             }
             document.getElementById('hud-p1-name').innerText = window.playerProfile.name;
             document.getElementById('hud-p2-name').innerText = window.opponentProfile.name;
@@ -1506,8 +1585,8 @@
         clinchActive = false; clinchScoreP1 = 0; clinchScoreP2 = 0; cpuReactionTimer = 0;
         syncTimer = 0;
 
-        p1 = new Fighter(true, window.isHost || !window.isOnlineGame ? window.playerProfile : window.opponentProfile); 
-        p2 = new Fighter(false, window.isHost || !window.isOnlineGame ? window.opponentProfile : window.playerProfile);
+        window.p1 = new Fighter(true, window.isHost || !window.isOnlineGame ? window.playerProfile : window.opponentProfile); 
+        window.p2 = new Fighter(false, window.isHost || !window.isOnlineGame ? window.opponentProfile : window.playerProfile);
         gameTimer = 99; window.matchActive = true; 
         
         document.getElementById('game-over-ui').classList.add('hidden');
@@ -1531,8 +1610,8 @@
         
         cinematicMode = false; cinematicTimer = 0; cinematicWinner = null;
         
-        p1 = new Fighter(true, window.isHost || !window.isOnlineGame ? window.playerProfile : window.opponentProfile); 
-        p2 = new Fighter(false, window.isHost || !window.isOnlineGame ? window.opponentProfile : window.playerProfile);
+        window.p1 = new Fighter(true, window.isHost || !window.isOnlineGame ? window.playerProfile : window.opponentProfile); 
+        window.p2 = new Fighter(false, window.isHost || !window.isOnlineGame ? window.opponentProfile : window.playerProfile);
         lastLoopTime = performance.now();
         document.getElementById('gameCanvas').focus();
     };
@@ -1546,7 +1625,7 @@
     };
 
     function processCPU() {
-        if (!window.matchActive || p2.state === ST_KNOCKDOWN) return;
+        if (!window.matchActive || window.p2.state === ST_KNOCKDOWN) return;
         
         cpuPrevInputs = { ...cpuInputs };
 
@@ -1557,10 +1636,10 @@
         ];
         let prof = diffProfiles[cpuDifficulty];
 
-        if (cpuDifficulty === 2 && ATTACK_DATA[p2.state]) {
-            let data = ATTACK_DATA[p2.state];
-            let elapsed = (data.windup + data.active + data.recov) - p2.stateTimer;
-            if (elapsed === 6 && (p2.state === ST_P_HOOK || p2.state === ST_KICK) && Math.random() < 0.4 && p2.feintCooldown === 0) {
+        if (cpuDifficulty === 2 && ATTACK_DATA[window.p2.state]) {
+            let data = ATTACK_DATA[window.p2.state];
+            let elapsed = (data.windup + data.active + data.recov) - window.p2.stateTimer;
+            if (elapsed === 6 && (window.p2.state === ST_P_HOOK || window.p2.state === ST_KICK) && Math.random() < 0.4 && window.p2.feintCooldown === 0) {
                 cpuInputs.arrowdown = true; 
             }
         }
@@ -1580,18 +1659,18 @@
         cpuReactionTimer = prof.reactBase + Math.random() * prof.reactRand; 
         Object.keys(cpuInputs).forEach(k => cpuInputs[k] = false);
         
-        let dist = Math.abs(p1.x - p2.x);
-        let isP1Attacking = p1.hitboxActive || (ATTACK_DATA[p1.state] && p1.stateTimer > ATTACK_DATA[p1.state].recov);
+        let dist = Math.abs(window.p1.x - window.p2.x);
+        let isP1Attacking = window.p1.hitboxActive || (ATTACK_DATA[window.p1.state] && window.p1.stateTimer > ATTACK_DATA[window.p1.state].recov);
         
-        let movingAway = p2.x > p1.x ? 'arrowright' : 'arrowleft';
-        let movingToward = p2.x > p1.x ? 'arrowleft' : 'arrowright';
+        let movingAway = window.p2.x > window.p1.x ? 'arrowright' : 'arrowleft';
+        let movingToward = window.p2.x > window.p1.x ? 'arrowleft' : 'arrowright';
 
-        if (isP1Attacking && p2.stamina > 20) {
+        if (isP1Attacking && window.p2.stamina > 20) {
             if (Math.random() < prof.block) { cpuInputs.arrowdown = true; cpuReactionTimer = 25; return; }
             else if (Math.random() < prof.dodge) { cpuInputs.enter = true; return; }
         }
         
-        if (p2.stamina < 50 && !isP1Attacking) {
+        if (window.p2.stamina < 50 && !isP1Attacking) {
             cpuInputs[movingAway] = true;
             if(Math.random() < 0.1) cpuInputs.enter = true;
             cpuReactionTimer = 15; return;
@@ -1599,14 +1678,14 @@
 
         if (dist > 180) {
             cpuInputs[movingToward] = true;
-            if (Math.random() < 0.2 && p2.stamina > 20) cpuInputs.enter = true; 
+            if (Math.random() < 0.2 && window.p2.stamina > 20) cpuInputs.enter = true; 
             if (Math.random() < 0.1) cpuInputs.arrowup = true; 
-            if (Math.random() < prof.tauntFreq && p1.state !== ST_KNOCKDOWN) cpuInputs['m'] = true; // Taunt!
+            if (Math.random() < prof.tauntFreq && window.p1.state !== ST_KNOCKDOWN) cpuInputs['m'] = true; // Taunt!
             cpuReactionTimer = 15; 
         } else {
-            if (Math.random() < prof.atkFreq && p2.stamina >= 20) {
+            if (Math.random() < prof.atkFreq && window.p2.stamina >= 20) {
                 let rand = Math.random();
-                if (p1.y < GROUND_Y - 30 && dist < 120 && Math.random() < 0.7) cpuInputs['7'] = true; 
+                if (window.p1.y < GROUND_Y - 30 && dist < 120 && Math.random() < 0.7) cpuInputs['7'] = true; 
                 else {
                     if (rand < 0.20) cpuInputs['1'] = true; else if (rand < 0.40) cpuInputs['2'] = true; 
                     else if (rand < 0.55) cpuInputs['3'] = true; else if (rand < 0.70) cpuInputs['7'] = true; 
@@ -1622,26 +1701,26 @@
     }
 
     function triggerClinch() {
-        p1.changeState(ST_CLINCHED, 999); p2.changeState(ST_CLINCHED, 999);
-        p1.x = W/2 - 20; p2.x = W/2 + 20;
+        window.p1.changeState(ST_CLINCHED, 999); window.p2.changeState(ST_CLINCHED, 999);
+        window.p1.x = W/2 - 20; window.p2.x = W/2 + 20;
         clinchActive = true; clinchTimer = CLINCH_MAX_TIME;
         clinchScoreP1 = 0; clinchScoreP2 = 0; screenShake = 15;
     }
 
     function updateUI() {
-        document.getElementById('p1-hp').style.width = `${Math.max(0, p1.hp)}%`;
-        document.getElementById('p1-stam').style.width = `${Math.max(0, (p1.stamina / p1.maxStamina) * 100)}%`;
+        document.getElementById('p1-hp').style.width = `${Math.max(0, window.p1.hp)}%`;
+        document.getElementById('p1-stam').style.width = `${Math.max(0, (window.p1.stamina / window.p1.maxStamina) * 100)}%`;
         
-        let p1FeintPerc = p1.feintCooldown === 0 ? 100 : 100 - (p1.feintCooldown / 180) * 100;
+        let p1FeintPerc = window.p1.feintCooldown === 0 ? 100 : 100 - (window.p1.feintCooldown / 180) * 100;
         document.getElementById('p1-feint').style.width = `${p1FeintPerc}%`;
-        document.getElementById('p1-feint').style.backgroundColor = p1.feintCooldown === 0 ? "#c084fc" : "#7e22ce";
+        document.getElementById('p1-feint').style.backgroundColor = window.p1.feintCooldown === 0 ? "#c084fc" : "#7e22ce";
 
-        document.getElementById('p2-hp').style.width = `${Math.max(0, p2.hp)}%`;
-        document.getElementById('p2-stam').style.width = `${Math.max(0, (p2.stamina / p2.maxStamina) * 100)}%`;
+        document.getElementById('p2-hp').style.width = `${Math.max(0, window.p2.hp)}%`;
+        document.getElementById('p2-stam').style.width = `${Math.max(0, (window.p2.stamina / window.p2.maxStamina) * 100)}%`;
         
-        let p2FeintPerc = p2.feintCooldown === 0 ? 100 : 100 - (p2.feintCooldown / 180) * 100;
+        let p2FeintPerc = window.p2.feintCooldown === 0 ? 100 : 100 - (window.p2.feintCooldown / 180) * 100;
         document.getElementById('p2-feint').style.width = `${p2FeintPerc}%`;
-        document.getElementById('p2-feint').style.backgroundColor = p2.feintCooldown === 0 ? "#c084fc" : "#7e22ce";
+        document.getElementById('p2-feint').style.backgroundColor = window.p2.feintCooldown === 0 ? "#c084fc" : "#7e22ce";
 
         document.getElementById('timer').innerText = Math.max(0, Math.ceil(gameTimer));
     }
@@ -1655,7 +1734,7 @@
         cinematicWinner = winner;
 
         if (window.isOnlineGame && window.dataChannel && window.dataChannel.readyState === 'open') {
-            window.dataChannel.send(JSON.stringify({ type: 'gameover', p1hp: p1.hp, p2hp: p2.hp }));
+            window.dataChannel.send(JSON.stringify({ type: 'gameover', p1hp: window.p1.hp, p2hp: window.p2.hp }));
         }
 
         if (winner) {
@@ -1676,18 +1755,18 @@
         
         let winnerTxt = "K.O."; let subTxt = "The bout is over.";
         
-        if (p1.hp > 0 && p2.hp > 0) winnerTxt = "TIME OUT";
+        if (window.p1.hp > 0 && window.p2.hp > 0) winnerTxt = "TIME OUT";
         
         if (window.isOnlineGame) {
-            let myFighter = window.isHost ? p1 : p2;
-            let oppFighter = window.isHost ? p2 : p1;
+            let myFighter = window.isHost ? window.p1 : window.p2;
+            let oppFighter = window.isHost ? window.p2 : window.p1;
             
             if(myFighter.hp > oppFighter.hp) { subTxt = "YOU DEFEATED YOUR OPPONENT!"; }
             else if(oppFighter.hp > myFighter.hp) { subTxt = "YOUR OPPONENT WON."; }
             else { subTxt = "IT'S A DRAW."; }
         } else {
-            if(p1.hp > p2.hp) { subTxt = vsCPU ? "YOU DEFEATED THE CPU!" : "PLAYER 1 IS VICTORIOUS!"; }
-            else if(p2.hp > p1.hp) { subTxt = vsCPU ? "THE CPU CRUSHED YOU." : "PLAYER 2 IS VICTORIOUS!"; }
+            if(window.p1.hp > window.p2.hp) { subTxt = vsCPU ? "YOU DEFEATED THE CPU!" : "PLAYER 1 IS VICTORIOUS!"; }
+            else if(window.p2.hp > window.p1.hp) { subTxt = vsCPU ? "THE CPU CRUSHED YOU." : "PLAYER 2 IS VICTORIOUS!"; }
             else { subTxt = "IT'S A DRAW."; }
         }
         
@@ -1711,8 +1790,8 @@
         
         if (window.matchActive && !clinchActive) {
             gameTimer -= 1/60; 
-            if (p1.hp <= 0 || p2.hp <= 0) {
-                window.triggerCinematic(p1.hp <= 0 ? p2 : p1);
+            if (window.p1.hp <= 0 || window.p2.hp <= 0) {
+                window.triggerCinematic(window.p1.hp <= 0 ? window.p2 : window.p1);
             } else if (gameTimer <= 0) {
                 window.checkGameOver();
             }
@@ -1721,8 +1800,8 @@
         if (cinematicMode) {
             cinematicTimer++;
             // Don't read user input during cutscene, but continue to update animations so they fall dynamically
-            p1.updateLocal(p2, false, KEYS_P1, {}, {});
-            p2.updateLocal(p1, false, KEYS_P2, {}, {});
+            window.p1.updateLocal(window.p2, false, KEYS_P1, {}, {});
+            window.p2.updateLocal(window.p1, false, KEYS_P2, {}, {});
             
             if (cinematicTimer > 180) { // 3 seconds cutscene
                 cinematicMode = false;
@@ -1744,20 +1823,20 @@
                 syncTimer++;
                 if (syncTimer >= 5) {
                     syncTimer = 0;
-                    window.onlineSendSync({ p1x: p1.x, p1hp: p1.hp, p1s: p1.stamina, p2x: p2.x, p2hp: p2.hp, p2s: p2.stamina, t: gameTimer });
+                    window.onlineSendSync({ p1x: window.p1.x, p1hp: window.p1.hp, p1s: window.p1.stamina, p2x: window.p2.x, p2hp: window.p2.hp, p2s: window.p2.stamina, t: gameTimer });
                 }
             } else if (!window.isHost && window.matchActive) {
-                if (window.hostSyncP1X !== undefined) p1.x += (window.hostSyncP1X - p1.x) * 0.15;
-                if (window.hostSyncP2X !== undefined && Math.abs(p2.x - window.hostSyncP2X) > 15) {
-                    p2.x += (window.hostSyncP2X - p2.x) * 0.05;
+                if (window.hostSyncP1X !== undefined) window.p1.x += (window.hostSyncP1X - window.p1.x) * 0.15;
+                if (window.hostSyncP2X !== undefined && Math.abs(window.p2.x - window.hostSyncP2X) > 15) {
+                    window.p2.x += (window.hostSyncP2X - window.p2.x) * 0.05;
                 }
             }
 
             processClinch(networkP1Keys, prevKeysDown, networkP2Keys, cpuPrevInputs);
             if (!clinchActive) { applySpacing(); }
             
-            p1.updateLocal(p2, window.matchActive, KEYS_P1, networkP1Keys, prevKeysDown);
-            p2.updateLocal(p1, window.matchActive, KEYS_P2, networkP2Keys, cpuPrevInputs);
+            window.p1.updateLocal(window.p2, window.matchActive, KEYS_P1, networkP1Keys, prevKeysDown);
+            window.p2.updateLocal(window.p1, window.matchActive, KEYS_P2, networkP2Keys, cpuPrevInputs);
             
             prevKeysDown = { ...networkP1Keys }; 
             cpuPrevInputs = { ...networkP2Keys };
@@ -1770,13 +1849,13 @@
             processClinch(keysDown, prevKeysDown, p2ActiveKeys, p2PrevKeys);
             if (!clinchActive) { applySpacing(); }
 
-            p1.updateLocal(p2, window.matchActive, KEYS_P1, keysDown, prevKeysDown);
-            p2.updateLocal(p1, window.matchActive, KEYS_P2, p2ActiveKeys, p2PrevKeys);
+            window.p1.updateLocal(window.p2, window.matchActive, KEYS_P1, keysDown, prevKeysDown);
+            window.p2.updateLocal(window.p1, window.matchActive, KEYS_P2, p2ActiveKeys, p2PrevKeys);
             
             prevKeysDown = { ...keysDown }; 
         }
         
-        p1.updateAnimation(); p2.updateAnimation();
+        window.p1.updateAnimation(); window.p2.updateAnimation();
         drawGame();
     }
 
@@ -1788,18 +1867,18 @@
             
             if (clinchTimer <= 0) {
                 clinchActive = false;
-                if (clinchScoreP1 > clinchScoreP2) { p2.changeState(ST_KNOCKDOWN, 80); p2.vy = -12; p2.vx = 20; p2.kdRotVel = 0.2; p2.hp -= 25; p1.changeState(ST_IDLE, 0); } 
-                else if (clinchScoreP2 > clinchScoreP1) { p1.changeState(ST_KNOCKDOWN, 80); p1.vy = -12; p1.vx = -20; p1.kdRotVel = -0.2; p1.hp -= 25; p2.changeState(ST_IDLE, 0); } 
-                else { p1.changeState(ST_HITSTUN, 30); p1.vx = -10; p2.changeState(ST_HITSTUN, 30); p2.vx = 10; }
-                if (p1.hp <= 0) p1.handleDeath(); if (p2.hp <= 0) p2.handleDeath();
+                if (clinchScoreP1 > clinchScoreP2) { window.p2.changeState(ST_KNOCKDOWN, 80); window.p2.vy = -12; window.p2.vx = 20; window.p2.kdRotVel = 0.2; window.p2.hp -= 25; window.p1.changeState(ST_IDLE, 0); } 
+                else if (clinchScoreP2 > clinchScoreP1) { window.p1.changeState(ST_KNOCKDOWN, 80); window.p1.vy = -12; window.p1.vx = -20; window.p1.kdRotVel = -0.2; window.p1.hp -= 25; window.p2.changeState(ST_IDLE, 0); } 
+                else { window.p1.changeState(ST_HITSTUN, 30); window.p1.vx = -10; window.p2.changeState(ST_HITSTUN, 30); window.p2.vx = 10; }
+                if (window.p1.hp <= 0) window.p1.handleDeath(); if (window.p2.hp <= 0) window.p2.handleDeath();
                 screenShake = 25; spawnParticles(W/2, GROUND_Y-80, '#fff', 70, 3.5);
             }
         }
     }
 
     function applySpacing() {
-        if (Math.abs(p1.x - p2.x) < 45 && p1.state !== ST_KNOCKDOWN && p2.state !== ST_KNOCKDOWN) {
-            const push = (p1.x < p2.x) ? -3.5 : 3.5; p1.x += push; p2.x -= push;
+        if (Math.abs(window.p1.x - window.p2.x) < 45 && window.p1.state !== ST_KNOCKDOWN && window.p2.state !== ST_KNOCKDOWN) {
+            const push = (window.p1.x < window.p2.x) ? -3.5 : 3.5; window.p1.x += push; window.p2.x -= push;
         }
     }
 
@@ -1830,7 +1909,7 @@
         ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 2;
         for(let i=0; i<W; i+=100) { ctx.beginPath(); ctx.moveTo(i, GROUND_Y); ctx.lineTo(i + (i-W/2)*0.5, H); ctx.stroke(); }
 
-        if(p1.state === ST_KNOCKDOWN) { p1.draw(ctx); p2.draw(ctx); } else if(p2.state === ST_KNOCKDOWN) { p2.draw(ctx); p1.draw(ctx); } else { p2.draw(ctx); p1.draw(ctx); }
+        if(window.p1.state === ST_KNOCKDOWN) { window.p1.draw(ctx); window.p2.draw(ctx); } else if(window.p2.state === ST_KNOCKDOWN) { window.p2.draw(ctx); window.p1.draw(ctx); } else { window.p2.draw(ctx); window.p1.draw(ctx); }
 
         for (let i = particles.length - 1; i >= 0; i--) {
             let p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.8; p.life -= 0.035;
