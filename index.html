@@ -733,7 +733,7 @@
 
         // Start Canvas Preview
         if(!previewFighter) previewFighter = new Fighter(true, tempProfile);
-        previewFighter.x = 100; previewFighter.y = 260; // preview ground Y
+        previewFighter.x = 100; previewFighter.y = GROUND_Y; // Fixed coordinate bug pulling fighter out of bounds
         previewFighter.changeState(ST_TAUNT, 120);
         previewFighter.currentTaunt = parseInt(tempProfile.emote) || 0;
         
@@ -803,9 +803,22 @@
             p.life -= (p.decay !== undefined ? p.decay : 0.035);
             cx.fillStyle = p.color; cx.globalAlpha = Math.max(0, p.life); 
             let s = p.size !== undefined ? p.size : 4;
-            cx.beginPath(); cx.arc(p.x, p.y, s, 0, Math.PI*2); cx.fill();
+            let previewY = p.y - (GROUND_Y - 260); // Adjust Y for preview canvas
+            cx.beginPath(); cx.arc(p.x, previewY, s, 0, Math.PI*2); cx.fill();
             cx.globalAlpha = 1.0;
             if (p.life <= 0) particles.splice(i, 1);
+        }
+
+        // Draw Emote Texts in Preview
+        for (let i = texts.length - 1; i >= 0; i--) {
+            let t = texts[i]; 
+            t.y += t.vy; t.vy *= 0.92; t.life -= 0.015;
+            cx.globalAlpha = Math.max(0, Math.min(1.0, t.life)); cx.fillStyle = t.color;
+            cx.font = t.big ? "900 38px Oswald" : "900 24px Oswald"; cx.textAlign = "center";
+            cx.strokeStyle = "rgba(0,0,0,0.9)"; cx.lineWidth = 6; 
+            let textPreviewY = t.y - (GROUND_Y - 260); // Adjust Y for preview canvas
+            cx.strokeText(t.text, t.x, textPreviewY); cx.fillText(t.text, t.x, textPreviewY);
+            cx.globalAlpha = 1.0; if (t.life <= 0) texts.splice(i, 1);
         }
 
         previewReq = requestAnimationFrame(drawPreviewLoop);
