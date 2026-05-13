@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glove Game - Smash Arena</title>
+    <title>Glove Game</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Inter:wght@400;700;900&display=swap');
@@ -21,6 +21,7 @@
         
         .hidden { display: none !important; }
         
+        /* Revamped UI styling */
         .glass-panel { 
             background: linear-gradient(135deg, rgba(15, 15, 20, 0.95) 0%, rgba(5, 5, 10, 0.98) 100%);
             border: 1px solid rgba(255,255,255,0.05); 
@@ -31,6 +32,7 @@
         
         h1, h2, .boxing-font { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
         
+        /* Modernized Buttons */
         .btn { 
             position: relative; overflow: hidden; padding: 16px 32px; font-weight: 900; 
             border-radius: 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
@@ -45,7 +47,6 @@
             transform: translateX(-100%); transition: transform 0.5s ease;
         }
         .btn:hover::before { transform: translateX(100%); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
         .btn-blue { 
             background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); 
@@ -95,6 +96,7 @@
         }
         .timer-glow { animation: pulse-glow 2s infinite; }
         
+        /* Custom styles for inputs */
         input[type="text"], select {
             background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);
             color: white; font-family: 'Inter', sans-serif;
@@ -113,6 +115,7 @@
             background-size: 30px 30px;
         }
 
+        /* Keyboard Key Styles for Controls UI */
         .key-btn {
             display: inline-flex; align-items: center; justify-content: center;
             background: linear-gradient(180deg, #334155, #0f172a);
@@ -131,9 +134,6 @@
         .ctrl-group { display: flex; align-items: center; gap: 4px; font-weight: 700; color: #94a3b8; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; }
         .ctrl-divider { width: 2px; height: 16px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 0 8px; }
         .controls-container { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 0; }
-        
-        .lobby-player-row { animation: slideIn 0.3s ease-out forwards; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
 <body>
@@ -147,18 +147,18 @@
             <div class="relative z-10" id="menu-primary">
                 <div class="mb-8">
                     <h1 class="text-[5.5rem] leading-none font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 tracking-tighter drop-shadow-[0_0_20px_rgba(59,130,246,0.4)]">GLOVE GAME</h1>
-                    <p class="text-blue-300/70 text-sm font-bold tracking-[0.4em] uppercase">Smash Arena Edition</p>
+                    <p class="text-blue-300/70 text-sm font-bold tracking-[0.4em] uppercase">Online & Local Arena</p>
                 </div>
                 
                 <div class="flex flex-col gap-4 px-12">
                     <button class="btn btn-purple py-4" onclick="showLobbyMenu()">
-                        <span class="text-xl">🌐</span> ONLINE LOBBY (2-4P)
+                        <span class="text-xl">🌐</span> ONLINE MULTIPLAYER (P2P)
                     </button>
-                    <button class="btn btn-blue py-4" onclick="initGame('1v1', 1)">
-                        <span class="text-xl">🥊</span> LOCAL 1V1 (VS CPU)
+                    <button class="btn btn-blue py-4" onclick="showDifficultyMenu()">
+                        <span class="text-xl">🥊</span> 1 PLAYER (VS CPU)
                     </button>
-                    <button class="btn btn-red py-4" onclick="initGame('ffa-cpu', 1)">
-                        <span class="text-xl">🔥</span> SMASH FFA (1P VS 3 CPU)
+                    <button class="btn btn-red py-4" onclick="initGame(false, 0, false)">
+                        <span class="text-xl">🤜🤛</span> 2 PLAYER (LOCAL CO-OP)
                     </button>
                     <button class="btn btn-gray py-3 mt-4 text-sm" onclick="showProfileMenu()">
                         <span>⚙️</span> EDIT FIGHTER PROFILE
@@ -197,7 +197,7 @@
                                 <label class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Accessory</label>
                                 <select id="profile-acc-input" class="w-full rounded-lg p-2.5 text-sm font-bold mt-1 appearance-none cursor-pointer text-center" onchange="updatePreviewProfile()">
                                     <option value="none">None</option>
-                                    <option value="sunglasses">Retro Shades</option>
+                                    <option value="sunglasses">Sunglasses</option>
                                     <option value="goldchain">Gold Chain</option>
                                 </select>
                             </div>
@@ -234,15 +234,15 @@
             
             <!-- Lobby Menu -->
             <div class="relative z-10 hidden flex-col h-full min-h-[420px]" id="menu-lobby">
-                <h2 class="text-4xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 tracking-tighter drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">ONLINE LOBBY</h2>
+                <h2 class="text-4xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 tracking-tighter drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]">PUBLIC LOBBIES</h2>
                 <div id="lobby-status" class="text-yellow-400/90 font-bold mb-4 h-6 uppercase tracking-wider text-sm"></div>
                 
                 <div class="flex-col gap-4 flex-grow flex px-2" id="lobby-options">
-                    <button class="btn btn-purple py-4" onclick="window.hostGame()">+ HOST NEW ARENA</button>
+                    <button class="btn btn-purple py-4" onclick="window.hostGame()">+ HOST NEW ROOM</button>
                     
                     <div class="bg-black/50 p-4 rounded-2xl border border-white/5 mt-2 flex-grow flex flex-col h-60 relative overflow-hidden">
                         <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 pointer-events-none z-10"></div>
-                        <p class="text-xs text-gray-500 font-bold mb-3 tracking-widest uppercase text-left">Available Arenas (P2P)</p>
+                        <p class="text-xs text-gray-500 font-bold mb-3 tracking-widest uppercase text-left">Available Matches (P2P)</p>
                         <div id="lobby-list" class="flex flex-col gap-3 overflow-y-auto pr-2 flex-grow relative z-20 pb-4">
                             <p class="text-gray-600 italic py-4 text-sm font-bold uppercase tracking-widest">Searching for rooms...</p>
                         </div>
@@ -250,23 +250,23 @@
                     <button class="btn btn-gray py-3 mt-2 text-sm" onclick="hideLobbyMenu()">BACK TO MENU</button>
                 </div>
                 
-                <!-- Waiting Room (Multiplayer) -->
-                <div id="lobby-waiting" class="hidden flex-col flex-grow h-full py-2">
-                    <div class="flex justify-between items-end mb-4 border-b border-white/10 pb-2">
-                        <h1 class="text-2xl font-black text-white tracking-widest">FIGHTERS JOINED</h1>
-                        <span id="lobby-count" class="text-purple-400 font-bold">1 / 4</span>
-                    </div>
-                    
-                    <div id="lobby-players-list" class="flex flex-col gap-2 flex-grow overflow-y-auto mb-4">
-                        <!-- Dynamically filled with joining players -->
-                    </div>
+                <div id="lobby-waiting" class="hidden flex-col gap-4 items-center justify-center flex-grow h-full py-6">
+                    <div class="w-20 h-20 rounded-full border-4 border-t-purple-500 border-r-transparent border-b-purple-500 border-l-transparent animate-spin mb-4 shadow-[0_0_30px_rgba(168,85,247,0.3)]"></div>
+                    <h1 class="text-3xl font-black text-white tracking-widest drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">HOSTING ROOM</h1>
+                    <p class="text-purple-400 font-bold animate-pulse" id="hosting-subtitle">Waiting for a challenger to join...</p>
+                    <button class="btn btn-gray text-sm py-3 mt-6 w-full" onclick="cancelHosting()">CANCEL</button>
+                </div>
+            </div>
 
-                    <p class="text-xs text-gray-400 font-bold tracking-widest uppercase mb-4" id="lobby-wait-msg">Waiting for Host to start...</p>
-                    
-                    <div class="flex gap-4">
-                        <button class="btn btn-gray flex-1 py-3 text-sm" onclick="cancelHosting()">LEAVE</button>
-                        <button id="btn-start-match" class="btn btn-green flex-1 py-3 text-sm hidden" onclick="startHostedMatch()">START MATCH</button>
-                    </div>
+            <!-- Difficulty Menu -->
+            <div class="relative z-10 hidden" id="menu-difficulty">
+                <h2 class="text-4xl font-black mb-6 text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">SELECT CPU DIFFICULTY</h2>
+                
+                <div class="flex flex-col gap-4 px-12">
+                    <button class="btn btn-green py-4" onclick="initGame(true, 0, false)">EASY - For Beginners</button>
+                    <button class="btn btn-blue py-4" onclick="initGame(true, 1, false)">MEDIUM - Balanced Bout</button>
+                    <button class="btn btn-red py-4" onclick="initGame(true, 2, false)">HARD - Professional</button>
+                    <button class="btn btn-gray py-3 mt-4 text-sm" onclick="hideDifficultyMenu()">BACK</button>
                 </div>
             </div>
         </div>
@@ -287,15 +287,48 @@
 
     <!-- HUD -->
     <div id="game-ui" class="hidden flex flex-col justify-between p-6 h-full">
-        <!-- The Dynamic Top HUD injected via JS -->
-        <div id="hud-container" class="flex justify-between items-start w-full max-w-[95%] mx-auto mt-2 gap-4"></div>
+        <div class="flex justify-between items-start w-full max-w-7xl mx-auto mt-2">
+            <!-- P1 HUD -->
+            <div class="w-5/12">
+                <div class="flex justify-between items-end mb-2 px-2">
+                    <div id="hud-p1-name" class="text-blue-400 boxing-font text-4xl drop-shadow-[0_0_15px_rgba(59,130,246,0.8)] font-black italic tracking-wider truncate max-w-[80%]">PLAYER 1</div>
+                    <div class="text-gray-400 text-sm font-bold tracking-widest">HP</div>
+                </div>
+                <div class="health-bar-container h-10 w-full bg-red-950/80 backdrop-blur-sm border-4 border-gray-900 rounded-lg overflow-hidden relative shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+                    <div id="p1-hp-trail" class="h-full bg-red-600 w-full absolute top-0 left-0 transition-all duration-700 ease-out origin-left"></div>
+                    <div id="p1-hp" class="h-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-white w-full transition-all duration-150 origin-left relative z-10"></div>
+                </div>
+                <div class="health-bar-container h-4 w-11/12 bg-gray-900 border-x-4 border-b-4 border-gray-900 rounded-b-lg overflow-hidden shadow-inner relative ml-4">
+                    <div id="p1-stam" class="h-full bg-gradient-to-r from-blue-600 to-cyan-400 w-full transition-all duration-75 absolute top-0 left-0"></div>
+                </div>
+            </div>
+            
+            <!-- Timer -->
+            <div class="w-2/12 text-center flex flex-col items-center relative z-20">
+                <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 text-white/20 font-black text-3xl italic tracking-widest pointer-events-none drop-shadow-xl z-0">VS</div>
+                <div class="bg-gray-900/90 border-4 border-gray-800 rounded-2xl px-6 py-2 backdrop-blur-md shadow-[0_15px_40px_rgba(0,0,0,0.9)] relative z-10">
+                    <div class="text-white font-black text-6xl boxing-font timer-glow" id="timer">99</div>
+                </div>
+                <div id="network-ping" class="text-[10px] text-green-400 font-bold mt-3 tracking-widest hidden animate-pulse bg-green-900/30 px-4 py-1 rounded-full border border-green-500/40 shadow-[0_0_15px_rgba(34,197,94,0.3)]">P2P CONNECTED</div>
+            </div>
 
-        <!-- Dynamic Network Connectivity Ping -->
-        <div class="absolute top-36 left-1/2 transform -translate-x-1/2">
-            <div id="network-ping" class="text-[10px] text-green-400 font-bold tracking-widest hidden animate-pulse bg-green-900/40 px-4 py-1.5 rounded-full border border-green-500/40 shadow-[0_0_15px_rgba(34,197,94,0.3)]">P2P CONNECTED</div>
+            <!-- P2 HUD -->
+            <div class="w-5/12">
+                <div class="flex justify-between items-end mb-2 px-2">
+                    <div class="text-gray-400 text-sm font-bold tracking-widest">HP</div>
+                    <div id="hud-p2-name" class="text-red-400 boxing-font text-4xl drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] font-black italic tracking-wider truncate max-w-[80%] text-right">PLAYER 2</div>
+                </div>
+                <div class="health-bar-container p2-skew h-10 w-full bg-red-950/80 backdrop-blur-sm border-4 border-gray-900 rounded-lg overflow-hidden relative flex justify-end shadow-[0_0_30px_rgba(239,68,68,0.3)]">
+                    <div id="p2-hp-trail" class="h-full bg-red-600 w-full absolute top-0 right-0 transition-all duration-700 ease-out origin-right"></div>
+                    <div id="p2-hp" class="h-full bg-gradient-to-l from-yellow-400 via-yellow-300 to-white w-full transition-all duration-150 origin-right relative z-10"></div>
+                </div>
+                <div class="health-bar-container p2-skew h-4 w-11/12 bg-gray-900 border-x-4 border-b-4 border-gray-900 rounded-b-lg overflow-hidden shadow-inner relative flex justify-end mr-4 float-right">
+                    <div id="p2-stam" class="h-full bg-gradient-to-l from-red-600 to-orange-400 w-full transition-all duration-75 absolute top-0 right-0"></div>
+                </div>
+            </div>
         </div>
 
-        <div id="controls-text" class="text-center text-gray-200 text-sm mb-4 bg-black/40 rounded-2xl mx-auto px-6 py-4 backdrop-blur-md pointer-events-none border border-white/5 shadow-2xl absolute bottom-6 left-1/2 transform -translate-x-1/2 w-max max-w-[98%] tracking-wide"></div>
+        <div id="controls-text" class="text-center text-gray-200 text-sm mb-4 bg-black/40 rounded-2xl mx-auto px-6 py-4 backdrop-blur-md pointer-events-none border border-white/5 shadow-2xl absolute bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] max-w-5xl tracking-wide"></div>
     </div>
 
     <canvas id="gameCanvas" width="1280" height="720" tabindex="0"></canvas>
@@ -303,7 +336,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getDatabase, ref, get, set, update, onValue, onDisconnect, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    import { getDatabase, ref, get, set, update, onValue, onDisconnect, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDUoYS6MwDIVe8coZOM9A0ZCYaZTeDSloo",
@@ -327,18 +360,14 @@
     window.lobbyQueryUnsub = null;
     window.roomListenerUnsub = null;
     window.currentRoomId = null;
-    window.isHost = false;
 
-    // WebRTC Variables for Star Topology (Multi-Peer)
-    window.peers = {}; // uid -> RTCPeerConnection
-    window.dataChannels = {}; // uid -> RTCDataChannel
-    window.remoteInputs = {}; // uid -> logical keys object
-    window.playerOrder = []; // Array of UIDs dictating player 1, 2, 3, 4
-    window.myPlayerIndex = 0;
-    
+    // WebRTC Variables
+    window.peerConnection = null;
+    window.dataChannel = null;
     window.localWantsRematch = false;
-    window.rematchVotes = {}; // uid -> boolean
+    window.remoteWantsRematch = false;
 
+    // TURN/STUN Configuration to bypass restrictive networks
     const rtcConfig = {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
@@ -382,27 +411,22 @@
                 const now = Date.now();
                 for (const [id, data] of Object.entries(rooms)) {
                     if (!data.timestamp || now - data.timestamp > 1800000) {
-                        remove(ref(db, 'rooms/' + id)).catch(e => {});
+                        set(ref(db, 'rooms/' + id), null).catch(e => {});
                         continue;
                     }
 
-                    if (data.status === 'waiting' && Object.keys(data.players || {}).length < 4) {
+                    if (data.status === 'waiting') {
                         count++;
                         const btn = document.createElement('button');
                         btn.className = 'btn btn-gray text-left py-4 px-5 flex justify-between items-center w-full rounded-xl border border-white/5 shadow-sm hover:border-purple-500/50 hover:bg-white/5 transition-all group';
                         
                         const hostDisplayName = (data.hostName || "FIGHTER").substring(0, 12);
-                        const pCount = Object.keys(data.players || {}).length;
-                        
                         btn.innerHTML = `
                             <div class="flex items-center gap-4">
                                 <span class="text-3xl drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] group-hover:scale-110 transition-transform">🥊</span>
-                                <div class="flex flex-col">
-                                    <span class="font-bold text-white tracking-widest uppercase">${hostDisplayName}'S ARENA</span>
-                                    <span class="text-xs text-gray-400 font-bold uppercase tracking-widest">${pCount}/4 Fighters</span>
-                                </div>
+                                <span class="font-bold text-white tracking-widest uppercase">${hostDisplayName}'S LOBBY</span>
                             </div>
-                            <span class="text-xs font-black text-green-400 tracking-widest bg-green-900/40 px-4 py-2 rounded-lg group-hover:bg-green-500 group-hover:text-black transition-colors border border-green-500/20 group-hover:border-transparent">JOIN</span>
+                            <span class="text-xs font-black text-green-400 tracking-widest bg-green-900/40 px-4 py-2 rounded-lg group-hover:bg-green-500 group-hover:text-black transition-colors border border-green-500/20 group-hover:border-transparent">JOIN P2P</span>
                         `;
                         btn.onclick = () => window.joinPublicRoom(id);
                         listEl.appendChild(btn);
@@ -411,7 +435,7 @@
             }
             
             if (count === 0) {
-                listEl.innerHTML = '<div class="h-full flex items-center justify-center"><p class="text-gray-500 italic text-sm tracking-widest uppercase">No open arenas found.</p></div>';
+                listEl.innerHTML = '<div class="h-full flex items-center justify-center"><p class="text-gray-500 italic text-sm tracking-widest uppercase">No open lobbies found.</p></div>';
             }
         });
     };
@@ -422,43 +446,6 @@
             window.lobbyQueryUnsub = null;
         }
     };
-
-    function renderLobbyPlayers(playersObj) {
-        const listEl = document.getElementById('lobby-players-list');
-        listEl.innerHTML = '';
-        const keys = Object.keys(playersObj || {});
-        document.getElementById('lobby-count').innerText = `${keys.length} / 4`;
-        
-        keys.forEach((uid, idx) => {
-            const isMe = uid === user.uid;
-            const isHostNode = playersObj[uid].isHost;
-            const pName = playersObj[uid].profile.name;
-            const colorClass = ['text-blue-400', 'text-red-400', 'text-green-400', 'text-yellow-400'][idx];
-            
-            listEl.innerHTML += `
-                <div class="lobby-player-row flex justify-between items-center bg-black/40 border border-white/5 rounded-lg p-3">
-                    <div class="flex items-center gap-3">
-                        <span class="font-black ${colorClass}">P${idx+1}</span>
-                        <span class="font-bold text-white tracking-widest uppercase">${pName}</span>
-                    </div>
-                    ${isHostNode ? '<span class="text-[10px] bg-purple-900/60 text-purple-300 px-2 py-1 rounded font-bold tracking-widest">HOST</span>' : ''}
-                    ${isMe ? '<span class="text-[10px] bg-white/10 text-white px-2 py-1 rounded font-bold tracking-widest">YOU</span>' : ''}
-                </div>
-            `;
-        });
-        
-        if (window.isHost) {
-            document.getElementById('lobby-wait-msg').classList.add('hidden');
-            if (keys.length > 1) {
-                document.getElementById('btn-start-match').classList.remove('hidden');
-            } else {
-                document.getElementById('btn-start-match').classList.add('hidden');
-            }
-        } else {
-            document.getElementById('btn-start-match').classList.add('hidden');
-            document.getElementById('lobby-wait-msg').classList.remove('hidden');
-        }
-    }
 
     window.hostGame = async function() {
         if (!user) return;
@@ -471,11 +458,9 @@
             await set(roomRef, {
                 host: user.uid,
                 hostName: window.playerProfile.name,
+                hostProfile: window.playerProfile,
                 status: 'waiting',
-                timestamp: Date.now(),
-                players: {
-                    [user.uid]: { profile: window.playerProfile, isHost: true }
-                }
+                timestamp: Date.now()
             });
 
             onDisconnect(roomRef).remove();
@@ -484,16 +469,23 @@
             document.getElementById('lobby-options').classList.remove('flex');
             document.getElementById('lobby-waiting').classList.remove('hidden');
             document.getElementById('lobby-waiting').classList.add('flex');
+            document.getElementById('hosting-subtitle').innerText = "Waiting for a challenger to join...";
             
             window.isHost = true;
             window.currentRoomId = roomId;
 
+            let webrtcStarted = false;
+
             window.roomListenerUnsub = onValue(roomRef, (snapshot) => {
                 const data = snapshot.val();
                 if(!data) return;
-                
-                if (data.status === 'waiting') {
-                    renderLobbyPlayers(data.players);
+
+                if (data.status === 'connecting' && !webrtcStarted) {
+                    webrtcStarted = true;
+                    // Read the guest's character profile when they connect
+                    window.opponentProfile = data.guestProfile || {};
+                    document.getElementById('hosting-subtitle').innerText = "Establishing P2P Connection...";
+                    startHostWebRTC(roomRef, data);
                 }
             });
         } catch (e) {
@@ -502,65 +494,48 @@
         }
     };
 
-    window.startHostedMatch = async function() {
-        if (!window.isHost || !window.currentRoomId) return;
-        document.getElementById('btn-start-match').disabled = true;
-        document.getElementById('btn-start-match').innerText = "CONNECTING...";
+    async function startHostWebRTC(roomRef, data) {
+        window.peerConnection = new RTCPeerConnection(rtcConfig);
         
-        // Grab final list of players to solidify order
-        const snap = await get(ref(db, `rooms/${window.currentRoomId}/players`));
-        const playersData = snap.val();
-        // Force Host to be index 0
-        const uids = Object.keys(playersData);
-        window.playerOrder = [user.uid, ...uids.filter(id => id !== user.uid)];
-        window.myPlayerIndex = 0;
-        
-        // Save profiles so we can instantiate fighters properly
-        window.matchProfiles = window.playerOrder.map(uid => playersData[uid].profile);
+        // Creating the UDP-like Data Channel
+        window.dataChannel = window.peerConnection.createDataChannel('gameData', { ordered: false, maxRetransmits: 0 });
+        setupDataChannelEvents(window.dataChannel);
 
-        // Update status to transition everyone
-        await update(ref(db, `rooms/${window.currentRoomId}`), { 
-            status: 'connecting',
-            playerOrder: window.playerOrder,
-            matchProfiles: window.matchProfiles
-        });
-        
-        // Initiate WebRTC to all guests
-        for (let i = 1; i < window.playerOrder.length; i++) {
-            const guestUid = window.playerOrder[i];
-            await startHostWebRTCToGuest(window.currentRoomId, guestUid);
-        }
-        
-        checkAllConnectionsOpen();
-    };
-
-    async function startHostWebRTCToGuest(roomId, guestUid) {
-        let pc = new RTCPeerConnection(rtcConfig);
-        window.peers[guestUid] = pc;
-        
-        let dc = pc.createDataChannel('gameData', { ordered: false, maxRetransmits: 0 });
-        window.dataChannels[guestUid] = dc;
-        setupDataChannelEvents(dc, guestUid);
-
-        pc.onicecandidate = (e) => {
-            if (e.candidate) push(ref(db, `rooms/${roomId}/candidates/host_${guestUid}`), e.candidate.toJSON());
+        window.peerConnection.onicecandidate = (e) => {
+            if (e.candidate) push(ref(db, `rooms/${window.currentRoomId}/hostCandidates`), e.candidate.toJSON());
         };
 
-        let offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        await set(ref(db, `rooms/${roomId}/offers/${guestUid}`), { type: offer.type, sdp: offer.sdp });
+        const offer = await window.peerConnection.createOffer();
+        await window.peerConnection.setLocalDescription(offer);
+        await update(roomRef, { offer: { type: offer.type, sdp: offer.sdp } });
 
-        // Listen for this specific guest's answer
-        onValue(ref(db, `rooms/${roomId}/answers/${guestUid}`), (snap) => {
-            if (snap.val() && pc.signalingState === 'have-local-offer') {
-                pc.setRemoteDescription(new RTCSessionDescription(snap.val())).catch(e=>console.log(e));
+        // Listen for the guest's Answer
+        onValue(ref(db, `rooms/${window.currentRoomId}/answer`), (snap) => {
+            const answer = snap.val();
+            if (answer && window.peerConnection.signalingState === 'have-local-offer') {
+                window.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
             }
         });
 
-        // Listen for this specific guest's ICE candidates
-        onChildAdded(ref(db, `rooms/${roomId}/candidates/${guestUid}_host`), (snap) => {
-            if (snap.val()) pc.addIceCandidate(new RTCIceCandidate(snap.val())).catch(e=>console.log(e));
+        // Listen for Guest ICE Candidates
+        let pendingCandidates = [];
+        onChildAdded(ref(db, `rooms/${window.currentRoomId}/guestCandidates`), (snap) => {
+            const candidate = snap.val();
+            if (candidate) {
+                if (window.peerConnection.remoteDescription) {
+                    window.peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error(e));
+                } else {
+                    pendingCandidates.push(new RTCIceCandidate(candidate));
+                }
+            }
         });
+        
+        window.peerConnection.onsignalingstatechange = () => {
+            if(window.peerConnection.remoteDescription) {
+                pendingCandidates.forEach(c => window.peerConnection.addIceCandidate(c).catch(e=>console.error(e)));
+                pendingCandidates = [];
+            }
+        };
     }
 
     window.joinPublicRoom = async function(roomId) {
@@ -569,193 +544,155 @@
         const roomRef = ref(db, 'rooms/' + roomId);
         
         try {
-            setLobbyStatus("Joining Arena...");
+            setLobbyStatus("Joining Lobby...");
             const snapshot = await get(roomRef);
-            if (!snapshot.exists() || snapshot.val().status !== 'waiting' || Object.keys(snapshot.val().players || {}).length >= 4) {
-                setLobbyStatus("Arena full or closed.");
+            if (!snapshot.exists() || snapshot.val().status !== 'waiting') {
+                setLobbyStatus("Lobby no longer exists or is full.");
                 window.startLobbyListener();
                 return;
             }
             
-            // Add self to players
-            await update(ref(db, `rooms/${roomId}/players/${user.uid}`), {
-                profile: window.playerProfile, isHost: false
+            await update(roomRef, {
+                guest: user.uid,
+                guestName: window.playerProfile.name,
+                guestProfile: window.playerProfile,
+                status: 'connecting'
             });
 
             window.isHost = false;
             window.currentRoomId = roomId;
-            
-            document.getElementById('lobby-options').classList.add('hidden');
-            document.getElementById('lobby-options').classList.remove('flex');
-            document.getElementById('lobby-waiting').classList.remove('hidden');
-            document.getElementById('lobby-waiting').classList.add('flex');
+            setLobbyStatus("Establishing P2P Connection...");
 
-            window.roomListenerUnsub = onValue(roomRef, async (snap) => {
-                const data = snap.val();
-                if(!data) return;
-                
-                if (data.status === 'waiting') {
-                    renderLobbyPlayers(data.players);
-                } else if (data.status === 'connecting' && !window.peerConnectionStarted) {
-                    window.peerConnectionStarted = true;
-                    document.getElementById('lobby-wait-msg').innerText = "Establishing P2P Connection...";
-                    
-                    window.playerOrder = data.playerOrder;
-                    window.matchProfiles = data.matchProfiles;
-                    window.myPlayerIndex = window.playerOrder.indexOf(user.uid);
-                    
-                    listenForHostOffer(roomId);
+            // Listen for Host Offer
+            onValue(ref(db, `rooms/${roomId}/offer`), async (snap) => {
+                const offer = snap.val();
+                if (offer && !window.peerConnection) {
+                    // Extract Host Profile Data
+                    const roomData = (await get(roomRef)).val();
+                    window.opponentProfile = roomData.hostProfile || {};
+                    startGuestWebRTC(roomId, offer);
                 }
             });
+
         } catch (e) {
             console.error(e);
             setLobbyStatus("Join failed: " + e.message);
         }
     };
 
-    function listenForHostOffer(roomId) {
-        onValue(ref(db, `rooms/${roomId}/offers/${user.uid}`), async (snap) => {
-            let offer = snap.val();
-            if (offer && !window.peers['host']) {
-                let pc = new RTCPeerConnection(rtcConfig);
-                window.peers['host'] = pc;
-                
-                pc.ondatachannel = (e) => {
-                    window.dataChannels['host'] = e.channel;
-                    setupDataChannelEvents(window.dataChannels['host'], 'host');
-                };
+    async function startGuestWebRTC(roomId, offer) {
+        window.peerConnection = new RTCPeerConnection(rtcConfig);
+        
+        window.peerConnection.ondatachannel = (e) => {
+            window.dataChannel = e.channel;
+            setupDataChannelEvents(window.dataChannel);
+        };
 
-                pc.onicecandidate = (e) => {
-                    if (e.candidate) push(ref(db, `rooms/${roomId}/candidates/${user.uid}_host`), e.candidate.toJSON());
-                };
+        window.peerConnection.onicecandidate = (e) => {
+            if (e.candidate) push(ref(db, `rooms/${roomId}/guestCandidates`), e.candidate.toJSON());
+        };
 
-                await pc.setRemoteDescription(new RTCSessionDescription(offer));
-                let answer = await pc.createAnswer();
-                await pc.setLocalDescription(answer);
-                await set(ref(db, `rooms/${roomId}/answers/${user.uid}`), { type: answer.type, sdp: answer.sdp });
+        await window.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await window.peerConnection.createAnswer();
+        await window.peerConnection.setLocalDescription(answer);
+        await update(ref(db, `rooms/${roomId}`), { answer: { type: answer.type, sdp: answer.sdp } });
 
-                onChildAdded(ref(db, `rooms/${roomId}/candidates/host_${user.uid}`), (s) => {
-                    if (s.val()) pc.addIceCandidate(new RTCIceCandidate(s.val())).catch(e=>{});
-                });
+        // Listen for Host ICE Candidates
+        let pendingCandidates = [];
+        onChildAdded(ref(db, `rooms/${roomId}/hostCandidates`), (snap) => {
+            const candidate = snap.val();
+            if (candidate) {
+                if (window.peerConnection.remoteDescription) {
+                    window.peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error(e));
+                } else {
+                    pendingCandidates.push(new RTCIceCandidate(candidate));
+                }
             }
         });
+
+        window.peerConnection.onsignalingstatechange = () => {
+            if(window.peerConnection.remoteDescription) {
+                pendingCandidates.forEach(c => window.peerConnection.addIceCandidate(c).catch(e=>console.error(e)));
+                pendingCandidates = [];
+            }
+        };
     }
 
-    function setupDataChannelEvents(dc, peerId) {
+    function setupDataChannelEvents(dc) {
         dc.onopen = () => {
-            console.log(`WebRTC Data Channel OPEN with ${peerId}`);
-            if (window.isHost) checkAllConnectionsOpen();
-            else startOnlineMatch();
+            console.log("WebRTC Data Channel OPEN");
+            document.getElementById('menu-lobby').classList.add('hidden');
+            document.getElementById('lobby-waiting').classList.add('hidden');
+            window.initGame(false, 0, true);
         };
 
         dc.onmessage = (e) => {
             const msg = JSON.parse(e.data);
-            if (msg.type === 'input' && window.isHost) {
-                // Host receives inputs from guests
-                window.remoteInputs[msg.uid] = msg.keys;
+            if (msg.type === 'input') {
+                window.remoteLogicalInputs = msg.keys;
             } else if (msg.type === 'sync' && !window.isHost) {
-                // Guest receives master sync from host
                 window.applyHostSync(msg.data);
             } else if (msg.type === 'rematch') {
-                window.rematchVotes[msg.uid] = true;
+                window.remoteWantsRematch = true;
+                if(document.getElementById('winner-sub')) {
+                    document.getElementById('winner-sub').innerText = "OPPONENT WANTS REMATCH...";
+                }
                 checkRematch();
             } else if (msg.type === 'gameover') {
-                msg.hps.forEach((hp, i) => { if(window.fighters[i]) window.fighters[i].hp = hp; });
-                if(window.matchActive) checkGameOver();
+                p1.hp = msg.p1hp; 
+                p2.hp = msg.p2hp;
+                if(matchActive) checkGameOver();
             }
         };
 
         dc.onclose = () => {
-            console.log(`WebRTC Data Channel CLOSED with ${peerId}`);
+            console.log("WebRTC Data Channel CLOSED");
             if (window.matchActive || !document.getElementById('game-ui').classList.contains('hidden')) {
-                document.getElementById('winner-text').innerText = "DISCONNECT";
-                document.getElementById('winner-sub').innerText = "A PLAYER LEFT THE ARENA.";
+                document.getElementById('winner-text').innerText = "DISCONNECTED";
+                document.getElementById('winner-sub').innerText = "CONNECTION TO PEER LOST.";
                 document.getElementById('rematch-btn').classList.add('hidden');
                 if(window.checkGameOverNetworkEvent) window.checkGameOverNetworkEvent();
             }
         };
     }
 
-    function checkAllConnectionsOpen() {
-        // Host checks if all guests are connected
-        let expectedGuests = window.playerOrder.length - 1;
-        let openCount = Object.values(window.dataChannels).filter(dc => dc.readyState === 'open').length;
-        if (openCount >= expectedGuests && expectedGuests > 0) {
-            startOnlineMatch();
-        }
-    }
-
-    function startOnlineMatch() {
-        document.getElementById('menu-lobby').classList.add('hidden');
-        document.getElementById('lobby-waiting').classList.add('hidden');
-        window.initGame('online', window.playerOrder.length);
-    }
-
     function checkRematch() {
-        // If everyone online wants to rematch
-        let allReady = true;
-        if (window.isOnlineGame) {
-            if (!window.localWantsRematch) allReady = false;
-            window.playerOrder.forEach(uid => {
-                if (uid !== user.uid && !window.rematchVotes[uid]) allReady = false;
-            });
-        } else {
-            allReady = window.localWantsRematch;
-        }
-
-        if (allReady) {
+        if (window.localWantsRematch && window.remoteWantsRematch) {
             window.localWantsRematch = false;
-            window.rematchVotes = {};
+            window.remoteWantsRematch = false;
             window.resetMatchForRematch();
-        } else {
-            let votes = window.localWantsRematch ? 1 : 0;
-            Object.values(window.rematchVotes).forEach(v => { if(v) votes++; });
-            let total = window.isOnlineGame ? window.playerOrder.length : 1;
-            if (document.getElementById('winner-sub')) {
-                document.getElementById('winner-sub').innerText = `WAITING FOR REMATCH... (${votes}/${total})`;
-            }
         }
     }
 
     window.onlineSendInput = function(logicalObj) {
-        // Guest sends input to Host
-        if (!window.isHost && window.dataChannels['host'] && window.dataChannels['host'].readyState === 'open') {
-            window.dataChannels['host'].send(JSON.stringify({ type: 'input', uid: user.uid, keys: logicalObj }));
+        if (window.dataChannel && window.dataChannel.readyState === 'open') {
+            window.dataChannel.send(JSON.stringify({ type: 'input', keys: logicalObj }));
         }
     };
 
     window.onlineSendSync = function(syncData) {
-        // Host broadcasts state to all Guests
-        if (window.isHost) {
-            const payload = JSON.stringify({ type: 'sync', data: syncData });
-            Object.values(window.dataChannels).forEach(dc => {
-                if (dc.readyState === 'open') dc.send(payload);
-            });
+        if (window.dataChannel && window.dataChannel.readyState === 'open' && window.isHost) {
+            window.dataChannel.send(JSON.stringify({ type: 'sync', data: syncData }));
         }
     };
 
     window.onlineRematchRequest = function() {
         window.localWantsRematch = true;
-        let payload = JSON.stringify({ type: 'rematch', uid: user?.uid || 'local' });
-        
-        if (window.isOnlineGame) {
-            Object.values(window.dataChannels).forEach(dc => {
-                if (dc.readyState === 'open') dc.send(payload);
-            });
+        if (window.dataChannel && window.dataChannel.readyState === 'open') {
+            window.dataChannel.send(JSON.stringify({ type: 'rematch' }));
         }
         document.getElementById('rematch-btn').classList.add('hidden');
+        document.getElementById('winner-sub').innerText = "WAITING FOR OPPONENT...";
         checkRematch();
     };
 
     window.cleanupNetworkConnections = function() {
-        Object.values(window.dataChannels).forEach(dc => dc.close());
-        Object.values(window.peers).forEach(pc => pc.close());
-        window.dataChannels = {}; window.peers = {};
+        if(window.dataChannel) { window.dataChannel.close(); window.dataChannel = null; }
+        if(window.peerConnection) { window.peerConnection.close(); window.peerConnection = null; }
         if(window.roomListenerUnsub) { window.roomListenerUnsub(); window.roomListenerUnsub = null; }
-        if(window.currentRoomId && window.isHost) { remove(ref(db, 'rooms/' + window.currentRoomId)).catch(e=>{}); }
-        window.currentRoomId = null; window.isHost = false; window.peerConnectionStarted = false;
-        document.getElementById('btn-start-match').disabled = false;
-        document.getElementById('btn-start-match').innerText = "START MATCH";
+        if(window.currentRoomId && window.isHost) { set(ref(db, 'rooms/' + window.currentRoomId), null).catch(e=>{}); }
+        window.currentRoomId = null;
+        window.isHost = false;
     };
 </script>
 
@@ -775,6 +712,9 @@
         window.playerProfile = JSON.parse(storedProfile);
     } else {
         window.playerProfile = { ...defaultProfile };
+        // Migrate legacy simple name if present
+        let legacyName = localStorage.getItem('gg_playerName');
+        if (legacyName) window.playerProfile.name = legacyName;
     }
 
     let tempProfile = {};
@@ -795,8 +735,8 @@
         document.getElementById('profile-finisher-input').value = tempProfile.finisher;
 
         // Start Canvas Preview
-        if(!previewFighter) previewFighter = new Fighter(0, tempProfile);
-        previewFighter.x = 100; previewFighter.y = GROUND_Y; // Keep actual physical Y normal
+        if(!previewFighter) previewFighter = new Fighter(true, tempProfile);
+        previewFighter.x = 100; previewFighter.y = GROUND_Y; // Fixed coordinate bug pulling fighter out of bounds
         previewFighter.changeState(ST_TAUNT, 120);
         previewFighter.currentTaunt = parseInt(tempProfile.emote) || 0;
         
@@ -854,9 +794,12 @@
             previewFighter.currentTaunt = parseInt(tempProfile.emote) || 0;
         }
 
-        previewFighter.tauntCooldown = 0; // Hide taunt CD bar in the preview
-        previewFighter.updateAnimation(true);
-        previewFighter.draw(cx, 260); // customGroundY = 260 renders the fighter gracefully into the tiny canvas
+        // Hide taunt CD bar in the preview
+        previewFighter.tauntCooldown = 0;
+
+        previewFighter.updateAnimation();
+        // customGroundY = 260 renders the fighter gracefully into the tiny canvas!
+        previewFighter.draw(cx, 260); 
         
         // Draw Emote Particles in Preview
         for (let i = particles.length - 1; i >= 0; i--) {
@@ -887,6 +830,7 @@
         previewReq = requestAnimationFrame(drawPreviewLoop);
     }
 
+    // Lobby Menus Logic
     window.showLobbyMenu = function() {
         document.getElementById('menu-primary').classList.add('hidden');
         document.getElementById('menu-lobby').classList.remove('hidden');
@@ -916,6 +860,16 @@
         document.getElementById('lobby-options').classList.add('flex');
         window.startLobbyListener();
     };
+
+    window.showDifficultyMenu = function() {
+        document.getElementById('menu-primary').classList.add('hidden');
+        document.getElementById('menu-difficulty').classList.remove('hidden');
+    };
+
+    window.hideDifficultyMenu = function() {
+        document.getElementById('menu-primary').classList.remove('hidden');
+        document.getElementById('menu-difficulty').classList.add('hidden');
+    };
 </script>
 
 <script>
@@ -924,7 +878,7 @@
     const W = canvas.width;
     const H = canvas.height;
 
-    const GROUND_Y = 620; // Lowered slightly to give more room for smash blast zones
+    const GROUND_Y = H - 100;
     const GRAVITY = 0.8;
 
     const ST_IDLE = 0, ST_MOVE = 1, ST_DASH = 2, ST_BLOCK = 3;
@@ -946,21 +900,30 @@
         [ST_AERIAL_KICK]:    { dmg: 16, stamDmg: 25, stamCost: 25, reach: 90, windup: 16, active: 8, recov: 20, stun: 30, name: "AIR KICK", guardBreak: true, knockdown: true }
     };
 
-    // Logical Keys Mapping - Using unified keys since CPUs don't use keyboard, and online matches everyone plays locally on P1 inputs
     const KEYS_P1 = { left: ['a'], right: ['d'], block: ['s'], dash: ['shift'], jab: ['j'], cross: ['k'], hook: ['l'], uppercut: ['h'], jump: ['w', ' '], knee: ['u'], kick: ['i'], clinch: ['o'], clinchMash: [' '], taunt: ['t'] };
-    
+    const KEYS_P2 = { left: ['arrowleft'], right: ['arrowright'], block: ['arrowdown'], dash: ['enter', '0'], jab: ['1', '['], cross: ['2', ']'], hook: ['3', '\\'], uppercut: ['7', '\''], jump: ['arrowup'], knee: ['4', '-'], kick: ['5', '='], clinch: ['6', 'backspace'], clinchMash: ['0', 'enter'], taunt: ['8', 'p'] };
+
     let keysDown = {};
+    let prevKeysDown = {};
     window.addEventListener('keydown', e => { keysDown[e.key.toLowerCase()] = true; });
     window.addEventListener('keyup', e => { keysDown[e.key.toLowerCase()] = false; });
     function checkKey(keysArray, keyStateObj) { return keysArray ? keysArray.some(k => keyStateObj[k]) : false; }
 
     window.isOnlineGame = false;
+    window.remoteLogicalInputs = {};
+
+    let lastSentInputString = "";
     let syncTimer = 0;
 
     let particles = [];
     let texts = [];
     let screenShake = 0;
-    let hitFlash = 0;
+    let hitFlash = 0; // Huge screen impact flash
+    let clinchActive = false;
+    let clinchTimer = 0;
+    let clinchScoreP1 = 0;
+    let clinchScoreP2 = 0;
+    const CLINCH_MAX_TIME = 180;
 
     function spawnParticles(x, y, color, count, speedMulti=1) {
         for(let i=0; i<count; i++) particles.push({ x: x, y: y, vx: (Math.random()-0.5)*25 * speedMulti, vy: (Math.random()-0.5)*25 * speedMulti - 4, life: 1.0, color: color });
@@ -971,16 +934,14 @@
         particles.push({x, y, vx, vy, color, life, maxLife: life, decay, size, gravity});
     }
 
-    function spawnText(x, y, txt, color, isBig=false, initialLife=1.0) { 
-        texts.push({ x, y, text: txt, color, life: initialLife, maxLife: initialLife, big: isBig, vy: -1.5 }); 
-    }
+    // Added initialLife support for lingering Taunts/Finishers
+    function spawnText(x, y, txt, color, isBig=false, initialLife=1.0) { texts.push({ x, y, text: txt, color, life: initialLife, maxLife: initialLife, big: isBig, vy: -1.5 }); }
 
     class Fighter {
-        constructor(index, profileData) {
-            this.index = index;
+        constructor(isPlayer1, profileData) {
+            this.isP1 = isPlayer1;
             this.profile = profileData || { hat: 'none', accessory: 'none', taunt: '', emote: '0', finisher: '' };
-            const colors = ['#3b82f6', '#ef4444', '#10b981', '#eab308'];
-            this.color = colors[index % colors.length]; 
+            this.color = isPlayer1 ? '#3b82f6' : '#ef4444'; 
             
             this.maxHp = 100; this.hp = 100;
             this.maxStamina = 300; this.stamina = 300;
@@ -988,27 +949,16 @@
             this.tauntCooldown = 0;
             this.currentTaunt = 0;
             
-            // Stock system for Smash mode
-            this.stocks = window.currentMap && window.currentMap.type === 'smash' ? 3 : 1;
-            this.respawning = 0;
-            this.invincible = 0;
-            this.isInvincibleSync = false;
-            
             this.width = 50; this.height = 150;
+            this.x = isPlayer1 ? W*0.3 : W*0.7;
             this.y = GROUND_Y;
             this.vx = 0; this.vy = 0;
-            this.facing = (index % 2 === 0) ? 1 : -1;
+            this.facing = isPlayer1 ? 1 : -1;
             
             this.state = ST_IDLE;
             this.stateTimer = 0;
             this.hitboxActive = false;
             this.parryCooldown = 0;
-            
-            this.airJumps = 1;
-            this.hasAirDashed = false;
-            
-            this.suplexVictim = null;
-            this.suplexSuplexer = null;
             
             this.duckAmount = 0;
             this.targetDuck = 0;
@@ -1028,18 +978,6 @@
             this.gloveR.x = this.gloveR.targetX; this.gloveR.y = this.gloveR.targetY;
             this.footL.x = this.footL.targetX; this.footL.y = this.footL.targetY;
             this.footR.x = this.footR.targetX; this.footR.y = this.footR.targetY;
-        }
-
-        getIsGrounded() {
-            if (!window.currentMap) return this.y >= GROUND_Y;
-            let map = window.currentMap;
-            // Check if standing on main stage
-            if (this.x >= map.stage.x - 20 && this.x <= map.stage.x + map.stage.w + 20 && Math.abs(this.y - map.stage.y) < 1) return true;
-            // Check if standing on any platform
-            for (let p of map.platforms) {
-                if (this.x >= p.x - 20 && this.x <= p.x + p.w + 20 && Math.abs(this.y - p.y) < 1) return true;
-            }
-            return false;
         }
 
         resetTargets() {
@@ -1077,18 +1015,11 @@
         }
 
         takeDamage(dmg, stamDmg, stunFrames, isCounter, hitX, hitY, isUnblockable, causesKnockdown = false, isAntiAir = false) {
-            if (this.state === ST_KNOCKDOWN || this.invincible > 0 || this.respawning > 0) return; // Keep taking hits only if not dead
-            
-            // Break grabs if hit by anything else
-            if (this.state === ST_SUPLEX || this.state === ST_BEING_SUPLEXED || this.state === ST_CLINCHED) {
-                if (this.suplexVictim) this.suplexVictim.changeState(ST_IDLE, 0);
-                if (this.suplexSuplexer) this.suplexSuplexer.changeState(ST_IDLE, 0);
-                this.suplexVictim = null; this.suplexSuplexer = null;
-            }
+            if (this.state === ST_KNOCKDOWN || this.state === ST_CLINCHED || this.state === ST_BEING_SUPLEXED || this.state === ST_SUPLEX) return;
 
             let finalDmg = dmg;
             screenShake = 6;
-            let isAntiAirHit = isAntiAir && !this.getIsGrounded();
+            let isAntiAirHit = isAntiAir && (this.y < GROUND_Y);
 
             if (this.state === ST_BLOCK && !isUnblockable && !isAntiAirHit) {
                 finalDmg = Math.max(1, Math.floor(dmg * 0.3)); 
@@ -1136,88 +1067,50 @@
             spawnParticles(hitX, hitY, '#ef4444', 40, 1.8);
             spawnText(hitX, hitY - 40, `-${finalDmg}`, "#fff", true);
 
-            // Brutal hit flash for heavy damage
+            // Screen flash and huge spray on heavy impacts
             if (finalDmg >= 15) {
                 hitFlash = 0.6;
-                spawnParticles(hitX, hitY, '#991b1b', 25, 3.0); // Extra blood
+                spawnParticles(hitX, hitY, '#991b1b', 25, 3.0); 
                 screenShake += 8;
             }
-
-            // Knockback Scaling
-            let hpRatio = Math.max(0, (100 - this.hp) / 100);
-            let kbMult = 1.0 + (hpRatio * 1.5); 
 
             if (this.hp <= 0) {
                 this.handleDeath();
             } else if (causesKnockdown && (this.state !== ST_BLOCK || isUnblockable)) {
                 this.changeState(ST_KNOCKDOWN, 65);
-                this.vx = -this.facing * (12 * kbMult);
-                this.vy = -10 * kbMult;
-                this.kdRotVel = this.facing * (0.2 * kbMult); 
+                this.vx = -this.facing * 12;
+                this.vy = -10;
+                this.kdRotVel = this.facing * 0.2; 
                 screenShake = 18;
                 spawnText(this.x, this.y - 180, "KNOCKDOWN!", "#facc15", true);
             } else {
                 this.changeState(ST_HITSTUN, stunFrames);
-                this.vx = -this.facing * ((isCounter || isAntiAirHit ? 10 : 5) * (1.0 + hpRatio * 0.5));
+                this.vx = -this.facing * (isCounter || isAntiAirHit ? 10 : 5);
             }
         }
         
         handleDeath() {
-            this.hp = 0; 
-            this.changeState(ST_KNOCKDOWN, 999);
-            this.vx = -this.facing * 15; this.vy = -18; 
+            this.hp = 0; this.changeState(ST_KNOCKDOWN, 999);
+            this.vx = -this.facing * 15; this.vy = -18; // Increased initial death lift
             this.kdRotVel = this.facing * 0.4; 
             screenShake = 25;
             hitFlash = 0.8;
-            if (window.currentMap && window.currentMap.type === 'smash' && this.stocks > 1) {
-                this.respawning = 180; // 3 sec before drop
-            }
         }
 
-        updateLocal(fightersArray, isActive, keyMap, activeKeysDown, activePrevKeysDown) {
-            let prevKeys = this.prevKeys || {};
-            this.prevKeys = { ...activeKeysDown };
-
-            // Handle Respawning Countdown
-            if (this.respawning > 0) {
-                this.respawning--;
-                if (this.respawning === 0) {
-                    if (this.stocks > 1) {
-                        this.stocks--;
-                        this.hp = this.maxHp;
-                        this.stamina = this.maxStamina;
-                        let map = window.currentMap;
-                        this.x = map.stage.x + map.stage.w / 2 + (Math.random()-0.5)*300;
-                        this.y = map.stage.y - 800; // Drop from sky
-                        this.vx = 0; this.vy = 0;
-                        this.changeState(ST_IDLE, 0);
-                        this.invincible = 180; // 3 secs invuln
-                        spawnParticles(this.x, this.y, this.color, 40, 2);
-                        spawnText(this.x, this.y - 50, "RESPAWN", this.color, true, 2.0);
-                    } else {
-                        this.stocks = 0;
-                    }
-                }
-                return; // Skip normal logic while dead/respawning
-            }
-
-            if (this.invincible > 0) this.invincible--;
-
+        updateLocal(opponent, isActive, keyMap, activeKeysDown, activePrevKeysDown) {
             if (this.state === ST_BEING_SUPLEXED) {
                 if (this.stateTimer > 0) this.stateTimer--;
-                let suplexer = this.suplexSuplexer;
-                if (!suplexer) { this.changeState(ST_IDLE, 0); return; } // Failsafe
-                
+                let suplexer = opponent;
                 let elapsed = 90 - this.stateTimer;
                 if (elapsed < 20) {
                     this.x = suplexer.x + suplexer.facing * 30;
-                    this.y = suplexer.y;
+                    this.y = GROUND_Y;
                 } else if (elapsed < 50) {
                     let progress = (elapsed - 20) / 30;
-                    this.x = suplexer.x + suplexer.facing * (30 - progress * 90); 
-                    this.y = suplexer.y - Math.sin(progress * Math.PI) * 140; 
+                    this.x = suplexer.x + suplexer.facing * (30 - progress * 90); // Arch back behind them
+                    this.y = GROUND_Y - Math.sin(progress * Math.PI) * 140; 
                 } else {
-                    this.y = suplexer.y;
+                    this.y = GROUND_Y;
                 }
                 this.vx = 0; this.vy = 0;
                 return; 
@@ -1225,26 +1118,22 @@
 
             if (this.state === ST_SUPLEX) {
                 if (this.stateTimer > 0) this.stateTimer--;
-                let victim = this.suplexVictim;
-                
-                if (this.stateTimer === 40 && victim) { // Impact at elapsed 50
+                if (this.stateTimer === 40) { // Impact at elapsed 50
                     screenShake = 40;
                     hitFlash = 0.8;
-                    spawnParticles(this.x - this.facing * 40, this.y, '#fff', 50, 3.5);
-                    spawnParticles(this.x - this.facing * 40, this.y, '#ef4444', 20, 2.0);
-                    spawnText(this.x - this.facing * 40, this.y - 50, "SLAM!", "#ef4444", true, 2.0);
-                    
-                    victim.hp -= 35;
-                    if (victim.hp <= 0) victim.handleDeath();
+                    spawnParticles(this.x - this.facing * 40, GROUND_Y, '#fff', 50, 3.5);
+                    spawnParticles(this.x - this.facing * 40, GROUND_Y, '#ef4444', 20, 2.0);
+                    spawnText(this.x - this.facing * 40, GROUND_Y - 50, "SLAM!", "#ef4444", true, 2.0);
+                    opponent.hp -= 35;
+                    if (opponent.hp <= 0) opponent.handleDeath();
                     else {
-                        victim.changeState(ST_KNOCKDOWN, 80);
-                        victim.vy = -16; 
-                        victim.vx = -this.facing * 10;
-                        victim.kdRotVel = (Math.random() - 0.5) * 0.8;
+                        opponent.changeState(ST_KNOCKDOWN, 80);
+                        opponent.vy = -16; // Massive recoil bounce
+                        opponent.vx = -this.facing * 10;
+                        opponent.kdRotVel = (Math.random() - 0.5) * 0.8;
                     }
                 } else if (this.stateTimer === 0) {
                     this.changeState(ST_IDLE, 0);
-                    this.suplexVictim = null;
                 }
                 this.applyPhysics();
                 return;
@@ -1261,25 +1150,12 @@
                 }
                 return; 
             }
-            
-            // Dynamic Targeting (Closest alive enemy)
-            let closest = null; let minDist = Infinity;
-            fightersArray.forEach((f, i) => {
-                if (i !== this.index && (f.hp > 0 || f.respawning > 0)) {
-                    let d = Math.abs(f.x - this.x);
-                    if (d < minDist) { minDist = d; closest = f; }
-                }
-            });
+            if (clinchActive) { this.applyPhysics(); return; }
 
-            let isGrounded = this.getIsGrounded();
+            let isGrounded = this.y >= GROUND_Y;
 
             if (isGrounded && (this.state === ST_IDLE || this.state === ST_MOVE)) {
                 this.stamina = Math.min(this.maxStamina, this.stamina + 1.8); 
-            }
-
-            if (isGrounded) {
-                this.airJumps = 1;
-                this.hasAirDashed = false;
             }
 
             if (this.parryCooldown > 0) this.parryCooldown--;
@@ -1287,18 +1163,15 @@
             if (this.tauntCooldown > 0) this.tauntCooldown--;
 
             if (isActive && (this.state === ST_IDLE || this.state === ST_MOVE || this.state === ST_BLOCK || this.state === ST_PARRY || this.state === ST_DASH || this.state === ST_TAUNT)) {
-                if (closest && this.state !== ST_TAUNT && this.state !== ST_DASH) {
-                    this.facing = closest.x > this.x ? 1 : -1;
-                }
-                
+                this.facing = opponent.x > this.x ? 1 : -1;
                 let moving = false; let moveDir = 0;
 
-                // Handle Taunts
-                if (isGrounded && checkKey(keyMap.taunt, activeKeysDown) && !checkKey(keyMap.taunt, prevKeys) && (this.state === ST_IDLE || this.state === ST_MOVE)) {
+                // Handle Taunts (Key T or 8)
+                if (isGrounded && checkKey(keyMap.taunt, activeKeysDown) && !checkKey(keyMap.taunt, activePrevKeysDown) && (this.state === ST_IDLE || this.state === ST_MOVE)) {
                     if (this.tauntCooldown === 0) {
                         this.changeState(ST_TAUNT, 120); 
                         this.currentTaunt = parseInt(this.profile.emote) || 0;
-                        this.tauntCooldown = 900; // 15s CD
+                        this.tauntCooldown = 900; // 15 second huge cooldown
                         if (this.profile.taunt) {
                             spawnText(this.x, this.y - 180, `"${this.profile.taunt}"`, this.color, true, 2.0);
                         }
@@ -1324,16 +1197,9 @@
                         this.changeState(ST_IDLE, 0);
                     }
 
-                    if (checkKey(keyMap.jump, activeKeysDown) && !checkKey(keyMap.jump, prevKeys) && this.stamina >= 20) {
-                        if (isGrounded) {
-                            this.vy = -18; this.stamina -= 20; isGrounded = false;
-                            spawnParticles(this.x, this.y, '#555', 15);
-                        } else if (this.airJumps > 0 && this.state !== ST_KNOCKDOWN && this.state !== ST_HITSTUN && !ATTACK_DATA[this.state]) {
-                            this.vy = -16; this.stamina -= 20; this.airJumps--;
-                            this.changeState(ST_IDLE, 0); 
-                            spawnParticles(this.x, this.y, '#fff', 25, 1.5);
-                            spawnText(this.x, this.y - 120, "DOUBLE JUMP", "#fff", false);
-                        }
+                    if (isGrounded && checkKey(keyMap.jump, activeKeysDown) && this.stamina >= 20) {
+                        this.vy = -18; this.stamina -= 20; isGrounded = false;
+                        spawnParticles(this.x, this.y, '#555', 15);
                     }
 
                     const moveSpeed = this.stamina < 20 ? 2.5 : 6.0;
@@ -1342,11 +1208,11 @@
                     else if (isGrounded) { this.vx *= 0.7; }
 
                     if (isGrounded) {
-                        if (checkKey(keyMap.dash, activeKeysDown) && !checkKey(keyMap.dash, prevKeys) && !moving && this.stamina >= 15) {
+                        if (checkKey(keyMap.dash, activeKeysDown) && !checkKey(keyMap.dash, activePrevKeysDown) && !moving && this.stamina >= 15) {
                             this.stamina -= 15; this.changeState(ST_DODGE, 25); spawnParticles(this.x, this.y, '#aaa', 15);
                         }
                         else if (checkKey(keyMap.dash, activeKeysDown) && moving && this.stamina > 1) {
-                            this.stamina -= 1; this.changeState(ST_DASH, 6); this.vx = moveDir * 14;
+                            this.stamina -= 1; this.changeState(ST_DASH, 2); this.vx = moveDir * 14;
                             if(Math.random() < 0.4) spawnParticles(this.x, this.y, '#fff', 3);
                         }
                         else if (this.state !== ST_DASH && this.state !== ST_DODGE && this.state !== ST_TAUNT) {
@@ -1354,21 +1220,10 @@
                             else if (Math.abs(this.vx) < 0.1) this.changeState(ST_IDLE, 0);
                         }
                     } else {
-                        if (checkKey(keyMap.dash, activeKeysDown) && !checkKey(keyMap.dash, prevKeys) && !this.hasAirDashed && this.stamina >= 25 && this.state !== ST_KNOCKDOWN && this.state !== ST_HITSTUN && !ATTACK_DATA[this.state]) {
-                            this.hasAirDashed = true;
-                            this.stamina -= 25;
-                            this.changeState(ST_DASH, 10);
-                            this.vy = 0; 
-                            this.vx = (moving ? moveDir : this.facing) * 16;
-                            spawnParticles(this.x, this.y, '#60a5fa', 20, 2);
-                            spawnText(this.x, this.y - 120, "AIR DASH", "#60a5fa", false);
-                        }
-                        else if (this.state === ST_MOVE || this.state === ST_DASH || this.state === ST_DODGE || this.state === ST_TAUNT) {
-                            if (this.stateTimer === 0) this.changeState(ST_IDLE, 0);
-                        }
+                        if (this.state === ST_MOVE || this.state === ST_DASH || this.state === ST_DODGE || this.state === ST_TAUNT) this.changeState(ST_IDLE, 0);
                     }
 
-                    if (this.stamina >= 10 && this.state !== ST_DODGE && this.state !== ST_TAUNT && this.state !== ST_DASH) {
+                    if (this.stamina >= 10 && this.state !== ST_DODGE && this.state !== ST_TAUNT) {
                         let attack = null;
                         if (isGrounded) {
                             if (checkKey(keyMap.jab, activeKeysDown)) attack = ST_P_JAB;
@@ -1377,6 +1232,7 @@
                             else if (checkKey(keyMap.uppercut, activeKeysDown)) attack = ST_P_UPPERCUT;
                             else if (checkKey(keyMap.knee, activeKeysDown)) attack = ST_KNEE;
                             else if (checkKey(keyMap.kick, activeKeysDown)) attack = ST_KICK;
+                            else if (checkKey(keyMap.clinch, activeKeysDown)) attack = ST_CLINCH_ATTEMPT;
                         } else {
                             if (checkKey(keyMap.jab, activeKeysDown) || checkKey(keyMap.cross, activeKeysDown) || checkKey(keyMap.hook, activeKeysDown)) attack = ST_AERIAL_PUNCH;
                             else if (checkKey(keyMap.kick, activeKeysDown) || checkKey(keyMap.knee, activeKeysDown)) attack = ST_AERIAL_KICK;
@@ -1415,7 +1271,7 @@
                     const totalDur = data.windup + data.active + data.recov;
                     const elapsed = totalDur - this.stateTimer;
 
-                    if (elapsed < data.windup && checkKey(keyMap.block, activeKeysDown) && !checkKey(keyMap.block, prevKeys)) {
+                    if (elapsed < data.windup && checkKey(keyMap.block, activeKeysDown) && !checkKey(keyMap.block, activePrevKeysDown)) {
                         if (this.feintCooldown === 0) {
                             this.changeState(ST_IDLE, 0);
                             this.stamina += data.stamCost * 0.5; 
@@ -1437,41 +1293,36 @@
                         if(this.state === ST_KNEE || this.state === ST_KICK) hitY += 35; 
                         else if(this.state === ST_P_UPPERCUT) hitY -= 40; 
 
-                        // Loop through all enemies to check hits
-                        fightersArray.forEach((enemy, i) => {
-                            if (i !== this.index && (enemy.hp > 0 || enemy.respawning > 0)) {
-                                let yDist = Math.abs(hitY - enemy.y + 75); 
-                                let xDist = Math.abs(hitX - enemy.x);
+                        let yDist = Math.abs(hitY - opponent.y + 75); 
+                        let xDist = Math.abs(hitX - opponent.x);
 
-                                if (xDist < enemy.width/2 + 35 && yDist < enemy.height/2 + 25) {
-                                    if (enemy.state === ST_DODGE) {
-                                        // Missed
-                                    } else if (enemy.state === ST_TAUNT) {
-                                        // TAUNT COUNTER -> SUPLEX
-                                        this.hitboxActive = false;
-                                        enemy.changeState(ST_SUPLEX, 90);
-                                        this.changeState(ST_BEING_SUPLEXED, 90);
-                                        
-                                        enemy.suplexVictim = this;
-                                        this.suplexSuplexer = enemy;
-                                        
-                                        this.x = enemy.x + enemy.facing * 30;
-                                        
-                                        spawnText(enemy.x, enemy.y - 200, "TAUNT COUNTER!", "#facc15", true, 2.0);
-                                        screenShake = 15;
-                                        addParticle(enemy.x, enemy.y - 100, 0, 0, '#facc15', 1.0, 0.05, 50, 0); 
-                                    } else if (enemy.state === ST_PARRY && !data.guardBreak) { 
-                                        this.hitboxActive = false;
-                                        enemy.parriedAttack(hitX, hitY); 
-                                        this.gotParriedStun(data.stamDmg); 
-                                    } else {
-                                        this.hitboxActive = false; 
-                                        const isCounter = (ATTACK_DATA[enemy.state] && enemy.stateTimer > ATTACK_DATA[enemy.state].recov);
-                                        enemy.takeDamage(data.dmg, data.stamDmg, data.stun, isCounter, hitX, hitY, data.guardBreak || false, data.knockdown || false, data.antiAir || false);
-                                    }
-                                }
+                        if (xDist < opponent.width/2 + 35 && yDist < opponent.height/2 + 25) {
+                            if (opponent.state === ST_DODGE) {
+                                // Missed
+                            } else if (opponent.state === ST_TAUNT) {
+                                // TAUNT COUNTER -> SUPLEX
+                                this.hitboxActive = false;
+                                opponent.changeState(ST_SUPLEX, 90);
+                                this.changeState(ST_BEING_SUPLEXED, 90);
+                                
+                                // Align exactly with the opponent
+                                this.x = opponent.x + opponent.facing * 30;
+                                
+                                spawnText(opponent.x, opponent.y - 200, "TAUNT COUNTER!", "#facc15", true, 2.0);
+                                screenShake = 15;
+                                addParticle(opponent.x, opponent.y - 100, 0, 0, '#facc15', 1.0, 0.05, 50, 0); 
+                            } else if (this.state === ST_CLINCH_ATTEMPT) {
+                                this.hitboxActive = false; triggerClinch();
+                            } else if (opponent.state === ST_PARRY && !data.guardBreak) { 
+                                this.hitboxActive = false;
+                                opponent.parriedAttack(hitX, hitY); 
+                                this.gotParriedStun(data.stamDmg); 
+                            } else {
+                                this.hitboxActive = false; 
+                                const isCounter = (ATTACK_DATA[opponent.state] && opponent.stateTimer > ATTACK_DATA[opponent.state].recov);
+                                opponent.takeDamage(data.dmg, data.stamDmg, data.stun, isCounter, hitX, hitY, data.guardBreak || false, data.knockdown || false, data.antiAir || false);
                             }
-                        });
+                        }
                     }
                 }
             }
@@ -1480,76 +1331,31 @@
         }
         
         applyPhysics() {
-            if(isNaN(this.x) || isNaN(this.y) || isNaN(this.vx) || isNaN(this.vy)) { this.x = W/2; this.y = window.currentMap ? window.currentMap.stage.y : GROUND_Y; this.vx = 0; this.vy = 0; }
+            if(isNaN(this.x) || isNaN(this.y) || isNaN(this.vx) || isNaN(this.vy)) { this.x = W/2; this.y = GROUND_Y; this.vx = 0; this.vy = 0; }
             this.x += this.vx; this.y += this.vy;
             
             if (this.state === ST_KNOCKDOWN) {
                 this.rotation += this.kdRotVel; 
             }
 
-            let currentFloor = Infinity; 
-            let map = window.currentMap;
-            let prevY = this.y - this.vy;
-
-            // Check Jump Pads First
-            if (map && map.jumpPads && this.vy > 0 && this.state !== ST_DASH) {
-                map.jumpPads.forEach(pad => {
-                    if (this.x >= pad.x - 20 && this.x <= pad.x + pad.w + 20) {
-                        if (prevY <= pad.y + 20 && this.y >= pad.y - 10) {
-                            this.vy = -pad.boost;
-                            this.y = pad.y;
-                            if (this.state === ST_KNOCKDOWN) {
-                                 this.changeState(ST_HITSTUN, 30); // Recover from knockdown
-                            } else if (this.state !== ST_HITSTUN && !ATTACK_DATA[this.state]) {
-                                 this.changeState(ST_IDLE, 0);
-                            }
-                            spawnParticles(this.x, pad.y, '#10b981', 20, 2.5);
-                            spawnText(this.x, pad.y - 40, "BOING!", "#10b981", true, 1.2);
-                            screenShake += 8;
-                        }
-                    }
-                });
-            }
-
-            if (map) {
-                // Check main stage
-                if (this.x >= map.stage.x - 20 && this.x <= map.stage.x + map.stage.w + 20) {
-                    if (prevY <= map.stage.y + 0.1 && this.y >= map.stage.y) {
-                        currentFloor = map.stage.y;
-                    }
-                }
-                
-                // Check platforms
-                map.platforms.forEach(p => {
-                    if (this.x >= p.x - 20 && this.x <= p.x + p.w + 20) {
-                        if (prevY <= p.y + 0.1 && this.y >= p.y) {
-                            if (p.y < currentFloor) currentFloor = p.y;
-                        }
-                    }
-                });
-            } else if (this.y >= GROUND_Y && prevY <= GROUND_Y + 0.1) {
-                currentFloor = GROUND_Y;
-            }
-
-            if (this.state === ST_DASH) {
-                this.vy = 0; // Nullify gravity during dash
-            } else if (this.y < currentFloor) {
+            if (this.y < GROUND_Y) { 
                 this.vy += GRAVITY; 
-            } else if (currentFloor !== Infinity) {
+            } else {
                 if (this.state === ST_KNOCKDOWN && this.vy > 4) {
                     screenShake = Math.max(screenShake, Math.min(30, this.vy * 2));
                     this.vy = -this.vy * 0.6; // Stronger ragdoll bounce
                     this.vx *= 0.7;
-                    this.y = currentFloor;
-                    this.kdRotVel = (Math.random() - 0.5) * 0.8; 
-                    spawnParticles(this.x, currentFloor, '#aaa', 15, 1.5);
-                    spawnParticles(this.x, currentFloor, '#ef4444', 10, 2.0); 
+                    this.y = GROUND_Y;
+                    this.kdRotVel = (Math.random() - 0.5) * 0.8; // Wild spin on impact
+                    spawnParticles(this.x, GROUND_Y, '#aaa', 15, 1.5);
+                    spawnParticles(this.x, GROUND_Y, '#ef4444', 10, 2.0); // Extra blood
                 } else {
-                    if (this.y > currentFloor && this.vy > 0 && ATTACK_DATA[this.state] && this.state >= ST_AERIAL_PUNCH) this.changeState(ST_IDLE, 0); 
-                    this.y = currentFloor; this.vy = 0;
+                    if (this.y > GROUND_Y && this.vy > 0 && ATTACK_DATA[this.state] && this.state >= ST_AERIAL_PUNCH) this.changeState(ST_IDLE, 0); 
+                    this.y = GROUND_Y; this.vy = 0;
                     
                     if (this.state === ST_KNOCKDOWN) {
                         this.vx *= 0.8;
+                        // Snap rotation to sprawl flat on ground
                         let targetFlat = Math.round(this.rotation / (Math.PI/2)) * (Math.PI/2);
                         if (Math.abs(targetFlat % Math.PI) < 0.1) targetFlat += Math.PI/2; 
                         this.rotation += (targetFlat - this.rotation) * 0.2;
@@ -1557,51 +1363,15 @@
                     } else if(this.state !== ST_DASH) {
                         this.vx *= 0.8;
                     }
-
-                    // Moving platform carry
-                    if (this.state !== ST_DASH && this.state !== ST_KNOCKDOWN && map && map.platforms) {
-                        map.platforms.forEach(p => {
-                            if (currentFloor === p.y && this.x >= p.x - 20 && this.x <= p.x + p.w + 20 && p.vx) {
-                                this.x += p.vx;
-                            }
-                        });
-                    }
                 }
             }
-
-            // Walls (Boxing Mode only)
-            if (map && map.walls) {
-                if (this.x < map.leftWall) { this.x = map.leftWall; this.vx *= -0.5; }
-                if (this.x > map.rightWall) { this.x = map.rightWall; this.vx *= -0.5; }
-            }
-
-            // Blast Zones (Death pits)
-            if (this.y > H + 1200 || this.x < -1500 || this.x > W + 1500) {
-                if (this.hp > 0 || this.stocks > 1) {
-                    if (this.respawning === 0) {
-                        this.hp = 0;
-                        this.vx = 0; this.vy = 0;
-                        screenShake = 30;
-                        let clampX = window.camera ? window.camera.x : W/2;
-                        let clampY = window.camera ? window.camera.y : H/2;
-                        spawnText(clampX, clampY, "BLASTED!", "#ef4444", true, 3.0);
-                        spawnParticles(clampX, clampY, '#facc15', 50, 4.0);
-                        
-                        if (window.currentMap && window.currentMap.type === 'smash' && this.stocks > 1) {
-                            this.respawning = 120;
-                            this.changeState(ST_KNOCKDOWN, 999);
-                        } else {
-                            this.stocks = 0;
-                            this.handleDeath();
-                        }
-                    }
-                }
-            }
+            if (this.x < 50) { this.x = 50; this.vx *= -0.5; }
+            if (this.x > W - 50) { this.x = W - 50; this.vx *= -0.5; }
         }
 
-        updateAnimation(isMenuPreview = false) {
+        updateAnimation() {
             this.resetTargets();
-            let isGrounded = isMenuPreview || this.getIsGrounded();
+            let isGrounded = this.y >= GROUND_Y;
             
             let targetSway = (this.state === ST_DODGE) ? -this.facing * 0.35 : 0;
             this.swayAmount += (targetSway - this.swayAmount) * 0.4;
@@ -1647,13 +1417,16 @@
                     this.gloveL.targetX = -this.facing * 25; 
                     targetRotation = -this.facing * 0.2; 
                     if (elapsed < data.windup) targetRotation = -this.facing * 0.3; 
+                } else if (this.state === ST_CLINCH_ATTEMPT) {
+                    this.gloveL.targetX = this.facing * ext; this.gloveL.targetY = -95;
+                    this.gloveR.targetX = this.facing * ext; this.gloveR.targetY = -95;
                 }
             } else if (this.state === ST_HITSTUN) {
                 targetRotation = -this.facing * 0.15;
                 this.gloveL.targetY = -55; this.gloveR.targetY = -55;
             } else if (this.state === ST_KNOCKDOWN) {
-                if (!isGrounded) {
-                    // Kinetic Ragdoll: Limbs drag behind velocity
+                if (this.y < GROUND_Y) {
+                    // Kinetic Ragdoll: Limbs violently drag behind velocity vector
                     let dragX = -this.vx * 3;
                     let dragY = -this.vy * 3;
                     this.gloveL.targetX = dragX - 20 * this.facing; this.gloveL.targetY = dragY - 100;
@@ -1663,6 +1436,7 @@
                     this.headOffset.y += dragY * 0.1;
                     this.headOffset.x += dragX * 0.1;
                 } else {
+                    // Flat on ground
                     targetGroundOffset = 40;
                     this.gloveL.targetX = 50; this.gloveL.targetY = -10;
                     this.gloveR.targetX = -50; this.gloveR.targetY = 10;
@@ -1721,6 +1495,7 @@
                     this.targetDuck = 30;
                     targetRotation = this.facing * 0.15;
                     
+                    // Intense Shaking
                     this.headOffset.x += (Math.random() - 0.5) * 5;
                     this.headOffset.y += (Math.random() - 0.5) * 5;
                     targetGroundOffset = (Math.random() - 0.5) * 3;
@@ -1746,13 +1521,19 @@
                     this.footL.targetX = -this.facing * 35; 
                     this.footR.targetX = this.facing * 35;
                     
+                    // Pointing arm (Front arm)
                     this.gloveL.targetX = this.facing * 85; this.gloveL.targetY = -100;
+                    // Arm blocking face/holding hat (Back arm)
                     this.gloveR.targetX = this.facing * 10; this.gloveR.targetY = -145;
                     
                     if (elapsed % 15 === 0 && Math.random() < 0.8) {
                         spawnText(this.x + (Math.random()-0.5)*160, this.y - 80 - Math.random()*120, "ゴ", "#a855f7", true, 1.2);
                     }
                 }
+            } else if (this.state === ST_CLINCHED) {
+                this.gloveL.targetX = this.facing * 45; this.gloveL.targetY = -105;
+                this.gloveR.targetX = this.facing * 45; this.gloveR.targetY = -105;
+                this.footL.targetX = this.facing * 15;
             }
 
             if (!isGrounded && this.state !== ST_KNOCKDOWN && !ATTACK_DATA[this.state] && this.state !== ST_BEING_SUPLEXED) {
@@ -1790,50 +1571,21 @@
             this.groundOffset += (targetGroundOffset - this.groundOffset) * 0.3;
         }
 
-        draw(ctx, customGroundY = null) {
+        draw(ctx, customGroundY = GROUND_Y) {
             ctx.save();
             
-            if (this.respawning > 0) { ctx.restore(); return; } // Don't draw if respawning
+            // Calculate absolute render position on canvas given an artificial ground
+            let renderY = this.y - (GROUND_Y - customGroundY);
             
-            let isInvuln = this.invincible > 0 || this.isInvincibleSync;
-            if (isInvuln) {
-                if (Math.floor(Date.now() / 100) % 2 === 0) ctx.globalAlpha = 0.4;
-            }
-
-            let renderY = customGroundY !== null ? this.y - (GROUND_Y - customGroundY) : this.y;
-            
-            // Dynamic drop shadow calculated on active floor
-            let shadowY = window.currentMap ? window.currentMap.stage.y : GROUND_Y;
-            if (window.currentMap) {
-                let foundFloor = Infinity;
-                if (this.x >= window.currentMap.stage.x && this.x <= window.currentMap.stage.x + window.currentMap.stage.w) {
-                    foundFloor = window.currentMap.stage.y;
-                }
-                window.currentMap.platforms.forEach(p => {
-                     if (this.x >= p.x && this.x <= p.x + p.w && p.y >= this.y - 1) {
-                         if (p.y < foundFloor) foundFloor = p.y;
-                     }
-                });
-                if (foundFloor !== Infinity) shadowY = foundFloor;
-            }
-            if (customGroundY !== null) shadowY = customGroundY;
-
             ctx.save();
-            ctx.translate(this.x, shadowY);
+            ctx.translate(this.x, customGroundY);
             ctx.fillStyle = 'rgba(0,0,0,0.8)';
             ctx.beginPath();
-            let shadowWidth = (this.state === ST_KNOCKDOWN) ? 70 : Math.max(15, 40 - (shadowY - renderY)*0.2);
+            let shadowWidth = (this.state === ST_KNOCKDOWN) ? 70 : Math.max(15, 40 - (customGroundY - renderY)*0.2);
             ctx.ellipse(0, 0, shadowWidth, 10, 0, 0, Math.PI * 2); ctx.fill();
             ctx.restore();
 
             ctx.translate(this.x, renderY);
-
-            // Invincibility Shield Aura
-            if (isInvuln) {
-                ctx.beginPath(); ctx.arc(0, -this.height/2, 100, 0, Math.PI*2);
-                ctx.strokeStyle = this.color; ctx.lineWidth = 4;
-                ctx.stroke();
-            }
 
             if (Math.abs(this.rotation) > 0.01 || this.groundOffset > 0.1 || Math.abs(this.swayAmount) > 0.01) { 
                 ctx.rotate(this.rotation + this.swayAmount); 
@@ -1882,7 +1634,7 @@
             ctx.beginPath(); ctx.moveTo(-6, -55); ctx.lineTo(this.footL.x, this.footL.y); ctx.stroke(); 
             ctx.beginPath(); ctx.moveTo(6, -55); ctx.lineTo(this.footR.x, this.footR.y); ctx.stroke();  
 
-            // Accessory: Gold Chain
+            // Accessory: Gold Chain (Anchored exactly to neck to track ducking and swaying)
             if (this.profile.accessory === 'goldchain') {
                 let neckY = this.headOffset.y + 15; 
                 ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 4;
@@ -1893,6 +1645,7 @@
                 ctx.lineTo(12, neckY);
                 ctx.stroke();
                 
+                // Pendant Block
                 ctx.fillStyle = '#f59e0b';
                 ctx.fillRect(-6, neckY + 18, 12, 14);
                 ctx.fillStyle = '#fef08a'; 
@@ -1906,19 +1659,18 @@
             ctx.beginPath(); ctx.roundRect(-18, -this.height + 25 + this.duckAmount, 36, this.height - 75 - this.duckAmount, 12); ctx.fill();
             
             // Trunks/Waist
-            ctx.fillStyle = ['#1e3a8a', '#7f1d1d', '#065f46', '#a16207'][this.index % 4]; 
-            ctx.beginPath(); ctx.roundRect(-20, -65, 40, 25, 6); ctx.fill();
+            ctx.fillStyle = this.isP1 ? '#1e3a8a' : '#7f1d1d'; ctx.beginPath(); ctx.roundRect(-20, -65, 40, 25, 6); ctx.fill();
             ctx.fillStyle = '#f8fafc'; ctx.fillRect(-20, -65, 40, 6); 
 
             // Back Arm
-            ctx.strokeStyle = ['#93c5fd', '#fca5a5', '#6ee7b7', '#fde047'][this.index % 4]; ctx.lineWidth = 10;
+            ctx.strokeStyle = this.isP1 ? '#93c5fd' : '#fca5a5'; ctx.lineWidth = 10;
             ctx.beginPath(); ctx.moveTo(-6, -this.height + 40 + this.duckAmount); ctx.lineTo(this.gloveR.x, this.gloveR.y); ctx.stroke();
             
             // Head
             ctx.fillStyle = '#fecaca'; ctx.beginPath(); ctx.arc(this.headOffset.x, this.headOffset.y, 22, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.arc(this.headOffset.x - this.facing*7, this.headOffset.y + 2, 18, 0, Math.PI*2); ctx.fill();
             
-            // Accessory: Sunglasses
+            // Accessory: Sunglasses (Sleek Visor layered precisely onto headOffset)
             if (this.profile.accessory === 'sunglasses') {
                 let eyeY = this.headOffset.y - 4;
                 let eyeX = this.headOffset.x + (this.facing * 6);
@@ -1931,6 +1683,7 @@
                 ctx.lineTo(eyeX - (this.facing * 10), eyeY + 6);
                 ctx.fill();
                 
+                // Visor Shine
                 ctx.fillStyle = 'rgba(255,255,255,0.8)';
                 ctx.beginPath();
                 ctx.moveTo(eyeX + (this.facing * 2), eyeY - 2);
@@ -1952,23 +1705,22 @@
                 ctx.fillStyle = '#0a0a0a';
                 let wx = this.headOffset.x;
                 let wy = this.headOffset.y - 18;
+                // Brim
                 ctx.beginPath(); ctx.ellipse(wx, wy, 42, 6, 0, 0, Math.PI*2); ctx.fill();
+                // Top
                 ctx.beginPath(); ctx.roundRect(wx - 16, wy - 16, 32, 16, 2); ctx.fill();
             }
 
             // Front Arm
-            ctx.strokeStyle = ['#93c5fd', '#fca5a5', '#6ee7b7', '#fde047'][this.index % 4]; ctx.lineWidth = 10;
+            ctx.strokeStyle = this.isP1 ? '#93c5fd' : '#fca5a5'; ctx.lineWidth = 10;
             ctx.beginPath(); ctx.moveTo(6, -this.height + 40 + this.duckAmount); ctx.lineTo(this.gloveL.x, this.gloveL.y); ctx.stroke();
 
             // Gloves with glowing drop shadow
             ctx.shadowColor = 'rgba(0,0,0,0.8)';
             ctx.shadowBlur = 10;
-            let darkCol = ['#2563eb', '#dc2828', '#059669', '#ca8a04'][this.index % 4];
-            let lightCol = ['#3b82f6', '#ef4444', '#10b981', '#eab308'][this.index % 4];
-            
-            ctx.fillStyle = darkCol; ctx.beginPath(); ctx.arc(this.gloveR.x, this.gloveR.y, 16, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = lightCol; ctx.beginPath(); ctx.arc(this.gloveL.x, this.gloveL.y, 18, 0, Math.PI*2); ctx.fill();
-            ctx.shadowBlur = 0;
+            ctx.fillStyle = this.isP1 ? '#2563eb' : '#dc2828'; ctx.beginPath(); ctx.arc(this.gloveR.x, this.gloveR.y, 16, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = this.isP1 ? '#3b82f6' : '#ef4444'; ctx.beginPath(); ctx.arc(this.gloveL.x, this.gloveL.y, 18, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0; // Reset shadow
 
             ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.arc(this.gloveL.x + this.facing*6, this.gloveL.y - 6, 6, 0, Math.PI*2); ctx.fill();
 
@@ -1989,25 +1741,21 @@
                     ctx.restore();
                 }
             }
-            
-            ctx.globalAlpha = 1.0;
             ctx.restore();
         }
     }
 
-    window.fighters = [];
-    window.camera = { x: W/2, y: H/2, scale: 1 };
-    window.currentMap = null;
-    window.bgEntities = [];
-
+    let p1, p2;
     let gameTimer = 99;
     let matchActive = false; 
     let gameStarted = false;
-    let gameMode = '1v1'; 
-    
-    let cpuReactionTimers = [0, 0, 0, 0];
+    let vsCPU = false;
+    let cpuDifficulty = 0;
+    let cpuReactionTimer = 0;
     let lastLoopTime = 0;
     let gameOverTimeout = null;
+    let cpuInputs = {};
+    let cpuPrevInputs = {};
 
     function getLogicalInputs(keysObj, keyMap) {
         return {
@@ -2016,92 +1764,36 @@
             jump: checkKey(keyMap.jump, keysObj), jab: checkKey(keyMap.jab, keysObj),
             cross: checkKey(keyMap.cross, keysObj), hook: checkKey(keyMap.hook, keysObj),
             uppercut: checkKey(keyMap.uppercut, keysObj), knee: checkKey(keyMap.knee, keysObj),
-            kick: checkKey(keyMap.kick, keysObj), taunt: checkKey(keyMap.taunt, keysObj)
+            kick: checkKey(keyMap.kick, keysObj), clinch: checkKey(keyMap.clinch, keysObj),
+            clinchMash: checkKey(keyMap.clinchMash, keysObj), taunt: checkKey(keyMap.taunt, keysObj)
         };
     }
 
     function applyLogicalToPhysical(logicalObj, isPlayer1) {
         let physical = {};
-        const map = isPlayer1 ? KEYS_P1 : KEYS_P1; 
+        const map = isPlayer1 ? KEYS_P1 : KEYS_P2;
         if(logicalObj.left) physical[map.left[0]] = true; if(logicalObj.right) physical[map.right[0]] = true;
         if(logicalObj.block) physical[map.block[0]] = true; if(logicalObj.dash) physical[map.dash[0]] = true;
         if(logicalObj.jump) physical[map.jump[0]] = true; if(logicalObj.jab) physical[map.jab[0]] = true;
         if(logicalObj.cross) physical[map.cross[0]] = true; if(logicalObj.hook) physical[map.hook[0]] = true;
         if(logicalObj.uppercut) physical[map.uppercut[0]] = true; if(logicalObj.knee) physical[map.knee[0]] = true;
-        if(logicalObj.kick) physical[map.kick[0]] = true; if(logicalObj.taunt) physical[map.taunt[0]] = true;
+        if(logicalObj.kick) physical[map.kick[0]] = true; if(logicalObj.clinch) physical[map.clinch[0]] = true;
+        if(logicalObj.clinchMash) physical[map.clinchMash[0]] = true; if(logicalObj.taunt) physical[map.taunt[0]] = true;
         return physical;
-    }
-
-    function buildDynamicHUD(numPlayers) {
-        const container = document.getElementById('hud-container');
-        container.innerHTML = '';
-        
-        let widthClass = numPlayers === 2 ? 'w-5/12' : (numPlayers === 3 ? 'w-3/12' : 'w-[23%]');
-        const colors = ['blue', 'red', 'green', 'yellow'];
-        const hex = ['#3b82f6', '#ef4444', '#10b981', '#eab308'];
-        
-        let panels = [];
-        for(let i=0; i<numPlayers; i++) {
-            let skew = (i%2===1) ? 'p2-skew' : '';
-            let align = (i%2===1) ? 'flex-row-reverse text-right' : 'text-left';
-            let floatRight = (i%2===1) ? 'float-right mr-4' : 'ml-4';
-            let justEnd = (i%2===1) ? 'flex justify-end' : '';
-            let origin = (i%2===1) ? 'origin-right bg-gradient-to-l' : 'origin-left bg-gradient-to-r';
-            let stamOrigin = (i%2===1) ? 'right-0 bg-gradient-to-l' : 'left-0 bg-gradient-to-r';
-            let name = window.fighters[i].profile.name;
-
-            panels.push(`
-                <div class="${widthClass}">
-                    <div class="flex justify-between items-end mb-2 px-2 ${align}">
-                        <div class="flex items-center gap-3 ${align}">
-                            <div id="hud-p${i}-name" class="text-${colors[i]}-400 boxing-font text-2xl drop-shadow-[0_0_10px_${hex[i]}80] font-black italic tracking-wider truncate max-w-[80%]">${name}</div>
-                            <div id="p${i}-stocks" class="flex gap-1"></div>
-                        </div>
-                        <div class="text-gray-400 text-[10px] font-bold tracking-widest">HP</div>
-                    </div>
-                    <div class="health-bar-container ${skew} h-8 w-full bg-red-950/80 backdrop-blur-sm border-4 border-gray-900 rounded-lg overflow-hidden relative shadow-[0_0_20px_${hex[i]}40] ${justEnd}">
-                        <div id="p${i}-hp-trail" class="absolute h-full w-full bg-red-600 ${origin} transition-all duration-700 ease-out z-0"></div>
-                        <div id="p${i}-hp" class="h-full ${origin} from-yellow-400 via-yellow-300 to-white w-full transition-all duration-150 relative z-10"></div>
-                    </div>
-                    <div class="health-bar-container ${skew} h-3 w-11/12 bg-gray-900 border-x-4 border-b-4 border-gray-900 rounded-b-lg overflow-hidden shadow-inner relative ${floatRight} ${justEnd}">
-                        <div id="p${i}-stam" class="h-full ${stamOrigin} from-${colors[i]}-600 to-${colors[i]}-400 w-full transition-all duration-75 absolute top-0"></div>
-                    </div>
-                </div>
-            `);
-        }
-        
-        let timerHTML = `
-            <div class="w-1/12 flex flex-col items-center justify-center shrink-0">
-                <div class="bg-gray-900/90 border-4 border-gray-800 rounded-2xl px-4 py-1 backdrop-blur-md shadow-[0_15px_40px_rgba(0,0,0,0.9)] relative z-10">
-                    <div class="text-white font-black text-4xl boxing-font timer-glow" id="timer">99</div>
-                </div>
-            </div>`;
-
-        if (numPlayers === 2) container.innerHTML = panels[0] + timerHTML + panels[1];
-        else if (numPlayers === 3) container.innerHTML = panels[0] + panels[1] + timerHTML + panels[2];
-        else if (numPlayers === 4) container.innerHTML = panels[0] + panels[1] + timerHTML + panels[2] + panels[3];
     }
 
     window.applyHostSync = function(syncData) {
         if (!matchActive) return;
         if (Math.abs(gameTimer - syncData.t) > 2) gameTimer = syncData.t; 
-        
-        syncData.p.forEach((data, i) => {
-            if (window.fighters[i]) {
-                window.fighters[i].hp = data.hp;
-                window.fighters[i].stamina = data.s;
-                window.fighters[i].stocks = data.st;
-                window.fighters[i].isInvincibleSync = data.inv;
-                if (i !== window.myPlayerIndex) {
-                    window.fighters[i].x += (data.x - window.fighters[i].x) * 0.2;
-                    window.fighters[i].y += (data.y - window.fighters[i].y) * 0.2;
-                }
-            }
-        });
+        p1.hp = syncData.p1hp; p1.stamina = syncData.p1s;
+        p2.hp = syncData.p2hp; p2.stamina = syncData.p2s;
+        window.hostSyncP1X = syncData.p1x; window.hostSyncP2X = syncData.p2x;
     };
 
-    window.initGame = function(mode, count = 2) {
-        gameMode = mode;
+    window.initGame = function(playAgainstCPU, diff = 1, isOnline = false) {
+        vsCPU = playAgainstCPU;
+        cpuDifficulty = diff;
+        window.isOnlineGame = isOnline;
         clearTimeout(gameOverTimeout);
         
         document.getElementById('ui-container').classList.add('hidden');
@@ -2109,109 +1801,110 @@
         document.getElementById('gameCanvas').focus(); 
         document.getElementById('rematch-btn').classList.remove('hidden'); 
         
-        if (gameMode === 'online') document.getElementById('network-ping').classList.remove('hidden');
-        else document.getElementById('network-ping').classList.add('hidden');
+        if (window.isOnlineGame) {
+            document.getElementById('network-ping').classList.remove('hidden');
+        } else {
+            document.getElementById('network-ping').classList.add('hidden');
+        }
 
         const cpuNames = ["ROOKIE CPU", "PRO CPU", "CHAMPION CPU"];
-        window.fighters = [];
         
-        let totalPlayers = (gameMode === 'online') ? window.playerOrder.length : (gameMode === 'ffa-cpu' ? 4 : 2);
-        
-        // Define the Arena based on player count / mode
-        let isSmash = (totalPlayers > 2) || (gameMode === 'ffa-cpu');
-        if (isSmash) {
-            window.currentMap = {
-                type: 'smash',
-                stage: { x: W * -0.4, y: GROUND_Y, w: W * 1.8 },
-                platforms: [
-                    { x: W * -0.15, y: GROUND_Y - 180, w: W * 0.3, vx: 0 },
-                    { x: W * 0.85, y: GROUND_Y - 180, w: W * 0.3, vx: 0 },
-                    { x: W * 0.35, y: GROUND_Y - 350, w: W * 0.3, vx: 2, minX: W * 0.1, maxX: W * 0.6 } // Moving platform
-                ],
-                jumpPads: [
-                    { x: W * -0.45, y: GROUND_Y - 50, w: 120, boost: 30 },
-                    { x: W * 1.33, y: GROUND_Y - 50, w: 120, boost: 30 }
-                ],
-                walls: false
+        let p1Prof = window.isOnlineGame ? (window.isHost ? window.playerProfile : window.opponentProfile) : window.playerProfile;
+        let p2Prof;
+
+        if (window.isOnlineGame) {
+            p2Prof = window.isHost ? window.opponentProfile : window.playerProfile;
+        } else if (vsCPU) {
+            const cpuHats = ['none', 'kippah', 'widebrim'];
+            const cpuAccs = ['none', 'sunglasses', 'goldchain'];
+            p2Prof = {
+                name: cpuNames[cpuDifficulty],
+                hat: cpuHats[Math.floor(Math.random()*3)],
+                accessory: cpuAccs[Math.floor(Math.random()*3)],
+                taunt: "I am programmed to win.",
+                emote: Math.floor(Math.random()*4).toString(),
+                finisher: "01001011 01001111" // "K O"
             };
         } else {
-            window.currentMap = {
-                type: 'boxing',
-                stage: { x: -1000, y: GROUND_Y, w: 3000 }, 
-                platforms: [],
-                jumpPads: [],
-                walls: true,
-                leftWall: 50,
-                rightWall: W - 50
+            p2Prof = {
+                name: "PLAYER 2",
+                hat: 'none',
+                accessory: 'none',
+                taunt: "Let's go!",
+                emote: "0",
+                finisher: "I am the champion!"
             };
         }
 
-        window.bgEntities = [];
-        for(let i=0; i<40; i++) {
-            window.bgEntities.push({
-                x: (Math.random() - 0.5) * W * 4,
-                y: (Math.random() - 0.5) * H * 4,
-                z: Math.random() * 3 + 1.0,
-                color: ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#facc15'][Math.floor(Math.random()*5)],
-                size: Math.random() * 8 + 2
-            });
+        document.getElementById('hud-p1-name').innerText = p1Prof.name;
+        document.getElementById('hud-p2-name').innerText = p2Prof.name;
+        
+        if (vsCPU || window.isOnlineGame) {
+            document.getElementById('controls-text').innerHTML = `
+                <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-bold uppercase tracking-wider text-white">
+                    <span class="text-blue-400 font-black">YOUR CONTROLS</span>
+                    <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">W A S D</span> Move</span>
+                    <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">SPACE</span> Jump</span>
+                    <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">SHIFT</span> Dodge</span>
+                    <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">S</span> Guard/Feint</span>
+                    <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">J K L</span> Punch</span>
+                    <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">H</span> Upper</span>
+                    <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">U I</span> Kick</span>
+                    <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">O</span> Clinch</span>
+                    <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-yellow-300">T</span> Taunt</span>
+                </div>
+            `;
+        } else {
+            document.getElementById('controls-text').innerHTML = `
+                <div class="flex flex-col gap-3">
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white">
+                        <span class="text-blue-400 font-black">P1</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">W A S D</span> Move</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">SHIFT</span> Dodge</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">S</span> Guard</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">J K L</span> Punch</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">H</span> Upper</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">U I</span> Kick</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">O</span> Clinch</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-yellow-300">T</span> Taunt</span>
+                    </div>
+                    <div class="w-full h-px bg-white/10"></div>
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white">
+                        <span class="text-red-400 font-black">P2</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">ARROWS</span> Move</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">ENTER</span> Dodge</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">↓</span> Guard</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">1 2 3</span> Punch</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">7</span> Upper</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">4 5</span> Kick</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-white/90">6</span> Clinch</span>
+                        <span class="flex items-center gap-1.5"><span class="bg-white/20 px-1.5 py-0.5 rounded text-yellow-300">8</span> Taunt</span>
+                    </div>
+                </div>
+            `;
         }
 
-        let spawnW = isSmash ? window.currentMap.stage.w : W;
-        let spawnStartX = isSmash ? window.currentMap.stage.x : 0;
-
-        for (let i = 0; i < totalPlayers; i++) {
-            let prof;
-            if (gameMode === 'online') {
-                prof = window.matchProfiles[i];
-            } else if (i === 0) {
-                prof = window.playerProfile;
-            } else {
-                prof = {
-                    name: cpuNames[Math.floor(Math.random()*3)],
-                    hat: ['none', 'kippah', 'widebrim'][Math.floor(Math.random()*3)],
-                    accessory: ['none', 'sunglasses', 'goldchain'][Math.floor(Math.random()*3)],
-                    taunt: "I am programmed to win.",
-                    emote: Math.floor(Math.random()*4).toString(),
-                    finisher: "01001011 01001111" 
-                };
-            }
-            let f = new Fighter(i, prof);
-            f.x = spawnStartX + spawnW * (0.2 + (0.6 / Math.max(1, totalPlayers - 1)) * i);
-            window.fighters.push(f);
-            
-            if (f.profile.taunt) spawnText(f.x, f.y - 180, `"${f.profile.taunt}"`, f.color, false, 3.5);
-        }
-
-        buildDynamicHUD(totalPlayers);
+        keysDown = {}; prevKeysDown = {}; cpuInputs = {};
+        window.remoteLogicalInputs = {}; window.localCacheString = "";
+        window.localWantsRematch = false; window.remoteWantsRematch = false;
         
-        document.getElementById('controls-text').innerHTML = `
-            <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-bold uppercase tracking-wider text-white">
-                <span class="text-blue-400 font-black">YOUR CONTROLS</span>
-                <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">W A S D</span> Move</span>
-                <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">SPACE</span> Jump</span>
-                <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">SHIFT</span> Dodge</span>
-                <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">S</span> Guard/Feint</span>
-                <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">J K L</span> Punch</span>
-                <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">H</span> Upper</span>
-                <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-white/90">U I</span> Kick</span>
-                <span class="flex items-center gap-2"><span class="bg-white/20 px-2 py-1 rounded text-yellow-300">T</span> Taunt</span>
-            </div>
-        `;
-
-        keysDown = {};
-        window.remoteInputs = {};
-        window.localCacheString = "";
-        window.localWantsRematch = false;
-        window.rematchVotes = {};
-        window.camera = { x: W/2, y: H/2, scale: 1 };
+        const p2KeysList = ['arrowleft', 'arrowright', 'arrowdown', 'arrowup', 'enter', '0', '1', '2', '3', '4', '5', '6', '7', 'backspace', '[', ']', '\\', '\'', '-', '=', '8', 'p'];
+        p2KeysList.forEach(k => cpuInputs[k] = false);
+        cpuPrevInputs = { ...cpuInputs };
         
-        screenShake = 0; particles = []; texts = [];
-        syncTimer = 0;
+        screenShake = 0; particles = []; texts = []; hitFlash = 0;
+        clinchActive = false; clinchScoreP1 = 0; clinchScoreP2 = 0; cpuReactionTimer = 0; syncTimer = 0;
 
+        p1 = new Fighter(true, p1Prof); 
+        p2 = new Fighter(false, p2Prof);
         gameTimer = 99; matchActive = true; 
         
+        // Initial HUD rendering setup
+        document.getElementById('p1-hp-trail').style.width = '100%';
+        document.getElementById('p2-hp-trail').style.width = '100%';
+        
         document.getElementById('game-over-ui').classList.add('hidden');
+        hideDifficultyMenu(); 
         hideLobbyMenu();
         
         lastLoopTime = performance.now(); 
@@ -2225,149 +1918,125 @@
         document.getElementById('winner-sub').innerText = "The bout is over.";
         document.getElementById('rematch-btn').classList.remove('hidden');
 
-        keysDown = {}; window.remoteInputs = {};
-        screenShake = 0; particles = []; texts = [];
-        matchActive = true; gameTimer = 99;
-        window.localWantsRematch = false; window.rematchVotes = {};
-        window.camera = { x: W/2, y: H/2, scale: 1 };
+        keysDown = {}; prevKeysDown = {}; cpuInputs = {}; window.remoteLogicalInputs = {};
+        screenShake = 0; particles = []; texts = []; hitFlash = 0;
+        clinchActive = false; matchActive = true; gameTimer = 99;
+        window.localWantsRematch = false; window.remoteWantsRematch = false;
         
-        let spawnW = window.currentMap.type === 'smash' ? window.currentMap.stage.w : W;
-        let spawnStartX = window.currentMap.type === 'smash' ? window.currentMap.stage.x : 0;
-        let totalPlayers = window.fighters.length;
-
-        window.fighters.forEach((f, i) => {
-            f.hp = f.maxHp; f.stamina = f.maxStamina; f.changeState(ST_IDLE, 0); f.y = GROUND_Y;
-            f.stocks = window.currentMap.type === 'smash' ? 3 : 1;
-            f.respawning = 0; f.invincible = 0;
-            f.x = spawnStartX + spawnW * (0.2 + (0.6 / Math.max(1, totalPlayers - 1)) * i);
-            if (f.profile.taunt) spawnText(f.x, f.y - 180, `"${f.profile.taunt}"`, f.color, false, 3.5);
-        });
+        p1 = new Fighter(true, p1.profile); 
+        p2 = new Fighter(false, p2.profile);
+        
+        document.getElementById('p1-hp-trail').style.width = '100%';
+        document.getElementById('p2-hp-trail').style.width = '100%';
 
         lastLoopTime = performance.now();
         document.getElementById('gameCanvas').focus();
     };
 
     window.handleRematchClick = function() {
-        if (gameMode === 'online') {
+        if (window.isOnlineGame) {
             window.onlineRematchRequest();
         } else {
             window.resetMatchForRematch();
         }
     };
 
-    function processCPU(cpuIndex) {
-        let f = window.fighters[cpuIndex];
-        if (!matchActive || f.state === ST_KNOCKDOWN || f.hp <= 0 || f.respawning > 0) return {};
+    function processCPU() {
+        if (!matchActive || p2.state === ST_KNOCKDOWN || p2.state === ST_SUPLEX || p2.state === ST_BEING_SUPLEXED) return;
         
-        let inputs = { left:false, right:false, block:false, dash:false, jump:false, jab:false, cross:false, hook:false, uppercut:false, knee:false, kick:false, taunt:false };
-        
-        // AI Platform Recovery Logic
-        if (window.currentMap.type === 'smash') {
-            let stageCenter = window.currentMap.stage.x + window.currentMap.stage.w / 2;
-            if (!f.getIsGrounded() && f.y > window.currentMap.stage.y + 50) {
-                inputs[f.x < stageCenter ? 'right' : 'left'] = true;
-                
-                // CPU uses double jump logic
-                if (Math.random() < 0.3) inputs.jump = true;
-                
-                // CPU uses air dash recovery if far away horizontally
-                if (f.stamina > 25 && Math.abs(f.x - stageCenter) > 400 && Math.random() < 0.15) inputs.dash = true; 
-                
-                cpuReactionTimers[cpuIndex] = 3; // Fast reaction while off-stage
-                return inputs;
+        cpuPrevInputs = { ...cpuInputs };
+
+        const diffProfiles = [
+            { reactBase: 15, reactRand: 20, block: 0.60, dodge: 0.30, atkFreq: 0.60, mashSpd: 10 },
+            { reactBase: 5,  reactRand: 10, block: 0.85, dodge: 0.50, atkFreq: 0.80, mashSpd: 4 },
+            { reactBase: 1,  reactRand: 5,  block: 0.98, dodge: 0.80, atkFreq: 0.95, mashSpd: 2 }
+        ];
+        let prof = diffProfiles[cpuDifficulty];
+
+        if (cpuDifficulty === 2 && ATTACK_DATA[p2.state]) {
+            let data = ATTACK_DATA[p2.state];
+            let elapsed = (data.windup + data.active + data.recov) - p2.stateTimer;
+            if (elapsed === 6 && (p2.state === ST_P_HOOK || p2.state === ST_KICK) && Math.random() < 0.4) {
+                cpuInputs.arrowdown = true; 
             }
         }
-
-        cpuReactionTimers[cpuIndex]--;
-        if (cpuReactionTimers[cpuIndex] > 0) return inputs; 
         
-        cpuReactionTimers[cpuIndex] = 10 + Math.random() * 20; 
-        
-        let closest = null; let minDist = Infinity;
-        window.fighters.forEach((e, i) => {
-            if (i !== cpuIndex && (e.hp > 0 || e.respawning > 0)) {
-                let d = Math.abs(e.x - f.x);
-                if (d < minDist) { minDist = d; closest = e; }
+        if (clinchActive) {
+            cpuReactionTimer--;
+            if (cpuReactionTimer <= 0) {
+                cpuInputs['0'] = !cpuInputs['0']; 
+                cpuReactionTimer = prof.mashSpd + Math.random() * (prof.mashSpd * 1.5); 
             }
-        });
-
-        if (!closest) return inputs;
-
-        let isAttacking = closest.hitboxActive || (ATTACK_DATA[closest.state] && closest.stateTimer > ATTACK_DATA[closest.state].recov);
-        let movingAway = closest.x > f.x ? 'left' : 'right';
-        let movingToward = closest.x > f.x ? 'right' : 'left';
-
-        if (isAttacking && f.stamina > 20) {
-            if (Math.random() < 0.6) { inputs.block = true; cpuReactionTimers[cpuIndex] = 25; return inputs; }
-            else if (Math.random() < 0.4) { inputs.dash = true; return inputs; }
+            return;
         }
         
-        if (f.stamina < 50 && !isAttacking) {
-            inputs[movingAway] = true;
-            if(Math.random() < 0.1) inputs.dash = true;
-            cpuReactionTimers[cpuIndex] = 15; return inputs;
+        cpuReactionTimer--;
+        if (cpuReactionTimer > 0) return; 
+        
+        cpuReactionTimer = prof.reactBase + Math.random() * prof.reactRand; 
+        Object.keys(cpuInputs).forEach(k => cpuInputs[k] = false);
+        
+        let dist = Math.abs(p1.x - p2.x);
+        let isP1Attacking = p1.hitboxActive || (ATTACK_DATA[p1.state] && p1.stateTimer > ATTACK_DATA[p1.state].recov);
+        let movingAway = p2.x > p1.x ? 'arrowright' : 'arrowleft';
+        let movingToward = p2.x > p1.x ? 'arrowleft' : 'arrowright';
+
+        if (isP1Attacking && p2.stamina > 20) {
+            if (Math.random() < prof.block) { cpuInputs.arrowdown = true; cpuReactionTimer = 25; return; }
+            else if (Math.random() < prof.dodge) { cpuInputs.enter = true; return; }
+        }
+        
+        if (p2.stamina < 50 && !isP1Attacking) {
+            cpuInputs[movingAway] = true;
+            if(Math.random() < 0.1) cpuInputs.enter = true;
+            cpuReactionTimer = 15; return;
         }
 
-        if (minDist > 180) {
-            inputs[movingToward] = true;
-            if (Math.random() < 0.2 && f.stamina > 20) inputs.dash = true; 
-            if (Math.random() < 0.2) inputs.jump = true; 
-            if (Math.random() < 0.02) inputs.taunt = true;
-            cpuReactionTimers[cpuIndex] = 15; 
+        if (dist > 180) {
+            cpuInputs[movingToward] = true;
+            if (Math.random() < 0.2 && p2.stamina > 20) cpuInputs.enter = true; 
+            if (Math.random() < 0.1) cpuInputs.arrowup = true; 
+            if (Math.random() < 0.02) cpuInputs['8'] = true; // CPU Taunt!
+            cpuReactionTimer = 15; 
         } else {
-            if (Math.random() < 0.8 && f.stamina >= 20) {
+            if (Math.random() < prof.atkFreq && p2.stamina >= 20) {
                 let rand = Math.random();
-                if (closest.y < f.y - 30 && minDist < 120 && Math.random() < 0.7) inputs.uppercut = true; 
+                if (p1.y < GROUND_Y - 30 && dist < 120 && Math.random() < 0.7) cpuInputs['7'] = true; 
                 else {
-                    if (rand < 0.20) inputs.jab = true; else if (rand < 0.40) inputs.cross = true; 
-                    else if (rand < 0.55) inputs.hook = true; else if (rand < 0.70) inputs.uppercut = true; 
-                    else if (rand < 0.85) inputs.knee = true; else if (rand < 0.95) inputs.kick = true; 
+                    if (rand < 0.20) cpuInputs['1'] = true; else if (rand < 0.40) cpuInputs['2'] = true; 
+                    else if (rand < 0.55) cpuInputs['3'] = true; else if (rand < 0.70) cpuInputs['7'] = true; 
+                    else if (rand < 0.85) cpuInputs['4'] = true; else if (rand < 0.95) cpuInputs['5'] = true; 
+                    else cpuInputs['6'] = true; 
                 }
-                cpuReactionTimers[cpuIndex] = 35; 
+                cpuReactionTimer = 35; 
             } else {
-                if (Math.random() < 0.5) inputs[movingAway] = true; else inputs[movingToward] = true;
-                cpuReactionTimers[cpuIndex] = 15;
+                if (Math.random() < 0.5) cpuInputs[movingAway] = true; else cpuInputs[movingToward] = true;
+                cpuReactionTimer = 15;
             }
         }
-        return inputs;
+    }
+
+    function triggerClinch() {
+        p1.changeState(ST_CLINCHED, 999); p2.changeState(ST_CLINCHED, 999);
+        p1.x = W/2 - 20; p2.x = W/2 + 20;
+        clinchActive = true; clinchTimer = CLINCH_MAX_TIME;
+        clinchScoreP1 = 0; clinchScoreP2 = 0; screenShake = 15;
     }
 
     function updateUI() {
-        const colors = ['blue', 'red', 'green', 'yellow'];
-        const hex = ['#3b82f6', '#ef4444', '#10b981', '#eab308'];
-
-        window.fighters.forEach((f, i) => {
-            let elHp = document.getElementById(`p${i}-hp`);
-            let elHpTrail = document.getElementById(`p${i}-hp-trail`);
-            let elStam = document.getElementById(`p${i}-stam`);
-            let elStocks = document.getElementById(`p${i}-stocks`);
-            
-            let hpPercent = Math.max(0, (f.hp / f.maxHp) * 100);
-            if(elHp) elHp.style.width = `${hpPercent}%`;
-            if(elHpTrail) {
-                let currentTrailStr = elHpTrail.style.width || '100%';
-                let currentTrail = parseFloat(currentTrailStr);
-                if (hpPercent < currentTrail) {
-                    setTimeout(() => { elHpTrail.style.width = `${hpPercent}%`; }, 400); 
-                } else {
-                    elHpTrail.style.width = `${hpPercent}%`; 
-                }
-            }
-            if(elStam) elStam.style.width = `${Math.max(0, (f.stamina / f.maxStamina) * 100)}%`;
-
-            if(elStocks) {
-                let stockHtml = '';
-                for(let s=0; s<f.stocks; s++) {
-                    stockHtml += `<div class="w-3 h-3 rounded-full bg-${colors[i]}-400 shadow-[0_0_8px_${hex[i]}] border border-white/50"></div>`;
-                }
-                elStocks.innerHTML = stockHtml;
-            }
-        });
+        document.getElementById('p1-hp').style.width = `${Math.max(0, p1.hp)}%`;
+        document.getElementById('p1-hp-trail').style.width = `${Math.max(0, p1.hp)}%`;
+        document.getElementById('p1-stam').style.width = `${Math.max(0, (p1.stamina / p1.maxStamina) * 100)}%`;
+        
+        document.getElementById('p2-hp').style.width = `${Math.max(0, p2.hp)}%`;
+        document.getElementById('p2-hp-trail').style.width = `${Math.max(0, p2.hp)}%`;
+        document.getElementById('p2-stam').style.width = `${Math.max(0, (p2.stamina / p2.maxStamina) * 100)}%`;
+        
         document.getElementById('timer').innerText = Math.max(0, Math.ceil(gameTimer));
     }
 
     window.checkGameOverNetworkEvent = function() {
-        matchActive = false;
+        matchActive = false; clinchActive = false;
         document.getElementById('ui-container').classList.remove('hidden');
         document.getElementById('main-menu').classList.add('hidden');
         document.getElementById('menu-primary').classList.add('hidden');
@@ -2376,25 +2045,18 @@
 
     function checkGameOver() {
         if(!matchActive) return;
-        
-        let aliveCount = window.fighters.filter(f => f.hp > 0 || f.stocks > 0 || f.respawning > 0).length;
-        if (gameTimer > 0 && aliveCount > 1) return; // Keep going
+        matchActive = false; clinchActive = false;
 
-        matchActive = false;
-
-        if (gameMode === 'online' && window.dataChannels && window.isHost) {
-            let hps = window.fighters.map(f => f.hp);
-            Object.values(window.dataChannels).forEach(dc => {
-                if(dc.readyState === 'open') dc.send(JSON.stringify({ type: 'gameover', hps: hps }));
-            });
+        if (window.isOnlineGame && window.dataChannel && window.dataChannel.readyState === 'open') {
+            window.dataChannel.send(JSON.stringify({ type: 'gameover', p1hp: p1.hp, p2hp: p2.hp }));
         }
 
-        // Show finisher messages for winners
-        window.fighters.forEach(f => {
-            if ((f.hp > 0 || f.stocks > 0) && f.profile.finisher) {
-                spawnText(f.x, f.y - 180, `"${f.profile.finisher}"`, f.color, true, 4.0);
-            }
-        });
+        // Show finisher message immediately
+        if (p1.hp <= 0 && p2.hp > 0 && p2.profile.finisher) {
+            spawnText(p2.x, p2.y - 180, `"${p2.profile.finisher}"`, p2.color, true, 4.0);
+        } else if (p2.hp <= 0 && p1.hp > 0 && p1.profile.finisher) {
+            spawnText(p1.x, p1.y - 180, `"${p1.profile.finisher}"`, p1.color, true, 4.0);
+        }
 
         gameOverTimeout = setTimeout(() => {
             document.getElementById('ui-container').classList.remove('hidden');
@@ -2405,66 +2067,24 @@
             
             let winnerTxt = "DRAW"; let subTxt = "The bout is over.";
             
-            let winners = window.fighters.filter(f => f.hp > 0 || f.stocks > 0 || f.respawning > 0);
-            if (winners.length === 1) {
-                let winIdx = winners[0].index;
-                let isMe = (winIdx === window.myPlayerIndex);
-                winnerTxt = `P${winIdx+1} WINS`;
-                subTxt = isMe ? "YOU ARE VICTORIOUS!" : "YOU WERE DEFEATED.";
+            if (window.isOnlineGame) {
+                let myFighter = window.isHost ? p1 : p2;
+                let oppFighter = window.isHost ? p2 : p1;
+                if(myFighter.hp > oppFighter.hp) { winnerTxt = "VICTORY"; subTxt = "YOU DEFEATED YOUR OPPONENT!"; }
+                if(oppFighter.hp > myFighter.hp) { winnerTxt = "DEFEAT"; subTxt = "YOUR OPPONENT WON."; }
+            } else {
+                if(p1.hp > p2.hp) { winnerTxt = "P1 WINS"; subTxt = vsCPU ? "YOU DEFEATED THE CPU!" : "PLAYER 1 IS VICTORIOUS!"; }
+                if(p2.hp > p1.hp) { winnerTxt = "P2 WINS"; subTxt = vsCPU ? "THE CPU CRUSHED YOU." : "PLAYER 2 IS VICTORIOUS!"; }
             }
             
             document.getElementById('winner-text').innerText = winnerTxt; 
             
-            if (window.rematchVotes[user?.uid]) {
-                // Ignore, handled by checkRematch
+            if (window.remoteWantsRematch) {
+                document.getElementById('winner-sub').innerText = "OPPONENT WANTS REMATCH...";
             } else {
                 document.getElementById('winner-sub').innerText = subTxt;
             }
         }, 2000);
-    }
-
-    function updateCamera() {
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-        let activeFighters = window.fighters.filter(f => f.hp > 0 || f.respawning > 0 || (f.state === ST_KNOCKDOWN && f.y < H + 500));
-        
-        if (activeFighters.length === 0) activeFighters = window.fighters; 
-
-        activeFighters.forEach(f => {
-            minX = Math.min(minX, f.x);
-            maxX = Math.max(maxX, f.x);
-            minY = Math.min(minY, f.y - f.height);
-            maxY = Math.max(maxY, f.y);
-        });
-
-        // Add map stage boundaries so camera doesn't zoom too wildly
-        if (window.currentMap && window.currentMap.type === 'smash') {
-            minX = Math.min(minX, window.currentMap.stage.x - 200);
-            maxX = Math.max(maxX, window.currentMap.stage.x + window.currentMap.stage.w + 200);
-            minY = Math.min(minY, window.currentMap.stage.y - 800);
-            maxY = Math.max(maxY, window.currentMap.stage.y + 300);
-        }
-
-        let cx = (minX + maxX) / 2;
-        let cy = (minY + maxY) / 2;
-
-        let paddingX = 800;
-        let paddingY = 600;
-        let targetW = (maxX - minX) + paddingX;
-        let targetH = (maxY - minY) + paddingY;
-
-        let scaleX = W / targetW;
-        let scaleY = H / targetH;
-        let targetScale = Math.min(scaleX, scaleY, 1.2);
-        targetScale = Math.max(targetScale, 0.4); 
-
-        if (window.currentMap && window.currentMap.type === 'boxing') {
-            targetScale = Math.max(targetScale, 0.85);
-            cy = Math.min(cy, GROUND_Y - 150);
-        }
-
-        window.camera.x += (cx - window.camera.x) * 0.05;
-        window.camera.y += (cy - window.camera.y) * 0.05;
-        window.camera.scale += (targetScale - window.camera.scale) * 0.04;
     }
 
     function gameLoop(timestamp) {
@@ -2476,212 +2096,133 @@
         if (dt < 16) return; 
         lastLoopTime = timestamp - (dt % 16); 
         
-        if (matchActive) {
+        if (matchActive && !clinchActive) {
             gameTimer -= 1/60; 
-            checkGameOver();
-
-            // Handle Moving Platforms
-            if (window.currentMap && window.currentMap.platforms) {
-                window.currentMap.platforms.forEach(p => {
-                    if (p.vx) {
-                        p.x += p.vx;
-                        if (p.x < p.minX || p.x > p.maxX) p.vx *= -1;
-                    }
-                });
-            }
-
-            // Handle Background Parallax Elements
-            if (window.bgEntities) {
-                window.bgEntities.forEach(ent => {
-                    ent.y -= 0.5 / ent.z; // Float upwards
-                    if (ent.y < -H * 2) ent.y = H * 2;
-                });
-            }
+            if(gameTimer <= 0 || p1.hp <= 0 || p2.hp <= 0) checkGameOver();
         }
 
-        let myLogical = getLogicalInputs(keysDown, KEYS_P1);
-
-        if (gameMode === 'online') {
+        if (window.isOnlineGame) {
+            let myLogical = getLogicalInputs(keysDown, KEYS_P1);
             let strMyLogical = JSON.stringify(myLogical);
+            
             if (strMyLogical !== window.localCacheString && window.onlineSendInput) {
                 window.onlineSendInput(myLogical);
                 window.localCacheString = strMyLogical;
             }
 
+            let networkP1Keys = window.isHost ? keysDown : applyLogicalToPhysical(window.remoteLogicalInputs, true);
+            let networkP2Keys = window.isHost ? applyLogicalToPhysical(window.remoteLogicalInputs, false) : applyLogicalToPhysical(myLogical, false);
+
             if (window.isHost && matchActive) {
                 syncTimer++;
                 if (syncTimer >= 5) {
                     syncTimer = 0;
-                    window.onlineSendSync({ 
-                        t: gameTimer, 
-                        p: window.fighters.map(f => ({ 
-                            x: Math.round(f.x), y: Math.round(f.y), 
-                            hp: f.hp, s: Math.round(f.stamina),
-                            st: f.stocks, inv: (f.invincible > 0)
-                        })) 
-                    });
+                    window.onlineSendSync({ p1x: p1.x, p1hp: p1.hp, p1s: p1.stamina, p2x: p2.x, p2hp: p2.hp, p2s: p2.stamina, t: gameTimer });
+                }
+            } else if (!window.isHost && matchActive) {
+                if (window.hostSyncP1X !== undefined) p1.x += (window.hostSyncP1X - p1.x) * 0.15;
+                if (window.hostSyncP2X !== undefined && Math.abs(p2.x - window.hostSyncP2X) > 15) {
+                    p2.x += (window.hostSyncP2X - p2.x) * 0.05;
                 }
             }
 
-            window.fighters.forEach((f, idx) => {
-                let keysToApply = {};
-                if (idx === window.myPlayerIndex) {
-                    keysToApply = applyLogicalToPhysical(myLogical, true);
-                } else if (window.isHost) {
-                    let uid = window.playerOrder[idx];
-                    keysToApply = applyLogicalToPhysical(window.remoteInputs[uid] || {}, true);
-                }
-                
-                f.updateLocal(window.fighters, matchActive, KEYS_P1, keysToApply, {});
-            });
+            processClinch(networkP1Keys, prevKeysDown, networkP2Keys, cpuPrevInputs);
+            if (!clinchActive) { applySpacing(); }
+            
+            p1.updateLocal(p2, matchActive, KEYS_P1, networkP1Keys, prevKeysDown);
+            p2.updateLocal(p1, matchActive, KEYS_P2, networkP2Keys, cpuPrevInputs);
+            
+            prevKeysDown = { ...networkP1Keys }; 
+            cpuPrevInputs = { ...networkP2Keys };
 
         } else {
-            // Local Matches
-            window.fighters.forEach((f, idx) => {
-                let logical = (idx === 0) ? myLogical : processCPU(idx);
-                let keysToApply = applyLogicalToPhysical(logical, true);
-                f.updateLocal(window.fighters, matchActive, KEYS_P1, keysToApply, {});
-            });
+            if (vsCPU) processCPU();
+            let p2ActiveKeys = vsCPU ? cpuInputs : keysDown;
+            let p2PrevKeys = vsCPU ? cpuPrevInputs : prevKeysDown;
+            
+            processClinch(keysDown, prevKeysDown, p2ActiveKeys, p2PrevKeys);
+            if (!clinchActive) { applySpacing(); }
+
+            p1.updateLocal(p2, matchActive, KEYS_P1, keysDown, prevKeysDown);
+            p2.updateLocal(p1, matchActive, KEYS_P2, p2ActiveKeys, p2PrevKeys);
+            
+            prevKeysDown = { ...keysDown }; 
         }
         
-        applySpacing();
-        updateCamera();
-        
-        window.fighters.forEach(f => f.updateAnimation(false));
+        p1.updateAnimation(); p2.updateAnimation();
         drawGame();
     }
 
-    function applySpacing() {
-        for(let i=0; i<window.fighters.length; i++) {
-            for(let j=i+1; j<window.fighters.length; j++) {
-                let f1 = window.fighters[i]; let f2 = window.fighters[j];
-                if (f1.hp > 0 && f2.hp > 0 && Math.abs(f1.x - f2.x) < 45 && f1.state !== ST_KNOCKDOWN && f2.state !== ST_KNOCKDOWN && f1.state !== ST_BEING_SUPLEXED && f2.state !== ST_BEING_SUPLEXED) {
-                    if (f1.getIsGrounded() && f2.getIsGrounded()) {
-                        let push = (f1.x < f2.x) ? -2.5 : 2.5;
-                        f1.x += push; f2.x -= push;
-                    }
-                }
+    function processClinch(p1Active, p1Prev, p2Active, p2Prev) {
+        if (clinchActive) {
+            clinchTimer--;
+            if (checkKey(KEYS_P1.clinchMash, p1Active) && !checkKey(KEYS_P1.clinchMash, p1Prev)) clinchScoreP1++;
+            if (checkKey(KEYS_P2.clinchMash, p2Active) && !checkKey(KEYS_P2.clinchMash, p2Prev)) clinchScoreP2++;
+            
+            if (clinchTimer <= 0) {
+                clinchActive = false;
+                if (clinchScoreP1 > clinchScoreP2) { p2.changeState(ST_KNOCKDOWN, 80); p2.vy = -12; p2.vx = 20; p2.kdRotVel = 0.2; p2.hp -= 25; p1.changeState(ST_IDLE, 0); } 
+                else if (clinchScoreP2 > clinchScoreP1) { p1.changeState(ST_KNOCKDOWN, 80); p1.vy = -12; p1.vx = -20; p1.kdRotVel = -0.2; p1.hp -= 25; p2.changeState(ST_IDLE, 0); } 
+                else { p1.changeState(ST_HITSTUN, 30); p1.vx = -10; p2.changeState(ST_HITSTUN, 30); p2.vx = 10; }
+                if (p1.hp <= 0) p1.handleDeath(); if (p2.hp <= 0) p2.handleDeath();
+                screenShake = 25; spawnParticles(W/2, GROUND_Y-80, '#fff', 70, 3.5);
             }
+        }
+    }
+
+    function applySpacing() {
+        if (Math.abs(p1.x - p2.x) < 45 && p1.state !== ST_KNOCKDOWN && p2.state !== ST_KNOCKDOWN && p1.state !== ST_BEING_SUPLEXED && p2.state !== ST_BEING_SUPLEXED) {
+            const push = (p1.x < p2.x) ? -3.5 : 3.5; p1.x += push; p2.x -= push;
         }
     }
 
     function drawGame() {
         ctx.save();
-        
-        // Static Background
-        ctx.clearRect(0, 0, W, H);
-        let bgGrad = ctx.createRadialGradient(W/2, H/2 - 100, 0, W/2, H/2, W);
-        bgGrad.addColorStop(0, '#0c0a20'); bgGrad.addColorStop(1, '#020205');
-        ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, W, H);
-
-        if (hitFlash > 0) {
-            ctx.fillStyle = `rgba(255, 255, 255, ${hitFlash})`;
-            ctx.fillRect(0, 0, W, H);
-            hitFlash -= 0.05;
-        }
-
-        // Apply Screen Shake
         if(screenShake > 0) {
             ctx.translate((Math.random()-0.5)*screenShake, (Math.random()-0.5)*screenShake);
             screenShake *= 0.85; if(screenShake < 0.5) screenShake = 0;
         }
 
-        // Apply Camera Transform
-        ctx.translate(W/2, H/2);
-        ctx.scale(window.camera.scale, window.camera.scale);
-        ctx.translate(-window.camera.x, -window.camera.y);
-
-        // Draw Parallax Background Entities
-        if (window.bgEntities) {
-            window.bgEntities.forEach(ent => {
-                let px = ent.x - window.camera.x * (0.2 / ent.z);
-                let py = ent.y - window.camera.y * (0.2 / ent.z);
-                ctx.fillStyle = ent.color;
-                ctx.globalAlpha = 0.4 / ent.z;
-                ctx.beginPath(); ctx.arc(px, py, ent.size / ent.z, 0, Math.PI*2); ctx.fill();
-            });
-            ctx.globalAlpha = 1.0;
+        ctx.clearRect(0, 0, W, H);
+        
+        // Spotlights overlay gradient
+        let bgGrad = ctx.createRadialGradient(W/2, H/2 - 100, 0, W/2, H/2, W);
+        bgGrad.addColorStop(0, '#0f0a1c'); bgGrad.addColorStop(1, '#020205');
+        ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, W, H);
+        
+        // Dynamic Boxing Ring Ropes
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)'; 
+        ctx.lineWidth = 6; ctx.lineCap = 'round';
+        let ropeY = H/2 - 120;
+        for(let r=0; r<4; r++) {
+            ctx.beginPath(); ctx.moveTo(0, ropeY + r*45); 
+            ctx.quadraticCurveTo(W/2, ropeY + r*45 + 40, W, ropeY + r*45); 
+            ctx.stroke();
         }
         
-        if (window.currentMap && window.currentMap.type === 'boxing') {
-            // Dynamic Boxing Ring Ropes
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)'; 
-            ctx.lineWidth = 6; ctx.lineCap = 'round';
-            let ropeY = GROUND_Y - 200;
-            for(let r=0; r<4; r++) {
-                ctx.beginPath(); ctx.moveTo(-500, ropeY + r*45); 
-                ctx.quadraticCurveTo(W/2, ropeY + r*45 + 40, W + 500, ropeY + r*45); 
-                ctx.stroke();
-            }
-            
-            // Ring Posts
-            ctx.fillStyle = '#0f172a';
-            ctx.fillRect(W*0.05 - 20, GROUND_Y - 250, 40, GROUND_Y - (GROUND_Y - 250));
-            ctx.fillRect(W*0.95 - 20, GROUND_Y - 250, 40, GROUND_Y - (GROUND_Y - 250));
-            
-            // Ring Post Lights
-            ctx.shadowColor = '#ef4444'; ctx.shadowBlur = 30;
-            ctx.fillStyle = '#fca5a5';
-            ctx.beginPath(); ctx.arc(W*0.05, GROUND_Y - 250, 15, 0, Math.PI*2); ctx.fill();
-            ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 30;
-            ctx.fillStyle = '#93c5fd';
-            ctx.beginPath(); ctx.arc(W*0.95, GROUND_Y - 250, 15, 0, Math.PI*2); ctx.fill();
-            ctx.shadowBlur = 0;
+        // Ring Posts
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(W*0.05, H/2 - 150, 40, GROUND_Y - (H/2 - 150));
+        ctx.fillRect(W*0.95 - 40, H/2 - 150, 40, GROUND_Y - (H/2 - 150));
+        
+        // Ring Post Lights (Neon effect)
+        ctx.shadowColor = '#ef4444'; ctx.shadowBlur = 30;
+        ctx.fillStyle = '#fca5a5';
+        ctx.beginPath(); ctx.arc(W*0.05 + 20, H/2 - 150, 15, 0, Math.PI*2); ctx.fill();
+        ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 30;
+        ctx.fillStyle = '#93c5fd';
+        ctx.beginPath(); ctx.arc(W*0.95 - 20, H/2 - 150, 15, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0; // Reset
 
-            let floorGrad = ctx.createLinearGradient(0, GROUND_Y, 0, H + 500);
-            floorGrad.addColorStop(0, '#111827'); floorGrad.addColorStop(1, '#030712');
-            ctx.fillStyle = floorGrad; ctx.fillRect(-1000, GROUND_Y, W + 2000, 1500);
-            
-            ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 2;
-            for(let i=-500; i<W+500; i+=100) { ctx.beginPath(); ctx.moveTo(i, GROUND_Y); ctx.lineTo(i + (i-W/2)*0.5, GROUND_Y + 1000); ctx.stroke(); }
-        } else if (window.currentMap && window.currentMap.type === 'smash') {
-            // Smash Stage
-            let stg = window.currentMap.stage;
-            ctx.fillStyle = '#1e293b';
-            ctx.beginPath();
-            ctx.roundRect(stg.x, stg.y, stg.w, 150, 20);
-            ctx.fill();
-            ctx.fillStyle = '#0f172a';
-            ctx.fillRect(stg.x + 10, stg.y + 20, stg.w - 20, 120);
-            
-            // Neon edge
-            ctx.shadowColor = '#3b82f6'; ctx.shadowBlur = 20;
-            ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 6;
-            ctx.beginPath(); ctx.moveTo(stg.x + 30, stg.y); ctx.lineTo(stg.x + stg.w - 30, stg.y); ctx.stroke();
-            ctx.shadowBlur = 0;
+        let floorGrad = ctx.createLinearGradient(0, GROUND_Y, 0, H);
+        floorGrad.addColorStop(0, '#1e293b'); floorGrad.addColorStop(1, '#020617');
+        ctx.fillStyle = floorGrad; ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+        
+        // Perspective Grid Floor Lines
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 2;
+        for(let i=0; i<W; i+=120) { ctx.beginPath(); ctx.moveTo(i, GROUND_Y); ctx.lineTo(i + (i-W/2)*0.8, H); ctx.stroke(); }
 
-            // Platforms
-            window.currentMap.platforms.forEach(p => {
-                ctx.fillStyle = 'rgba(30, 41, 59, 0.8)';
-                ctx.beginPath(); ctx.roundRect(p.x, p.y, p.w, 15, 8); ctx.fill();
-                
-                ctx.shadowColor = '#a855f7'; ctx.shadowBlur = 15;
-                ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 4;
-                ctx.beginPath(); ctx.moveTo(p.x + 10, p.y); ctx.lineTo(p.x + p.w - 10, p.y); ctx.stroke();
-                ctx.shadowBlur = 0;
-            });
-
-            // Jump Pads
-            if (window.currentMap.jumpPads) {
-                window.currentMap.jumpPads.forEach(pad => {
-                    ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
-                    ctx.beginPath(); ctx.roundRect(pad.x, pad.y, pad.w, 20, 10); ctx.fill();
-                    
-                    ctx.shadowColor = '#10b981'; ctx.shadowBlur = 15;
-                    ctx.strokeStyle = '#34d399'; ctx.lineWidth = 4;
-                    ctx.beginPath(); ctx.moveTo(pad.x + 10, pad.y); ctx.lineTo(pad.x + pad.w - 10, pad.y); ctx.stroke();
-                    ctx.shadowBlur = 0;
-                    
-                    ctx.fillStyle = `rgba(52, 211, 153, ${0.5 + Math.sin(Date.now()/150)*0.3})`;
-                    ctx.fillRect(pad.x + 20, pad.y + 4, pad.w - 40, 4);
-                });
-            }
-        }
-
-        // Draw knocked down fighters first
-        window.fighters.forEach(f => { if(f.state === ST_KNOCKDOWN || f.state === ST_BEING_SUPLEXED) f.draw(ctx); });
-        // Draw standing fighters
-        window.fighters.forEach(f => { if(f.state !== ST_KNOCKDOWN && f.state !== ST_BEING_SUPLEXED) f.draw(ctx); });
+        if(p1.state === ST_KNOCKDOWN || p1.state === ST_BEING_SUPLEXED) { p1.draw(ctx); p2.draw(ctx); } else if(p2.state === ST_KNOCKDOWN || p2.state === ST_BEING_SUPLEXED) { p2.draw(ctx); p1.draw(ctx); } else { p2.draw(ctx); p1.draw(ctx); }
 
         for (let i = particles.length - 1; i >= 0; i--) {
             let p = particles[i]; 
@@ -2703,8 +2244,31 @@
             ctx.globalAlpha = 1.0; if (t.life <= 0) texts.splice(i, 1);
         }
 
-        ctx.restore(); 
-        updateUI();
+        if (clinchActive) {
+            ctx.fillStyle = "rgba(0,0,0,0.85)"; ctx.fillRect(0,0,W,H);
+            ctx.fillStyle = "white"; ctx.font = "900 80px Oswald"; ctx.textAlign = "center";
+            ctx.shadowColor = "rgba(255,255,255,0.8)"; ctx.shadowBlur = 20;
+            ctx.fillText("CLINCH! MASH!", W/2, H/3);
+            ctx.shadowBlur = 0;
+            
+            let totalScore = Math.max(1, clinchScoreP1 + clinchScoreP2); let p1Ratio = clinchScoreP1 / totalScore;
+            ctx.fillStyle = "#1e293b"; ctx.fillRect(W/2 - 350, H/2, 700, 50);
+            ctx.fillStyle = "#3b82f6"; ctx.fillRect(W/2 - 350, H/2, 700 * p1Ratio, 50);
+            ctx.fillStyle = "#ef4444"; ctx.fillRect(W/2 - 350 + (700 * p1Ratio), H/2, 700 * (1 - p1Ratio), 50);
+            ctx.strokeStyle = "white"; ctx.lineWidth = 6; ctx.strokeRect(W/2 - 350, H/2, 700, 50);
+            
+            ctx.font = "900 40px Oswald"; ctx.fillStyle = "white"; 
+            ctx.fillText("P1", W/2 - 390, H/2 + 40); ctx.fillText("P2", W/2 + 390, H/2 + 40);
+        }
+
+        // Heavy Screen Hit Flash Overlay
+        if (hitFlash > 0) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${hitFlash})`;
+            ctx.fillRect(0, 0, W, H);
+            hitFlash -= 0.05;
+        }
+
+        ctx.restore(); updateUI();
     }
 </script>
 </body>
