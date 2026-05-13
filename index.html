@@ -1216,6 +1216,7 @@
 
     window.fighters = [];
     let gameTimer = 99; let matchActive = false; let gameStarted = false; let vsCPU = false; 
+    let gameOverTimeout = null; let syncTimer = 0; let cpuPrevInputs = {}; let lastLoopTime = 0;
 
     window.initGame = function(playerCount) {
         clearTimeout(gameOverTimeout);
