@@ -912,17 +912,17 @@
         } else if (type === 'smash') {
             return {
                 type: 'smash',
-                stage: { x: W/2 - 1000, y: GROUND_Y, w: 2000 },
+                stage: { x: W/2 - 700, y: GROUND_Y, w: 1400 },
                 platforms: [
-                    { x: W/2 - 800, y: GROUND_Y - 200, w: 350 },
-                    { x: W/2 + 450, y: GROUND_Y - 200, w: 350 },
-                    { x: W/2 - 250, y: GROUND_Y - 450, w: 500, moving: true, dir: 1.5 }
+                    { x: W/2 - 450, y: GROUND_Y - 200, w: 250 },
+                    { x: W/2 + 200, y: GROUND_Y - 200, w: 250 },
+                    { x: W/2 - 150, y: GROUND_Y - 400, w: 300, moving: true, dir: 1 }
                 ],
                 jumpPads: [
-                    { x: W/2 - 950, y: GROUND_Y - 10, w: 80 },
-                    { x: W/2 + 870, y: GROUND_Y - 10, w: 80 }
+                    { x: W/2 - 650, y: GROUND_Y - 10, w: 60 },
+                    { x: W/2 + 590, y: GROUND_Y - 10, w: 60 }
                 ],
-                bounds: { minX: W/2 - 2000, maxX: W/2 + 2000, killY: H + 600 } // Blast zones
+                bounds: { minX: W/2 - 1500, maxX: W/2 + 1500, killY: H + 400 } // Blast zones
             };
         }
     }
@@ -953,7 +953,7 @@
             this.hitboxActive = false;
             this.parryCooldown = 0;
             
-            this.airJumps = 2;
+            this.airJumps = 1;
             this.hasAirDashed = false;
             
             this.duckAmount = 0;
@@ -1128,7 +1128,7 @@
                 this.stocks--;
                 this.respawning = 180; 
                 this.hp = 100; this.stamina = 300;
-                this.x = W/2 + (Math.random()-0.5)*1200; this.y = -600;
+                this.x = W/2 + (Math.random()-0.5)*400; this.y = -400;
                 this.vx = 0; this.vy = 0;
                 this.changeState(ST_IDLE, 0);
             } else {
@@ -1209,8 +1209,7 @@
 
             if (isGrounded && (this.state === ST_IDLE || this.state === ST_MOVE)) {
                 this.stamina = Math.min(this.maxStamina, this.stamina + 1.8); 
-                this.airJumps = 2; 
-                this.hasAirDashed = false; 
+                this.airJumps = 1; this.hasAirDashed = false; 
             }
 
             if (this.parryCooldown > 0) this.parryCooldown--;
@@ -1248,7 +1247,7 @@
                             this.vy = -20; this.stamina -= 20; isGrounded = false;
                             spawnParticles(this.x, this.y, '#555', 15);
                         } else if (this.airJumps > 0 && this.state !== ST_KNOCKDOWN && this.state !== ST_HITSTUN && !ATTACK_DATA[this.state]) {
-                            this.vy = -28; this.stamina -= 20; this.airJumps--;
+                            this.vy = -25; this.stamina -= 20; this.airJumps--;
                             this.changeState(ST_IDLE, 0); 
                             spawnParticles(this.x, this.y, '#fff', 25, 1.5);
                             spawnText(this.x, this.y - 120, "DOUBLE JUMP", "#fff", false);
@@ -1270,7 +1269,7 @@
                             }
                         } else if (!this.hasAirDashed && this.stamina >= 25 && moving) { 
                             this.stamina -= 25; this.hasAirDashed = true;
-                            this.vy = -12; this.vx = moveDir * 25; 
+                            this.vy = -5; this.vx = moveDir * 20; 
                             this.changeState(ST_DASH, 5);
                             spawnParticles(this.x, this.y, '#06b6d4', 20, 2);
                             spawnText(this.x, this.y - 120, "AIR DASH", "#06b6d4", false);
@@ -1395,9 +1394,9 @@
             } else if (this.vy >= 0) {
                 if (this.state === ST_KNOCKDOWN && this.vy > 4) {
                     screenShake = Math.max(screenShake, Math.min(30, this.vy * 2));
-                    this.vy = -this.vy * 0.5; 
+                    this.vy = -this.vy * 0.6; 
                     this.vx *= 0.7;
-                    this.kdRotVel = (Math.random() - 0.5) * 0.5; 
+                    this.kdRotVel = (Math.random() - 0.5) * 0.8; 
                     spawnParticles(this.x, this.y, '#aaa', 15, 1.5);
                     if (this.vy < -8) {
                         for(let i=0; i<5; i++) addParticle(this.x, this.y, (Math.random()-0.5)*10, -Math.random()*5, '#991b1b', 1.0, 0.05, 4, 0.5);
@@ -1408,7 +1407,8 @@
                     
                     if (this.state === ST_KNOCKDOWN) {
                         this.vx *= 0.8;
-                        let targetFlat = this.facing * (Math.PI / 2);
+                        let targetFlat = Math.round(this.rotation / (Math.PI/2)) * (Math.PI/2);
+                        if (Math.abs(targetFlat % Math.PI) < 0.1) targetFlat += Math.PI/2; 
                         this.rotation += (targetFlat - this.rotation) * 0.2;
                         this.kdRotVel *= 0.8;
                     } else if(this.state !== ST_DASH) {
@@ -1501,20 +1501,20 @@
                 this.gloveL.targetY = -55; this.gloveR.targetY = -55;
             } else if (this.state === ST_KNOCKDOWN) {
                 if (!isGrounded) {
-                    let dragX = Math.max(-40, Math.min(40, -this.vx * 2));
-                    let dragY = Math.max(-40, Math.min(40, -this.vy * 2));
+                    let dragX = Math.max(-60, Math.min(60, -this.vx * 3));
+                    let dragY = Math.max(-60, Math.min(60, -this.vy * 3));
                     this.gloveL.targetX = dragX - 20 * this.facing; this.gloveL.targetY = dragY - 100;
                     this.gloveR.targetX = dragX + 20 * this.facing; this.gloveR.targetY = dragY - 120;
                     this.footL.targetX = dragX - 10; this.footL.targetY = dragY - 20;
                     this.footR.targetX = dragX + 10; this.footR.targetY = dragY - 40;
-                    this.headOffset.y += dragY * 0.1;
-                    this.headOffset.x += dragX * 0.1;
+                    this.headOffset.y += dragY * 0.05;
+                    this.headOffset.x += dragX * 0.05;
                 } else {
-                    targetGroundOffset = 25;
-                    this.gloveL.targetX = 30; this.gloveL.targetY = -70;
-                    this.gloveR.targetX = -30; this.gloveR.targetY = -80;
-                    this.footL.targetX = 15; this.footL.targetY = -10;
-                    this.footR.targetX = -15; this.footR.targetY = -5;
+                    targetGroundOffset = 40;
+                    this.gloveL.targetX = 50; this.gloveL.targetY = -10;
+                    this.gloveR.targetX = -50; this.gloveR.targetY = 10;
+                    this.footL.targetX = 40; this.footL.targetY = 20;
+                    this.footR.targetX = -40; this.footR.targetY = 10;
                 }
             } else if (this.state === ST_DODGE) {
                 this.gloveL.targetX = this.facing * 10; this.gloveL.targetY = -80;
@@ -1875,20 +1875,7 @@
             } else {
                 prof = { name: "PLAYER 2", hat: 'none', accessory: 'none', taunt: "Let's go!", emote: "0", finisher: "I am the champion!" };
             }
-            
-            let f = new Fighter(i, prof);
-            
-            // Give players proper spacing depending on mode!
-            if (playerCount > 2) {
-                const spawnX = [W/2 - 700, W/2 + 700, W/2 - 250, W/2 + 250];
-                f.x = spawnX[i];
-                f.facing = (i === 0 || i === 2) ? 1 : -1;
-            } else {
-                f.x = W/2 + (i === 0 ? -300 : 300);
-                f.facing = i === 0 ? 1 : -1;
-            }
-            
-            window.fighters.push(f);
+            window.fighters.push(new Fighter(i, prof));
         }
 
         buildDynamicHUD(playerCount);
@@ -2203,19 +2190,7 @@
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
         let aliveCount = 0;
         
-        let trackedFighters = window.fighters;
-
-        // Focus the camera solely on the local player (unless playing Local Co-Op 2P)
-        if (window.isOnlineGame && user) {
-            let myIdx = window.playerOrder.indexOf(user.uid);
-            if (myIdx !== -1 && window.fighters[myIdx] && (window.fighters[myIdx].hp > 0 || window.fighters[myIdx].stocks > 0)) {
-                trackedFighters = [window.fighters[myIdx]];
-            }
-        } else if (vsCPU && window.fighters[0] && (window.fighters[0].hp > 0 || window.fighters[0].stocks > 0)) {
-            trackedFighters = [window.fighters[0]];
-        }
-
-        trackedFighters.forEach(f => {
+        window.fighters.forEach(f => {
             if (f.hp > 0 || f.stocks > 0) {
                 minX = Math.min(minX, f.x); maxX = Math.max(maxX, f.x);
                 minY = Math.min(minY, f.y); maxY = Math.max(maxY, f.y);
@@ -2228,22 +2203,16 @@
         let targetX = (minX + maxX) / 2;
         let targetY = (minY + maxY) / 2 - 100;
 
-        let width = Math.max(1400, maxX - minX + 800); 
+        let width = Math.max(800, maxX - minX + 600); 
         let targetScale = W / width;
-        targetScale = Math.max(0.35, Math.min(1.0, targetScale)); 
+        targetScale = Math.max(0.4, Math.min(1.2, targetScale)); 
 
-        window.camera.x += (targetX - window.camera.x) * 0.08;
-        window.camera.y += (targetY - window.camera.y) * 0.08;
+        window.camera.x += (targetX - window.camera.x) * 0.1;
+        window.camera.y += (targetY - window.camera.y) * 0.1;
         window.camera.scale += (targetScale - window.camera.scale) * 0.05;
 
         let maxCamX = window.currentMap.stage.x + window.currentMap.stage.w;
         let minCamX = window.currentMap.stage.x;
-        
-        // Allow camera to naturally pan further out in smash mode
-        if (window.currentMap.type === 'smash') {
-            maxCamX += 400; minCamX -= 400;
-        }
-        
         window.camera.x = Math.max(minCamX, Math.min(maxCamX, window.camera.x));
     }
 
